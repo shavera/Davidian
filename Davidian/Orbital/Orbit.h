@@ -7,7 +7,7 @@
 
 
 class Orbit {
-
+void dummy();
 };
 
 
