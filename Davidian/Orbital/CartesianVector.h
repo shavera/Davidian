@@ -17,13 +17,13 @@ public:
   CartesianVector(double x, double y, double z);
   CartesianVector(const SphericalVector& otherVector);
 
-  double x();
-  double y();
-  double z();
+  double x() const;
+  double y() const;
+  double z() const;
 
 private:
-  class CartesianVectorImpl;
-  std::unique_ptr<CartesianVectorImpl> m_impl;
+  class Impl;
+  std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace orbital

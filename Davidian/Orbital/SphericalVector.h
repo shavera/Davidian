@@ -8,20 +8,24 @@
 #include <memory>
 
 namespace orbital{
+
+class CartesianVector;
+
 class SphericalVector {
 public:
   SphericalVector();
-  SphericalVector(const double x, const double y, const double z);
+  SphericalVector(const double r, const double theta, const double phi);
   SphericalVector(const CartesianVector& otherVector);
 
-  double const r();
-  double const theta();
-  double const phi();
+  double r() const;
+  double theta() const;
+  double  phi() const;
 
 private:
-  class SphericalVectorImpl;
-  std::unique_ptr<SphericalVectorImpl> m_impl;
+  class Impl;
+  std::unique_ptr<Impl> m_impl;
 };
+
 } // namespace orbital
 
 #endif //DAVIDIAN_SPHERICALVECTOR_H
