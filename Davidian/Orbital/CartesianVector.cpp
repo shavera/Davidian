@@ -5,26 +5,52 @@
 #include "CartesianVector.h"
 #include "SphericalVector.h"
 
-orbital::CartesianVector::CartesianVector() {
+#include <Eigen/Dense>
 
+#include <array>
+
+namespace orbital{
+
+namespace {
+using VectorInitializer = std::array<double, 3>;
+
+VectorInitializer createVectorFromSphericalCoords(const SphericalVector sphericalVector){
+  const double& r = sphericalVector.r();
+  const double& theta = sphericalVector.theta();
+  const double& phi = sphericalVector.phi();
+  return {r*sin(phi)*cos(theta), r*sin(phi)*sin(theta), r*cos(phi)};
 }
 
-orbital::CartesianVector::CartesianVector(double x, double y, double z) {
+} // anonymous namespace
 
+class CartesianVector::Impl{
+public:
+  Impl(const double x, const double y, const double z) : vector{x,y,z} {}
+  Impl(const VectorInitializer initializer) : Impl{initializer.at(0), initializer.at(1), initializer.at(2)} {}
+  Eigen::Vector3d vector;
+};
+
+CartesianVector::CartesianVector() : m_impl{std::make_unique<CartesianVector::Impl>(0, 0, 0)} {}
+
+CartesianVector::CartesianVector(const double x, const double y, const double z)
+    : m_impl{std::make_unique<CartesianVector::Impl>(x,y,z)}
+{}
+
+CartesianVector::CartesianVector(const SphericalVector& otherVector)
+    : m_impl{std::make_unique<CartesianVector::Impl>(createVectorFromSphericalCoords(otherVector))}
+{}
+
+double CartesianVector::x() const{
+  return m_impl->vector.x();
 }
 
-orbital::CartesianVector::CartesianVector(const orbital::SphericalVector& otherVector) {
-
+double CartesianVector::y() const{
+  return m_impl->vector.y();
 }
 
-double orbital::CartesianVector::x() const{
-  return 0;
+double CartesianVector::z() const {
+  return m_impl->vector.z();
 }
 
-double orbital::CartesianVector::y() const{
-  return 0;
-}
+} // namespace orbital
 
-double orbital::CartesianVector::z() const {
-  return 0;
-}

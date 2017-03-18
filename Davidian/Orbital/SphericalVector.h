@@ -14,7 +14,7 @@ class CartesianVector;
 class SphericalVector {
 public:
   SphericalVector();
-  SphericalVector(const double r, const double theta, const double phi);
+  explicit SphericalVector(const double r, const double theta, const double phi);
   SphericalVector(const CartesianVector& otherVector);
 
   double r() const;
@@ -22,8 +22,8 @@ public:
   double  phi() const;
 
 private:
-  class Impl;
-  std::unique_ptr<Impl> m_impl;
+//  class Impl;
+//  std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace orbital

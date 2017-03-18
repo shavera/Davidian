@@ -14,7 +14,7 @@ class SphericalVector;
 class CartesianVector {
 public:
   CartesianVector();
-  CartesianVector(double x, double y, double z);
+  explicit CartesianVector(const double x, const double y, const double z);
   CartesianVector(const SphericalVector& otherVector);
 
   double x() const;
