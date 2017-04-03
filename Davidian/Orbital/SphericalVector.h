@@ -14,12 +14,12 @@ class CartesianVector;
 class SphericalVector {
 public:
   SphericalVector();
-  explicit SphericalVector(const double r, const double theta, const double phi);
+  explicit SphericalVector(const double r, const double polar_angle, const double azimuth);
   SphericalVector(const CartesianVector& otherVector);
 
   double r() const;
-  double theta() const;
-  double  phi() const;
+  double polar_angle() const;
+  double azimuth() const;
 
 private:
   class Impl;

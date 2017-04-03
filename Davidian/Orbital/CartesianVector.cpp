@@ -14,8 +14,8 @@ using VectorInitializer = std::array<double, 3>;
 
 VectorInitializer createVectorFromSphericalCoords(const SphericalVector& sphericalVector){
   const double& r = sphericalVector.r();
-  const double& theta = sphericalVector.theta();
-  const double& phi = sphericalVector.phi();
+  const double& theta = sphericalVector.polar_angle();
+  const double& phi = sphericalVector.azimuth();
   return {r*sin(phi)*cos(theta), r*sin(phi)*sin(theta), r*cos(phi)};
 }
 

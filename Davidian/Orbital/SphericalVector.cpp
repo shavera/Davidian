@@ -21,7 +21,7 @@ VectorInitializer createVectorFromCartesianCoords(const CartesianVector& cartesi
 
 class SphericalVector::Impl{
 public:
-  Impl(const double r, const double theta, const double phi){}
+  Impl(const double r, const double polar, const double azimuth){}
   Impl(const VectorInitializer initializer) : Impl{initializer.at(0), initializer.at(1), initializer.at(2)} {}
   Eigen::Vector3d vector;
 };
@@ -31,8 +31,8 @@ SphericalVector::SphericalVector()
 
 }
 
-SphericalVector::SphericalVector(const double r, const double theta, const double phi)
-    : m_impl{std::make_unique<SphericalVector::Impl>(r, theta, phi)}
+SphericalVector::SphericalVector(const double r, const double polar_angle, const double azimuth)
+    : m_impl{std::make_unique<SphericalVector::Impl>(r, polar_angle, azimuth)}
 {}
 
 SphericalVector::SphericalVector(const CartesianVector& otherVector)
@@ -43,11 +43,11 @@ double SphericalVector::r() const {
   return 0;
 }
 
-double SphericalVector::theta() const {
+double SphericalVector::polar_angle() const {
   return 0;
 }
 
-double SphericalVector::phi() const {
+double SphericalVector::azimuth() const {
   return 0;
 }
 
@@ -60,20 +60,20 @@ double SphericalVector::phi() const {
 
 class OrbitalVectorTest : public ::testing::Test {
 public:
-  const double expectedR{222.222}, expectedTheta{1.23}, expectedPhi{-0.12};
-  orbital::SphericalVector vector{expectedR, expectedTheta, expectedPhi};
+  const double expectedR{222.222}, expectedPolarAngle{1.23}, expectedAzimuth{-0.12};
+  orbital::SphericalVector vector{expectedR, expectedPolarAngle, expectedAzimuth};
 };
 
 TEST_F(OrbitalVectorTest, r) {
   EXPECT_EQ(expectedR, vector.r());
 }
 
-TEST_F(OrbitalVectorTest, theta) {
-  EXPECT_EQ(expectedTheta, vector.theta());
+TEST_F(OrbitalVectorTest, polar_angle) {
+  EXPECT_EQ(expectedPolarAngle, vector.polar_angle());
 }
 
-TEST_F(OrbitalVectorTest, phi) {
-  EXPECT_EQ(expectedPhi, vector.phi());
+TEST_F(OrbitalVectorTest, azimuth) {
+  EXPECT_EQ(expectedAzimuth, vector.azimuth());
 }
 
 
