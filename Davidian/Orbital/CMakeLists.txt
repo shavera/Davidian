@@ -11,5 +11,9 @@ set(SOURCES
 
 add_library(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen)
-#add_executable(${PROJECT_NAME}_TEST)
-#target_link_libraries(${PROJECT_NAME}_TEST gtest_main)
+
+if (BUILD_TESTING)
+    target_link_libraries(${PROJECT_NAME} PRIVATE gtest)
+    add_executable(${PROJECT_NAME}_TEST ${SOURCES})
+    target_link_libraries(${PROJECT_NAME}_TEST gtest_main ${PROJECT_NAME})
+endif()
