@@ -7,8 +7,6 @@
 
 #include <Eigen/Dense>
 
-#include <array>
-
 namespace orbital{
 
 namespace {
@@ -53,4 +51,14 @@ double CartesianVector::z() const {
 }
 
 } // namespace orbital
+
+//#ifdef TEST
+
+#include <gtest/gtest.h>
+
+TEST(Dummy, d1){
+  EXPECT_TRUE(true);
+}
+
+//#endif
 
