@@ -9,10 +9,15 @@
 
 namespace orbital{
 
+namespace impl{
+class VectorImpl;
+}
+
 class SphericalVector;
 
 class CartesianVector {
 public:
+  friend class SphericalVector;
   CartesianVector();
   explicit CartesianVector(const double x, const double y, const double z);
   CartesianVector(const SphericalVector& otherVector);
@@ -21,9 +26,10 @@ public:
   double y() const;
   double z() const;
 
+  double norm() const;
+
 private:
-  class Impl;
-  std::unique_ptr<Impl> m_impl;
+  std::unique_ptr<impl::VectorImpl> m_impl;
 };
 
 } // namespace orbital

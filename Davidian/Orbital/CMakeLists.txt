@@ -7,6 +7,8 @@ set(SOURCES
         CartesianVector
         Orbit
         SphericalVector
+
+        impl/VectorImpl
         )
 
 add_library(${PROJECT_NAME} ${SOURCES})
