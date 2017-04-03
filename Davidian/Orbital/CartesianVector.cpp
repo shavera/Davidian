@@ -52,7 +52,7 @@ double CartesianVector::z() const {
 
 } // namespace orbital
 
-//#ifdef TEST
+//#ifdef BUILD_TESTS
 
 #include <gtest/gtest.h>
 
