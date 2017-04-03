@@ -12,7 +12,7 @@ namespace orbital{
 namespace {
 using VectorInitializer = std::array<double, 3>;
 
-VectorInitializer createVectorFromSphericalCoords(const SphericalVector sphericalVector){
+VectorInitializer createVectorFromSphericalCoords(const SphericalVector& sphericalVector){
   const double& r = sphericalVector.r();
   const double& theta = sphericalVector.theta();
   const double& phi = sphericalVector.phi();
@@ -57,21 +57,28 @@ double CartesianVector::z() const {
 #include <gtest/gtest.h>
 
 
-class CartesianVector : public ::testing::Test {
+class CartesianVectorTest : public ::testing::Test {
 public:
   const double expectedX{1.2345}, expectedY{-2.341}, expectedZ{0.0};
   orbital::CartesianVector vector{expectedX, expectedY, expectedZ};
 };
 
-TEST_F(CartesianVector, x) {
+TEST_F(CartesianVectorTest, DefaultConstructorTest){
+  orbital::CartesianVector defaultVector;
+  EXPECT_EQ(0, defaultVector.x());
+  EXPECT_EQ(0, defaultVector.y());
+  EXPECT_EQ(0, defaultVector.z());
+}
+
+TEST_F(CartesianVectorTest, x) {
   EXPECT_EQ(expectedX, vector.x());
 }
 
-TEST_F(CartesianVector, y) {
+TEST_F(CartesianVectorTest, y) {
   EXPECT_EQ(expectedY, vector.y());
 }
 
-TEST_F(CartesianVector, z) {
+TEST_F(CartesianVectorTest, z) {
   EXPECT_EQ(expectedZ, vector.z());
 }
 
