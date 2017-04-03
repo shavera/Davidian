@@ -56,9 +56,25 @@ double CartesianVector::z() const {
 
 #include <gtest/gtest.h>
 
-TEST(Dummy, d1){
-  EXPECT_TRUE(true);
+
+class CartesianVector : public ::testing::Test {
+public:
+  const double expectedX{1.2345}, expectedY{-2.341}, expectedZ{0.0};
+  orbital::CartesianVector vector{expectedX, expectedY, expectedZ};
+};
+
+TEST_F(CartesianVector, x) {
+  EXPECT_EQ(expectedX, vector.x());
 }
+
+TEST_F(CartesianVector, y) {
+  EXPECT_EQ(expectedY, vector.y());
+}
+
+TEST_F(CartesianVector, z) {
+  EXPECT_EQ(expectedZ, vector.z());
+}
+
 
 //#endif
 
