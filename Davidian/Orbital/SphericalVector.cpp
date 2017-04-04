@@ -59,7 +59,7 @@ double SphericalVector::azimuth() const {
 
 } // namespace orbital
 
-//#ifdef BUILD_TESTS
+#ifdef BUILD_TESTS
 
 #include <gtest/gtest.h>
 
@@ -201,4 +201,4 @@ TEST(SphericalVector_FromCartesian, originSingularity){
 
 } // anonymous namespace for testing
 
-//#endif
+#endif

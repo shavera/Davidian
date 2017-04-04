@@ -53,9 +53,28 @@ CartesianVector CartesianVector::normalizedVector() const {
   return normalizedVector;
 }
 
+double CartesianVector::dot(const CartesianVector& vector1, const CartesianVector& vector2) {
+  return vector1.m_impl->vector.dot(vector2.m_impl->vector);
+}
+
+CartesianVector CartesianVector::cross(const CartesianVector& leftVector, const CartesianVector& rightVector) {
+  Eigen::Vector3d result = leftVector.m_impl->vector.cross(rightVector.m_impl->vector);
+  CartesianVector returnVector;
+  returnVector.m_impl->vector = result;
+  return returnVector;
+}
+
+double CartesianVector::dot(const CartesianVector& other) const {
+  return CartesianVector::dot(*this, other);
+}
+
+CartesianVector CartesianVector::cross(const CartesianVector& rightVector) const {
+  return CartesianVector::cross(*this, rightVector);
+}
+
 } // namespace orbital
 
-//#ifdef BUILD_TESTS
+#ifdef BUILD_TESTS
 
 #include <gtest/gtest.h>
 
@@ -147,7 +166,33 @@ TEST(CartesianVector_FromSpherical, originSingularity){
   EXPECT_EQ(0.0, cartesianVector.z());
 }
 
+
+class CartesianVectorOperationsTest : public ::testing::Test {
+public:
+  orbital::CartesianVector leftVector{1.23, -3.24, 2.29};
+  orbital::CartesianVector rightVector{2.38, 4.22, -1.34};
+};
+
+TEST_F(CartesianVectorOperationsTest, dot){
+  const double expectedValue{-13.814};
+  EXPECT_EQ(expectedValue, orbital::CartesianVector::dot(leftVector, rightVector));
+  EXPECT_EQ(expectedValue, leftVector.dot(rightVector));
+}
+
+TEST_F(CartesianVectorOperationsTest, cross){
+  const orbital::CartesianVector expectedVector{-5.3222, 7.0984, 12.9018};
+  orbital::CartesianVector actualVector{orbital::CartesianVector::cross(leftVector, rightVector)};
+  EXPECT_NEAR(expectedVector.x(), actualVector.x(), 1e-4);
+  EXPECT_NEAR(expectedVector.y(), actualVector.y(), 1e-4);
+  EXPECT_NEAR(expectedVector.z(), actualVector.z(), 1e-4);
+
+  actualVector = leftVector.cross(rightVector);
+  EXPECT_NEAR(expectedVector.x(), actualVector.x(), 1e-4);
+  EXPECT_NEAR(expectedVector.y(), actualVector.y(), 1e-4);
+  EXPECT_NEAR(expectedVector.z(), actualVector.z(), 1e-4);
+}
+
 } // anonymous namespace for testing
 
-//#endif
+#endif
 
