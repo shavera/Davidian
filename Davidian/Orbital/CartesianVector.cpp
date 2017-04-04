@@ -14,9 +14,9 @@ namespace {
 
 Array3D createVectorFromSphericalCoords(const SphericalVector& sphericalVector){
   const double& r = sphericalVector.r();
-  const double& theta = sphericalVector.polarAngle();
-  const double& phi = sphericalVector.azimuth();
-  return {r*sin(phi)*cos(theta), r*sin(phi)*sin(theta), r*cos(phi)};
+  const double& polarAngle = sphericalVector.polarAngle();
+  const double& azimuth = sphericalVector.azimuth();
+  return {r*sin(polarAngle)*cos(azimuth), r*sin(polarAngle)*sin(azimuth), r*cos(polarAngle)};
 }
 
 } // anonymous namespace
@@ -96,6 +96,55 @@ TEST_F(CartesianVectorTest, normalizedVector){
   EXPECT_EQ(expectedX/expectedNorm, normalizedVector.x());
   EXPECT_EQ(expectedY/expectedNorm, normalizedVector.y());
   EXPECT_EQ(expectedZ/expectedNorm, normalizedVector.z());
+}
+
+TEST(CartesianVector_FromSpherical, simple){
+  const double expectedX{3.0}, expectedY{-4.0}, expectedZ{-5.0};
+  const double r{5.0*std::sqrt(2)};
+  const double polarAngle{3*M_PI/4};
+  const double azimuth{std::atan2(expectedY, expectedX)};
+
+  EXPECT_NEAR(-.927295218, azimuth, 1e-5);
+
+  const orbital::SphericalVector sphericalVector{r, polarAngle, azimuth};
+
+  const orbital::CartesianVector actualVector{sphericalVector};
+  EXPECT_NEAR(expectedX, actualVector.x(), 1e-12);
+  EXPECT_NEAR(expectedY, actualVector.y(), 1e-12);
+  EXPECT_NEAR(expectedZ, actualVector.z(), 1e-12);
+}
+
+TEST(CartesianVector_FromSpherical, northPoleSingularity){
+  const double expectedX{0.0}, expectedY{0.0}, expectedZ{5.0};
+  const orbital::SphericalVector sphericalVector{5.0, 0.0, 1.2335};
+
+  const orbital::CartesianVector cartesianVector{sphericalVector};
+
+  EXPECT_EQ(expectedX, cartesianVector.x());
+  EXPECT_EQ(expectedY, cartesianVector.y());
+  EXPECT_EQ(expectedZ, cartesianVector.z());
+}
+
+TEST(CartesianVector_FromSpherical, southPoleSingularity){
+  const double expectedX{0.0}, expectedY{0.0}, expectedZ{-5.0};
+  const orbital::SphericalVector sphericalVector{5.0, M_PI, -0.23235};
+
+  const orbital::CartesianVector cartesianVector{sphericalVector};
+
+  // because of M_PI being not precise for double, the south pole singularity doesn't exactly reproduce 0,0 coordinates
+  EXPECT_NEAR(expectedX, cartesianVector.x(), 1e-15);
+  EXPECT_NEAR(expectedY, cartesianVector.y(), 1e-15);
+  EXPECT_EQ(expectedZ, cartesianVector.z());
+
+}
+
+TEST(CartesianVector_FromSpherical, originSingularity){
+  const orbital::SphericalVector sphericalVector;
+  const orbital::CartesianVector cartesianVector{sphericalVector};
+
+  EXPECT_EQ(0.0, cartesianVector.x());
+  EXPECT_EQ(0.0, cartesianVector.y());
+  EXPECT_EQ(0.0, cartesianVector.z());
 }
 
 } // anonymous namespace for testing

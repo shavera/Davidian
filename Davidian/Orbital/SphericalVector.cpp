@@ -157,11 +157,7 @@ TEST(SphericalVector_FromCartesian, SimpleConversion){
   const double expectedPolarAngle{std::acos(normalizedVector.z())};
   const double expectedAzimuth{std::atan2(normalizedVector.y(), normalizedVector.x())};
 
-  std::cout << normalizedVector.x() << " " << normalizedVector.y() << " " << normalizedVector.z() << std::endl;
-
   const orbital::SphericalVector actualVector{vector};
-
-  std::cout << actualVector.r() <<" " << actualVector.polarAngle() << " " << actualVector.azimuth() << std::endl;
 
   /* Cross check with hand calculated numbers if necessary:
    * x,y,z: 1.2345, -2.341, 3.0 -> 4.00053, .7228854, -1.0855175
@@ -176,7 +172,7 @@ TEST(SphericalVector_FromCartesian, SimpleConversion){
   EXPECT_NEAR(expectedAzimuth, actualVector.azimuth(), 1e-12);
 }
 
-TEST(SphericalVector_FromCartesian, PolarSingularities){
+TEST(SphericalVector_FromCartesian, northPoleSingularities){
   const orbital::CartesianVector northPole{0, 0, 5};
   orbital::SphericalVector testVector;
   ASSERT_NO_THROW(testVector = orbital::SphericalVector{northPole});
@@ -185,7 +181,7 @@ TEST(SphericalVector_FromCartesian, PolarSingularities){
   EXPECT_EQ(0, testVector.azimuth());
 }
 
-TEST(SphericalVector_FromCartesian, SouthPoleSingularity){
+TEST(SphericalVector_FromCartesian, southPoleSingularity){
   const orbital::CartesianVector southPole{0, 0, -5};
   orbital::SphericalVector testVector;
   ASSERT_NO_THROW(testVector = orbital::SphericalVector{southPole});
@@ -194,14 +190,13 @@ TEST(SphericalVector_FromCartesian, SouthPoleSingularity){
   EXPECT_EQ(0, testVector.azimuth());
 }
 
-TEST(SphericalVector_FromCartesian, OriginSingularity){
+TEST(SphericalVector_FromCartesian, originSingularity){
   const orbital::CartesianVector zeroVector{0, 0, 0};
   orbital::SphericalVector testVector;
   ASSERT_NO_THROW(testVector = orbital::SphericalVector{zeroVector});
   EXPECT_EQ(0, testVector.r());
   EXPECT_EQ(0, testVector.polarAngle());
   EXPECT_EQ(0, testVector.azimuth());
-
 }
 
 } // anonymous namespace for testing
