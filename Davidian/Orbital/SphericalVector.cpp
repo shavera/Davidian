@@ -37,7 +37,10 @@ SphericalVector::SphericalVector(const double r, const double polar_angle, const
 
 SphericalVector::SphericalVector(const CartesianVector& otherVector)
     : m_impl{std::make_unique<impl::VectorImpl>([&otherVector](){
-      return Array3D{0, 0, 0};
+      const double norm{otherVector.norm()};
+      const CartesianVector normalizedOther{otherVector.normalizedVector()};
+      const double polarAngle{(0 == normalizedOther.z()) ? 0 : std::acos(normalizedOther.z())};
+      return Array3D{norm, polarAngle, std::atan2(normalizedOther.y(), normalizedOther.x())};
       }()
     )}
 {}
@@ -46,7 +49,7 @@ double SphericalVector::r() const {
   return m_impl->vector[0];
 }
 
-double SphericalVector::polar_angle() const {
+double SphericalVector::polarAngle() const {
   return m_impl->vector[1];
 }
 
@@ -71,7 +74,7 @@ public:
 TEST_F(SphericalVectorTest, defaultConstructorTest){
   orbital::SphericalVector _vector;
   EXPECT_EQ(0, _vector.r());
-  EXPECT_EQ(0, _vector.polar_angle());
+  EXPECT_EQ(0, _vector.polarAngle());
   EXPECT_EQ(0, _vector.azimuth());
 }
 
@@ -80,7 +83,7 @@ TEST_F(SphericalVectorTest, r) {
 }
 
 TEST_F(SphericalVectorTest, polar_angle) {
-  EXPECT_EQ(expectedPolarAngle, vector.polar_angle());
+  EXPECT_EQ(expectedPolarAngle, vector.polarAngle());
 }
 
 TEST_F(SphericalVectorTest, azimuth){
@@ -116,7 +119,7 @@ std::array<AngleDataPair, 8> polarAngleData{{
 TEST_P(SphericalVector_PolarWrappingTest, polarAngle){
   const double polarAngle = testData.first * M_PI;
   orbital::SphericalVector _vector{expectedR, polarAngle, expectedAzimuth};
-  EXPECT_NEAR(testData.second, _vector.polar_angle()/M_PI, maxAllowedError);
+  EXPECT_NEAR(testData.second, _vector.polarAngle()/M_PI, maxAllowedError);
 }
 
 INSTANTIATE_TEST_CASE_P(SphericalVector_PolarWrappingTest,
@@ -152,13 +155,53 @@ TEST(SphericalVector_FromCartesian, SimpleConversion){
   const double expectedNorm{std::sqrt(std::pow(expectedX, 2) + std::pow(expectedY,2 ) + std::pow(expectedZ, 2))};
   const orbital::CartesianVector normalizedVector{expectedX/expectedNorm, expectedY/expectedNorm, expectedZ/expectedNorm};
   const double expectedPolarAngle{std::acos(normalizedVector.z())};
-  const double expectedAzimuth{std::atan2(normalizedVector.x(), normalizedVector.y())};
+  const double expectedAzimuth{std::atan2(normalizedVector.y(), normalizedVector.x())};
+
+  std::cout << normalizedVector.x() << " " << normalizedVector.y() << " " << normalizedVector.z() << std::endl;
 
   const orbital::SphericalVector actualVector{vector};
 
+  std::cout << actualVector.r() <<" " << actualVector.polarAngle() << " " << actualVector.azimuth() << std::endl;
+
+  /* Cross check with hand calculated numbers if necessary:
+   * x,y,z: 1.2345, -2.341, 3.0 -> 4.00053, .7228854, -1.0855175
+
+  EXPECT_NEAR(4.00053, actualVector.r(), 1e-5);
+  EXPECT_NEAR(.7228854, actualVector.polarAngle(), 1e-5);
+  EXPECT_NEAR(-1.0855175, actualVector.azimuth(), 1e-5);
+  */
+
   EXPECT_NEAR(expectedNorm, actualVector.r(), 1e-12);
-  EXPECT_NEAR(expectedPolarAngle, actualVector.polar_angle(), 1e-12);
+  EXPECT_NEAR(expectedPolarAngle, actualVector.polarAngle(), 1e-12);
   EXPECT_NEAR(expectedAzimuth, actualVector.azimuth(), 1e-12);
+}
+
+TEST(SphericalVector_FromCartesian, PolarSingularities){
+  const orbital::CartesianVector northPole{0, 0, 5};
+  orbital::SphericalVector testVector;
+  ASSERT_NO_THROW(testVector = orbital::SphericalVector{northPole});
+  EXPECT_EQ(5, testVector.r());
+  EXPECT_EQ(0, testVector.polarAngle());
+  EXPECT_EQ(0, testVector.azimuth());
+}
+
+TEST(SphericalVector_FromCartesian, SouthPoleSingularity){
+  const orbital::CartesianVector southPole{0, 0, -5};
+  orbital::SphericalVector testVector;
+  ASSERT_NO_THROW(testVector = orbital::SphericalVector{southPole});
+  EXPECT_EQ(5, testVector.r());
+  EXPECT_EQ(M_PI, testVector.polarAngle());
+  EXPECT_EQ(0, testVector.azimuth());
+}
+
+TEST(SphericalVector_FromCartesian, OriginSingularity){
+  const orbital::CartesianVector zeroVector{0, 0, 0};
+  orbital::SphericalVector testVector;
+  ASSERT_NO_THROW(testVector = orbital::SphericalVector{zeroVector});
+  EXPECT_EQ(0, testVector.r());
+  EXPECT_EQ(0, testVector.polarAngle());
+  EXPECT_EQ(0, testVector.azimuth());
+
 }
 
 } // anonymous namespace for testing

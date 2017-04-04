@@ -30,7 +30,7 @@ public:
   SphericalVector(const CartesianVector& otherVector);
 
   double r() const;
-  double polar_angle() const;
+  double polarAngle() const;
   double azimuth() const;
 
 private:
