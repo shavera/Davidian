@@ -44,7 +44,13 @@ double CartesianVector::z() const {
 }
 
 double CartesianVector::norm() const {
-  return 0;
+  return m_impl->vector.norm();
+}
+
+CartesianVector CartesianVector::normalizedVector() const {
+  CartesianVector normalizedVector;
+  normalizedVector.m_impl->vector = this->m_impl->vector.normalized();
+  return normalizedVector;
 }
 
 } // namespace orbital
@@ -57,7 +63,8 @@ namespace {
 
 class CartesianVectorTest : public ::testing::Test {
 public:
-  const double expectedX{1.2345}, expectedY{-2.341}, expectedZ{0.0};
+  const double expectedX{1.2345}, expectedY{-2.341}, expectedZ{3.0};
+  const double expectedNorm{std::sqrt(std::pow(expectedX, 2) + std::pow(expectedY,2 ) + std::pow(expectedZ, 2))};
   orbital::CartesianVector vector{expectedX, expectedY, expectedZ};
 };
 
@@ -78,6 +85,17 @@ TEST_F(CartesianVectorTest, y) {
 
 TEST_F(CartesianVectorTest, z) {
   EXPECT_EQ(expectedZ, vector.z());
+}
+
+TEST_F(CartesianVectorTest, norm){
+  EXPECT_EQ(expectedNorm, vector.norm());
+}
+
+TEST_F(CartesianVectorTest, normalizedVector){
+  orbital::CartesianVector normalizedVector{vector.normalizedVector()};
+  EXPECT_EQ(expectedX/expectedNorm, normalizedVector.x());
+  EXPECT_EQ(expectedY/expectedNorm, normalizedVector.y());
+  EXPECT_EQ(expectedZ/expectedNorm, normalizedVector.z());
 }
 
 } // anonymous namespace for testing

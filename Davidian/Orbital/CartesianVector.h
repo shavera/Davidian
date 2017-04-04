@@ -17,7 +17,6 @@ class SphericalVector;
 
 class CartesianVector {
 public:
-  friend class SphericalVector;
   CartesianVector();
   explicit CartesianVector(const double x, const double y, const double z);
   CartesianVector(const SphericalVector& otherVector);
@@ -27,6 +26,7 @@ public:
   double z() const;
 
   double norm() const;
+  CartesianVector normalizedVector() const;
 
 private:
   std::unique_ptr<impl::VectorImpl> m_impl;
