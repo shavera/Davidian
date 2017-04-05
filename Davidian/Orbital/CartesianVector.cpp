@@ -73,7 +73,7 @@ CartesianVector CartesianVector::cross(const CartesianVector& rightVector) const
 }
 
 double CartesianVector::separation(const CartesianVector& other) const {
-  return 0;
+  return (*this - other).norm();
 }
 
 CartesianVector CartesianVector::operator-() const {
@@ -220,10 +220,11 @@ TEST_F(CartesianVectorOperationsTest, cross){
   EXPECT_NEAR(expectedVector.z(), actualVector.z(), 1e-4);
 }
 
-//TEST_F(CartesianVectorOperationsTest, separation){
-//  const double difference=.01;
-//  const orbital::CartesianVector modifiedLeftVector{};
-//}
+TEST_F(CartesianVectorOperationsTest, separation){
+  const orbital::CartesianVector differenceVector{.12, -.23, .34};
+  const orbital::CartesianVector modifiedLeftVector{leftVector + differenceVector};
+  EXPECT_NEAR(differenceVector.norm(), leftVector.separation(modifiedLeftVector), 1e-15);
+}
 
 TEST_F(CartesianVectorOperationsTest, negation_operator){
   const orbital::CartesianVector negativeLeftVector{-1.23, 3.24, -2.29};
