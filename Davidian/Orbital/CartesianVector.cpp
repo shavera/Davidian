@@ -72,16 +72,24 @@ CartesianVector CartesianVector::cross(const CartesianVector& rightVector) const
   return CartesianVector::cross(*this, rightVector);
 }
 
+double CartesianVector::separation(const CartesianVector& other) const {
+  return 0;
+}
+
 CartesianVector CartesianVector::operator-() const {
-  return CartesianVector();
+  CartesianVector negativeVector;
+  negativeVector.m_impl->vector = -(this->m_impl->vector);
+  return negativeVector;
 }
 
 CartesianVector CartesianVector::operator+(const CartesianVector& otherVector) const {
-  return CartesianVector();
+  CartesianVector sumVector;
+  sumVector.m_impl->vector = m_impl->vector + otherVector.m_impl->vector;
+  return sumVector;
 }
 
 CartesianVector CartesianVector::operator-(const CartesianVector& otherVector) const {
-  return CartesianVector();
+  return *this + (-otherVector);
 }
 
 bool CartesianVector::operator==(const CartesianVector& otherVector) const {
@@ -189,8 +197,8 @@ TEST(CartesianVector_FromSpherical, originSingularity){
 
 class CartesianVectorOperationsTest : public ::testing::Test {
 public:
-  orbital::CartesianVector leftVector{1.23, -3.24, 2.29};
-  orbital::CartesianVector rightVector{2.38, 4.22, -1.34};
+  const orbital::CartesianVector leftVector{1.23, -3.24, 2.29};
+  const orbital::CartesianVector rightVector{2.38, 4.22, -1.34};
 };
 
 TEST_F(CartesianVectorOperationsTest, dot){
@@ -211,23 +219,27 @@ TEST_F(CartesianVectorOperationsTest, cross){
   EXPECT_NEAR(expectedVector.y(), actualVector.y(), 1e-4);
   EXPECT_NEAR(expectedVector.z(), actualVector.z(), 1e-4);
 }
-/*
-TEST_F(CartesianVectorOperationsTest, separation){
 
-}
+//TEST_F(CartesianVectorOperationsTest, separation){
+//  const double difference=.01;
+//  const orbital::CartesianVector modifiedLeftVector{};
+//}
 
 TEST_F(CartesianVectorOperationsTest, negation_operator){
-
+  const orbital::CartesianVector negativeLeftVector{-1.23, 3.24, -2.29};
+  EXPECT_EQ(negativeLeftVector, -leftVector);
 }
 
 TEST_F(CartesianVectorOperationsTest, addition_operator){
-//  const orbital::CartesianVector expecteVector{};
+  const orbital::CartesianVector expectedVector{1.23+2.38, -3.24+4.22, 2.29-1.34};
+  EXPECT_EQ(expectedVector, leftVector + rightVector);
 }
 
 TEST_F(CartesianVectorOperationsTest, subtraction_operator){
-
+  const orbital::CartesianVector expectedVector{1.23-2.38, -3.24-4.22, 2.29+1.34};
+  EXPECT_EQ(expectedVector, leftVector - rightVector);
 }
-*/
+
 TEST_F(CartesianVectorOperationsTest, equality_operator){
   const orbital::CartesianVector congruentToLeftVector{1.23, -3.24, 2.29};
   EXPECT_TRUE(congruentToLeftVector == leftVector);
