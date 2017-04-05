@@ -72,6 +72,26 @@ CartesianVector CartesianVector::cross(const CartesianVector& rightVector) const
   return CartesianVector::cross(*this, rightVector);
 }
 
+CartesianVector CartesianVector::operator-() const {
+  return CartesianVector();
+}
+
+CartesianVector CartesianVector::operator+(const CartesianVector& otherVector) const {
+  return CartesianVector();
+}
+
+CartesianVector CartesianVector::operator-(const CartesianVector& otherVector) const {
+  return CartesianVector();
+}
+
+bool CartesianVector::operator==(const CartesianVector& otherVector) const {
+  return m_impl->vector == otherVector.m_impl->vector;
+}
+
+bool CartesianVector::operator!=(const CartesianVector& otherVector) const {
+  return !(otherVector == *this);
+}
+
 } // namespace orbital
 
 #ifdef BUILD_TESTS
@@ -190,6 +210,36 @@ TEST_F(CartesianVectorOperationsTest, cross){
   EXPECT_NEAR(expectedVector.x(), actualVector.x(), 1e-4);
   EXPECT_NEAR(expectedVector.y(), actualVector.y(), 1e-4);
   EXPECT_NEAR(expectedVector.z(), actualVector.z(), 1e-4);
+}
+/*
+TEST_F(CartesianVectorOperationsTest, separation){
+
+}
+
+TEST_F(CartesianVectorOperationsTest, negation_operator){
+
+}
+
+TEST_F(CartesianVectorOperationsTest, addition_operator){
+//  const orbital::CartesianVector expecteVector{};
+}
+
+TEST_F(CartesianVectorOperationsTest, subtraction_operator){
+
+}
+*/
+TEST_F(CartesianVectorOperationsTest, equality_operator){
+  const orbital::CartesianVector congruentToLeftVector{1.23, -3.24, 2.29};
+  EXPECT_TRUE(congruentToLeftVector == leftVector);
+  EXPECT_FALSE(rightVector == congruentToLeftVector);
+  EXPECT_EQ(leftVector, congruentToLeftVector);
+}
+
+TEST_F(CartesianVectorOperationsTest, inequality_operator){
+  const orbital::CartesianVector congruentToLeftVector{1.23, -3.24, 2.29};
+  EXPECT_FALSE(congruentToLeftVector != leftVector);
+  EXPECT_TRUE(rightVector != congruentToLeftVector);
+  EXPECT_NE(rightVector, congruentToLeftVector);
 }
 
 } // anonymous namespace for testing

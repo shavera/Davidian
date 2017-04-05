@@ -33,6 +33,15 @@ public:
   double dot(const CartesianVector& other) const;
   CartesianVector cross(const CartesianVector& rightVector) const;
 
+  /// magnitude of the difference between two vectors
+  double separation(const CartesianVector& other) const;
+
+  CartesianVector operator-() const;
+  CartesianVector operator+(const CartesianVector& otherVector) const;
+  CartesianVector operator-(const CartesianVector& otherVector) const;
+  bool operator==(const CartesianVector& otherVector) const;
+  bool operator!=(const CartesianVector& otherVector) const;
+
 private:
   std::unique_ptr<impl::VectorImpl> m_impl;
 };
