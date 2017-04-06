@@ -76,6 +76,14 @@ double CartesianVector::separation(const CartesianVector& other) const {
   return (*this - other).norm();
 }
 
+double& CartesianVector::at(const size_t index) {
+  return m_impl->vector[index];
+}
+
+const double& CartesianVector::c_at(const size_t index) const {
+  return m_impl->vector[index];
+}
+
 CartesianVector CartesianVector::operator-() const {
   CartesianVector negativeVector;
   negativeVector.m_impl->vector = -(this->m_impl->vector);
@@ -143,6 +151,24 @@ TEST_F(CartesianVectorTest, normalizedVector){
   EXPECT_EQ(expectedX/expectedNorm, normalizedVector.x());
   EXPECT_EQ(expectedY/expectedNorm, normalizedVector.y());
   EXPECT_EQ(expectedZ/expectedNorm, normalizedVector.z());
+}
+
+TEST_F(CartesianVectorTest, at_indexAccessor){
+  double& xRef = vector.at(0);
+  EXPECT_EQ(expectedX, xRef);
+  double& yRef = vector.at(1);
+  EXPECT_EQ(expectedY, yRef);
+  double& zRef = vector.at(2);
+  EXPECT_EQ(expectedZ, zRef);
+
+  xRef = 23.1;
+  EXPECT_EQ(23.1, vector.x());
+}
+
+TEST_F(CartesianVectorTest, c_at_indexAccessor){
+  EXPECT_EQ(expectedX, vector.c_at(0));
+  EXPECT_EQ(expectedY, vector.c_at(1));
+  EXPECT_EQ(expectedZ, vector.c_at(2));
 }
 
 TEST(CartesianVector_FromSpherical, simple){

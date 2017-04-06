@@ -33,6 +33,11 @@ public:
   double polarAngle() const;
   double azimuth() const;
 
+  /// index based accessor, 0->r, 1->polarAngle, 2->azimuth.
+  /// WARNING! if you set a new value using at, there's no angle wrapping involved, so there could be issues associated.
+  double& at(const size_t index);
+  const double& c_at(const size_t index) const;
+
 private:
   std::unique_ptr<impl::VectorImpl> m_impl;
 };

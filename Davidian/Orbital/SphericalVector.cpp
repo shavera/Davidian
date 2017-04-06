@@ -57,6 +57,14 @@ double SphericalVector::azimuth() const {
   return m_impl->vector[2];
 }
 
+double& SphericalVector::at(const size_t index) {
+  return m_impl->vector[index];
+}
+
+const double& SphericalVector::c_at(const size_t index) const {
+  return m_impl->vector[index];
+}
+
 } // namespace orbital
 
 #ifdef BUILD_TESTS
@@ -88,6 +96,24 @@ TEST_F(SphericalVectorTest, polar_angle) {
 
 TEST_F(SphericalVectorTest, azimuth){
   EXPECT_EQ(expectedAzimuth, vector.azimuth());
+}
+
+TEST_F(SphericalVectorTest, at_indexAccessor){
+  double& rRef = vector.at(0);
+  EXPECT_EQ(expectedR, rRef);
+  double& polarRef = vector.at(1);
+  EXPECT_EQ(expectedPolarAngle, polarRef);
+  double& azimuthRef = vector.at(2);
+  EXPECT_EQ(expectedAzimuth, azimuthRef);
+
+  rRef = 123.234;
+  EXPECT_EQ(123.234, vector.r());
+}
+
+TEST_F(SphericalVectorTest, c_at_indexAccessor){
+  EXPECT_EQ(expectedR, vector.c_at(0));
+  EXPECT_EQ(expectedPolarAngle, vector.c_at(1));
+  EXPECT_EQ(expectedAzimuth, vector.c_at(2));
 }
 
 // first is actual (times pi) and second is expected

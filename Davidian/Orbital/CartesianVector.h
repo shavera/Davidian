@@ -36,6 +36,10 @@ public:
   /// magnitude of the difference between two vectors
   double separation(const CartesianVector& other) const;
 
+  /// bounds checking member access by 0-based index (0->x, 1->y, 2->z)
+  double& at(const size_t index);
+  const double& c_at(const size_t index) const;
+
   CartesianVector operator-() const;
   CartesianVector operator+(const CartesianVector& otherVector) const;
   CartesianVector operator-(const CartesianVector& otherVector) const;
