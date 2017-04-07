@@ -7,6 +7,7 @@ set(SOURCES
         CartesianVector
         Orbit
         SphericalVector
+        Body
 
         impl/VectorImpl
         )
