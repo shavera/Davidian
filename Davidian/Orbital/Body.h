@@ -5,7 +5,7 @@
 #ifndef DAVIDIAN_BODY_H
 #define DAVIDIAN_BODY_H
 
-#include <bits/unique_ptr.h>
+#include <memory>
 
 namespace orbital{
 
@@ -15,7 +15,9 @@ class StateVector;
 
 class Body {
 public:
-  Body(const double& mass, CelestialBody* parent = nullptr, StateVector* intitalState = nullptr, const double& time =0);
+  Body(const double& mass, CelestialBody* parent = nullptr, const StateVector* initialState = nullptr,
+       const double& time = 0);
+  virtual ~Body();
 
   /// Using the more precise definition of GM_1 + GM_2, rather than just approximating it to be GM_1 (as appropriate)
   const double standardGravitationalParameter() const;
