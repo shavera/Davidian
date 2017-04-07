@@ -4,5 +4,3 @@
 
 #include "Orbit.h"
 
-void Orbit::dummy() {
-}
