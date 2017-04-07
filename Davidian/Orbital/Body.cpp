@@ -6,19 +6,21 @@
 #include "Orbit.h"
 #include "CelestialBody.h"
 #include "impl/GlobalDefinitions.h"
+#include "impl/VectorImpl.h"
 
 namespace orbital{
 Body::Body(const double& mass, CelestialBody* parent, const StateVector* /*initialState*/, const double& /*time*/)
-: m_mass{0.0}, _parent{nullptr}, m_orbit{nullptr}
+: m_mass{mass}, _parent{parent}, m_orbit{nullptr}
 {
 }
 
 const double Body::standardGravitationalParameter() const {
-  return 0;
+  double totalMass = m_mass + ((nullptr != _parent) ? _parent->mass() : 0.0);
+  return totalMass*orbital::G;
 }
 
 const double Body::mass() const {
-  return 0;
+  return m_mass;
 }
 
 } // namespace orbital
