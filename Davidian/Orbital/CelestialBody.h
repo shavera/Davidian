@@ -11,8 +11,7 @@ namespace orbital{
 class CelestialBody : public Body{
 public:
   CelestialBody(const double& mass, CelestialBody* parent = nullptr, const StateVector* initialState = nullptr,
-                const double& time = 0)
-      : Body(mass, parent, initialState, time){}
+                const double& time = 0);
 
 };
 }

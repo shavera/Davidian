@@ -21,8 +21,6 @@ const double Body::mass() const {
   return 0;
 }
 
-Body::~Body() = default;
-
 } // namespace orbital
 
 #ifdef BUILD_TESTS
