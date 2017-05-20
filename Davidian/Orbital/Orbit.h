@@ -22,6 +22,7 @@ class Orbit {
 public:
   Orbit(const StateVector& stateVector, const  );
 };
+}
 
 } // namespace orbital
 
