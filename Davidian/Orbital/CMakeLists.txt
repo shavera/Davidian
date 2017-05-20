@@ -4,7 +4,9 @@ project(orbital)
 set(CMAKE_CXX_STANDARD 14)
 
 set(SOURCES
+        Body
         CartesianVector
+        CelestialBody
         Orbit
         SphericalVector
 

@@ -5,10 +5,9 @@
 #ifndef DAVIDIAN_ORBIT_H
 #define DAVIDIAN_ORBIT_H
 
-
+namespace orbital{
 class Orbit {
-void dummy();
 };
-
+}
 
 #endif //DAVIDIAN_ORBIT_H
