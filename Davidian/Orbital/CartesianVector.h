@@ -20,6 +20,10 @@ public:
   CartesianVector();
   CartesianVector(const double x, const double y, const double z);
   CartesianVector(const SphericalVector& otherVector);
+    CartesianVector(const CartesianVector& other);
+    CartesianVector(CartesianVector&& other);
+    CartesianVector operator =(const CartesianVector& other);
+  virtual ~CartesianVector();
 
   double x() const;
   double y() const;

@@ -108,6 +108,20 @@ bool CartesianVector::operator!=(const CartesianVector& otherVector) const {
   return !(otherVector == *this);
 }
 
+CartesianVector::CartesianVector(const CartesianVector& other)
+: m_impl{new impl::VectorImpl{*(other.m_impl.get())}}
+{}
+
+CartesianVector::CartesianVector(CartesianVector&& other)
+: m_impl{other.m_impl.release()}
+{}
+
+CartesianVector CartesianVector::operator=(const CartesianVector& other) {
+    return CartesianVector(other);
+}
+
+CartesianVector::~CartesianVector() = default;
+
 } // namespace orbital
 
 #ifdef BUILD_TESTS
