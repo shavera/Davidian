@@ -11,6 +11,7 @@ set(SOURCES
         SphericalVector
 
         impl/VectorImpl
+        impl/OrbitImpl
         )
 
 add_library(${PROJECT_NAME} ${SOURCES})

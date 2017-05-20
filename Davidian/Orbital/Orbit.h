@@ -20,9 +20,8 @@ struct OrbitalElements{
 
 class Orbit {
 public:
-  Orbit(const StateVector& stateVector, const  );
+  Orbit(const StateVector& stateVector, double standardGravitationalParameter);
 };
-}
 
 } // namespace orbital
 
