@@ -12,7 +12,7 @@ namespace impl{
 
 class OrbitImpl {
 public:
-    double energy(const StateVector& stateVector, double standardGravitationalParameter);
+    virtual double energy(const StateVector& stateVector, double standardGravitationalParameter);
 };
 
 } // namespace impl

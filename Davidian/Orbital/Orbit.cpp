@@ -3,16 +3,17 @@
 //
 
 #include "Orbit.h"
+#include "impl/OrbitImpl.h"
 
 namespace orbital {
 
-struct OrbitalAccessories{
-
-};
-
-Orbit::Orbit(const orbital::StateVector& stateVector, double standardGravitationalParameter) {
+Orbit::Orbit(const StateVector& stateVector, double standardGravitationalParameter, impl::OrbitImpl* impl)
+    : m_impl{nullptr == impl ? new impl::OrbitImpl : impl}
+{
 
 }
+
+Orbit::~Orbit() = default;
 
 } // namespace orbital
 
@@ -29,7 +30,7 @@ class OrbitTest : public ::testing::Test{
 };
 
 TEST_F(OrbitTest, dummy){
-
+    Orbit orbit(StateVector{}, 1);
 }
 
 } // anonymous namespace

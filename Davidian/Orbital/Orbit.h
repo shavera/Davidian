@@ -7,7 +7,13 @@
 
 #include "impl/GlobalDefinitions.h"
 
+#include <memory>
+
 namespace orbital{
+
+namespace impl{
+class OrbitImpl;
+} // namespace impl
 
 struct OrbitalElements{
   double semiMajorAxis;
@@ -18,9 +24,14 @@ struct OrbitalElements{
   double meanAnomalyAtEpoch;
 };
 
+
 class Orbit {
 public:
-  Orbit(const StateVector& stateVector, double standardGravitationalParameter);
+    Orbit(const StateVector& stateVector, double standardGravitationalParameter, impl::OrbitImpl* impl = nullptr);
+    virtual ~Orbit();
+
+private:
+    std::unique_ptr<impl::OrbitImpl> m_impl;
 };
 
 } // namespace orbital
