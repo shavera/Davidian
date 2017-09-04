@@ -8,7 +8,7 @@
 namespace orbital {
 
 Orbit::Orbit(const StateVector& stateVector, double standardGravitationalParameter, impl::OrbitImpl* impl)
-    : m_impl{nullptr == impl ? new impl::OrbitImpl : impl}
+    : m_impl{nullptr == impl ? new impl::OrbitImpl{stateVector, standardGravitationalParameter} : impl}
 {
 
 }
