@@ -12,7 +12,7 @@ namespace impl{
 
 class OrbitImpl {
 public:
-    OrbitImpl(const StateVector& stateVector, const double standardGravitationalParameter);
+    OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass);
 //    virtual double energy(const StateVector& stateVector, double standardGravitationalParameter);
 
     const orbital::OrbitalElements m_elements;

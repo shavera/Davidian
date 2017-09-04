@@ -47,6 +47,7 @@ public:
   CartesianVector operator-() const;
   CartesianVector operator+(const CartesianVector& otherVector) const;
   CartesianVector operator-(const CartesianVector& otherVector) const;
+    CartesianVector operator/(const double& scale) const;
   bool operator==(const CartesianVector& otherVector) const;
   bool operator!=(const CartesianVector& otherVector) const;
 
