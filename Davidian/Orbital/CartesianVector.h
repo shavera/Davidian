@@ -18,8 +18,12 @@ class SphericalVector;
 class CartesianVector {
 public:
   CartesianVector();
-  explicit CartesianVector(const double x, const double y, const double z);
+  CartesianVector(const double x, const double y, const double z);
   CartesianVector(const SphericalVector& otherVector);
+    CartesianVector(const CartesianVector& other);
+    CartesianVector(CartesianVector&& other);
+    CartesianVector operator =(const CartesianVector& other);
+  virtual ~CartesianVector();
 
   double x() const;
   double y() const;
@@ -43,6 +47,7 @@ public:
   CartesianVector operator-() const;
   CartesianVector operator+(const CartesianVector& otherVector) const;
   CartesianVector operator-(const CartesianVector& otherVector) const;
+    CartesianVector operator/(const double& scale) const;
   bool operator==(const CartesianVector& otherVector) const;
   bool operator!=(const CartesianVector& otherVector) const;
 

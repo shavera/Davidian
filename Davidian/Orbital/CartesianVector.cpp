@@ -108,15 +108,41 @@ bool CartesianVector::operator!=(const CartesianVector& otherVector) const {
   return !(otherVector == *this);
 }
 
+CartesianVector::CartesianVector(const CartesianVector& other)
+: m_impl{new impl::VectorImpl{*(other.m_impl.get())}}
+{}
+
+CartesianVector::CartesianVector(CartesianVector&& other)
+: m_impl{other.m_impl.release()}
+{}
+
+CartesianVector CartesianVector::operator=(const CartesianVector& other) {
+    return CartesianVector(other);
+}
+
+CartesianVector CartesianVector::operator/(const double& scale) const {
+    CartesianVector scaledCopy{x()/scale, y()/scale, z()/scale};
+    return scaledCopy;
+}
+
+CartesianVector::~CartesianVector() = default;
+
 } // namespace orbital
 
 #ifdef BUILD_TESTS
 
 #include <gtest/gtest.h>
 
+namespace orbital{
+void PrintTo(const CartesianVector& vector, std::ostream* os){
+    *os << "(" << vector.x() << ", " << vector.y() << ", " << vector.z() << ")";
+}
+} // namespace orbital
+
 namespace {
 
 class CartesianVectorTest : public ::testing::Test {
+
 public:
   const double expectedX{1.2345}, expectedY{-2.341}, expectedZ{3.0};
   const double expectedNorm{std::sqrt(std::pow(expectedX, 2) + std::pow(expectedY,2 ) + std::pow(expectedZ, 2))};
