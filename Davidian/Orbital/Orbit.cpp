@@ -7,8 +7,8 @@
 
 namespace orbital {
 
-Orbit::Orbit(const StateVector& stateVector, double standardGravitationalParameter, impl::OrbitImpl* impl)
-    : m_impl{nullptr == impl ? new impl::OrbitImpl{stateVector, standardGravitationalParameter} : impl}
+Orbit::Orbit(const StateVector& stateVector, const double barymass, const double leptomass, impl::OrbitImpl* impl)
+    : m_impl{nullptr == impl ? new impl::OrbitImpl{stateVector, barymass, leptomass} : impl}
 {
 
 }
@@ -30,7 +30,7 @@ class OrbitTest : public ::testing::Test{
 };
 
 TEST_F(OrbitTest, dummy){
-    Orbit orbit(StateVector{}, 1);
+//    Orbit orbit(StateVector{}, 1);
 }
 
 } // anonymous namespace

@@ -20,7 +20,7 @@ class OrbitImpl;
 
 class Orbit {
 public:
-    Orbit(const StateVector& stateVector, double standardGravitationalParameter, impl::OrbitImpl* impl = nullptr);
+    Orbit(const StateVector& stateVector, const double barymass, const double leptomass, impl::OrbitImpl* impl);
     virtual ~Orbit();
 
 private:
