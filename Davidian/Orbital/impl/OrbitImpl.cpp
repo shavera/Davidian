@@ -35,6 +35,10 @@ double eccentricity(const double specificOrbitalEnergy, const double standardGra
   return sqrt(1 + (2*specificOrbitalEnergy*specificAngularMomentum.dot(specificAngularMomentum))/(std::pow(standardGravitationalParameter, 2)));
 }
 
+double semiMajorAxis(const double standardGravitationalParameter, const double specificOrbitalEnergy){
+  return -standardGravitationalParameter/(2*specificOrbitalEnergy);
+}
+
 } // anonymous namespace
 
 OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
@@ -43,6 +47,7 @@ OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, cons
   m_specificOrbitalEnergy = energy(stateVector, stdGravParam);
   m_specificAngularMomentum = specificAngularMomentum(stateVector, reducedMass(barymass, leptomass));
   m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
+  m_elements.semiMajorAxis = semiMajorAxis(stdGravParam, m_specificOrbitalEnergy);
 }
 
 } // namespace impl
@@ -94,6 +99,16 @@ TEST_F(OrbitImpl, eccentricity){
   const double actualEccentricity{eccentricity(specificOrbitalEnergy, standardGravitationalParameter, specificAngularMomentum)};
 
   EXPECT_NEAR(expectedEccentricity, actualEccentricity, 1e-6*expectedEccentricity);
+}
+
+TEST_F(OrbitImpl, semiMajorAxis){
+  const double stdGravParam{73};
+  const double specificEnergy{13.42};
+  const double expectedSemiMajorAxis{-stdGravParam/(2*specificEnergy)};
+
+  const double actualSemiMajorAxis{semiMajorAxis(stdGravParam, specificEnergy)};
+
+  EXPECT_NEAR(expectedSemiMajorAxis, actualSemiMajorAxis, -1e-6*expectedSemiMajorAxis);
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later
