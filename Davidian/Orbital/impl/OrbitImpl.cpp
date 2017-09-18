@@ -10,27 +10,27 @@ namespace impl{
 namespace {
 
 struct EnhancedOrbitalElements{
-    orbital::OrbitalElements elements;
-    double energy{0.0};
+  orbital::OrbitalElements elements;
+  double energy{0.0};
 };
 
 double reducedMass(const double m1, const double m2){
-    return 1/(1/m1 + 1/m2);
+  return 1/(1/m1 + 1/m2);
 };
 
 double energy(const StateVector& stateVector, const double standardGravitationalParameter){
-    return stateVector.velocity.dot(stateVector.velocity)/2 - standardGravitationalParameter/stateVector.position.norm();
+  return stateVector.velocity.dot(stateVector.velocity)/2 - standardGravitationalParameter/stateVector.position.norm();
 }
 
 CartesianVector specificAngularMomentum(const StateVector& stateVector, const double reducedMass){
-    CartesianVector angularMomentum = stateVector.position.cross(stateVector.velocity) / reducedMass;
+  CartesianVector angularMomentum = stateVector.position.cross(stateVector.velocity) / reducedMass;
+  return angularMomentum;
 }
 
 } // anonymous namespace
 
-    OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
-//        :
-    {}
+OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
+{}
 
 } // namespace impl
 } // namespace orbital
@@ -64,9 +64,7 @@ TEST_F(OrbitImpl, energy){
 TEST_F(OrbitImpl, specificAngularMomentum){
     const double reducedMass{7.6};
     CartesianVector expectedSpecificAngularMomentum{0,0,62.5};
-    CartesianVector actualAngularMomentum{specificAngularMomentum(simpleState, reducedMass)};
-//    EXPECT_EQ(expectedSpecificAngularMomentum, actualAngularMomentum);
-//    EXPECT_EQ(expectedSpecificAngularMomentum, specificAngularMomentum(simpleState, reducedMass));
+    EXPECT_EQ(expectedSpecificAngularMomentum, specificAngularMomentum(simpleState, reducedMass));
 }
 
 } // anonymous namespace
