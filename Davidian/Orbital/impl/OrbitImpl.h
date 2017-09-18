@@ -13,10 +13,9 @@ namespace impl{
 class OrbitImpl {
 public:
     OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass);
-//    virtual double energy(const StateVector& stateVector, double standardGravitationalParameter);
 
-    const orbital::OrbitalElements m_elements;
-    const double m_energy{0.0};
+    orbital::OrbitalElements m_elements;
+    double m_energy{0.0};
 };
 
 } // namespace impl
