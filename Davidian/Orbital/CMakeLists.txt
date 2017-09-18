@@ -10,7 +10,6 @@ set(SOURCES
         Orbit
         SphericalVector
 
-        impl/VectorImpl
         impl/OrbitImpl
         )
 

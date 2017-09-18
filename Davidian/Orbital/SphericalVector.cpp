@@ -4,9 +4,6 @@
 
 #include "SphericalVector.h"
 #include "CartesianVector.h"
-#include "impl/VectorImpl.h"
-
-#include <Eigen/Dense>
 
 namespace orbital{
 
@@ -25,44 +22,40 @@ double constrainAzimuth(const double azimuth){
 } // anonymous namespace
 
 SphericalVector::SphericalVector()
-    : m_impl{std::make_unique<impl::VectorImpl>(0, 0, 0)}  {
-
-}
+    : m_vector{0, 0, 0}
+{}
 
 SphericalVector::SphericalVector(const double r, const double polar_angle, const double azimuth)
-    : m_impl{std::make_unique<impl::VectorImpl>(r,
-                                                constrainPolarAngle(polar_angle),
-                                                constrainAzimuth(azimuth))}
+    : m_vector{r, constrainPolarAngle(polar_angle), constrainAzimuth(azimuth)}
 {}
 
 SphericalVector::SphericalVector(const CartesianVector& otherVector)
-    : m_impl{std::make_unique<impl::VectorImpl>([&otherVector](){
-      const double norm{otherVector.norm()};
-      const CartesianVector normalizedOther{otherVector.normalizedVector()};
-      const double polarAngle{(0 == normalizedOther.z()) ? 0 : std::acos(normalizedOther.z())};
-      return Array3D{norm, polarAngle, std::atan2(normalizedOther.y(), normalizedOther.x())};
-      }()
-    )}
+    : m_vector{[&otherVector](){
+        const double norm{otherVector.norm()};
+        const CartesianVector normalizedOther{otherVector.normalizedVector()};
+        const double polarAngle{(0 == normalizedOther.z()) ? 0 : std::acos(normalizedOther.z())};
+        return Eigen::Vector3d{norm, polarAngle, std::atan2(normalizedOther.y(), normalizedOther.x())};
+      }()}
 {}
 
 double SphericalVector::r() const {
-  return m_impl->vector[0];
+  return m_vector[0];
 }
 
 double SphericalVector::polarAngle() const {
-  return m_impl->vector[1];
+  return m_vector[1];
 }
 
 double SphericalVector::azimuth() const {
-  return m_impl->vector[2];
+  return m_vector[2];
 }
 
 double& SphericalVector::at(const size_t index) {
-  return m_impl->vector[index];
+  return m_vector[index];
 }
 
 const double& SphericalVector::c_at(const size_t index) const {
-  return m_impl->vector[index];
+  return m_vector[index];
 }
 
 } // namespace orbital

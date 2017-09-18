@@ -5,13 +5,9 @@
 #ifndef DAVIDIAN_CARTESIANVECTOR_H
 #define DAVIDIAN_CARTESIANVECTOR_H
 
-#include <memory>
+#include <Eigen/Dense>
 
 namespace orbital{
-
-namespace impl{
-class VectorImpl;
-}
 
 class SphericalVector;
 
@@ -20,9 +16,6 @@ public:
   CartesianVector();
   CartesianVector(const double x, const double y, const double z);
   CartesianVector(const SphericalVector& otherVector);
-    CartesianVector(const CartesianVector& other);
-    CartesianVector(CartesianVector&& other);
-    CartesianVector operator =(const CartesianVector& other);
   virtual ~CartesianVector();
 
   double x() const;
@@ -47,12 +40,12 @@ public:
   CartesianVector operator-() const;
   CartesianVector operator+(const CartesianVector& otherVector) const;
   CartesianVector operator-(const CartesianVector& otherVector) const;
-    CartesianVector operator/(const double& scale) const;
+  CartesianVector operator/(const double& scale) const;
   bool operator==(const CartesianVector& otherVector) const;
   bool operator!=(const CartesianVector& otherVector) const;
 
 private:
-  std::unique_ptr<impl::VectorImpl> m_impl;
+  Eigen::Vector3d m_vector;
 };
 
 } // namespace orbital
