@@ -12,10 +12,11 @@ namespace impl{
 
 class OrbitImpl {
 public:
-    OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass);
+  OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass);
 
-    orbital::OrbitalElements m_elements;
-    double m_energy{0.0};
+  orbital::OrbitalElements m_elements;
+  double m_specificOrbitalEnergy;
+  CartesianVector m_specificAngularMomentum;
 };
 
 } // namespace impl

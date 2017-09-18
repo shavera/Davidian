@@ -31,11 +31,18 @@ CartesianVector specificAngularMomentum(const StateVector& stateVector, const do
   return angularMomentum;
 }
 
+double eccentricity(const double specificOrbitalEnergy, const double standardGravitationalParameter, const CartesianVector& specificAngularMomentum){
+  return sqrt(1 + (2*specificOrbitalEnergy*specificAngularMomentum.dot(specificAngularMomentum))/(std::pow(standardGravitationalParameter, 2)));
+}
+
 } // anonymous namespace
 
 OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
 {
-  m_energy = energy(stateVector, standardGravitationalParameter(barymass, leptomass));
+  const double stdGravParam{standardGravitationalParameter(barymass, leptomass)};
+  m_specificOrbitalEnergy = energy(stateVector, stdGravParam);
+  m_specificAngularMomentum = specificAngularMomentum(stateVector, reducedMass(barymass, leptomass));
+  m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
 }
 
 } // namespace impl
@@ -77,6 +84,16 @@ TEST_F(OrbitImpl, specificAngularMomentum){
   const double reducedMass{7.6};
   CartesianVector expectedSpecificAngularMomentum{0,0,62.5};
   EXPECT_EQ(expectedSpecificAngularMomentum, specificAngularMomentum(simpleState, reducedMass));
+}
+
+TEST_F(OrbitImpl, eccentricity){
+  // manually calculated value for the given parameters
+  const double expectedEccentricity{1.752428577};
+  const CartesianVector specificAngularMomentum{0,0,5};
+  const double specificOrbitalEnergy{7}, standardGravitationalParameter{13};
+  const double actualEccentricity{eccentricity(specificOrbitalEnergy, standardGravitationalParameter, specificAngularMomentum)};
+
+  EXPECT_NEAR(expectedEccentricity, actualEccentricity, 1e-6*expectedEccentricity);
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later
