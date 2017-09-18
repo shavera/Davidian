@@ -39,6 +39,10 @@ double semiMajorAxis(const double standardGravitationalParameter, const double s
   return -standardGravitationalParameter/(2*specificOrbitalEnergy);
 }
 
+double inclination(const CartesianVector& specificAngularMomentum){
+  return std::acos(specificAngularMomentum.z()/specificAngularMomentum.norm());
+}
+
 } // anonymous namespace
 
 OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
@@ -48,6 +52,7 @@ OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, cons
   m_specificAngularMomentum = specificAngularMomentum(stateVector, reducedMass(barymass, leptomass));
   m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
   m_elements.semiMajorAxis = semiMajorAxis(stdGravParam, m_specificOrbitalEnergy);
+  m_elements.inclination = inclination(m_specificAngularMomentum);
 }
 
 } // namespace impl
@@ -109,6 +114,15 @@ TEST_F(OrbitImpl, semiMajorAxis){
   const double actualSemiMajorAxis{semiMajorAxis(stdGravParam, specificEnergy)};
 
   EXPECT_NEAR(expectedSemiMajorAxis, actualSemiMajorAxis, -1e-6*expectedSemiMajorAxis);
+}
+
+TEST_F(OrbitImpl, inclination){
+  const CartesianVector angularMomentum{std::sqrt(3/2), 1/4, std::sqrt(3)};
+  const double expectedInclination{M_PI/6};
+
+  const double actualInclination{inclination(angularMomentum)};
+
+  EXPECT_NEAR(expectedInclination, actualInclination, 1e-6*expectedInclination);
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later
