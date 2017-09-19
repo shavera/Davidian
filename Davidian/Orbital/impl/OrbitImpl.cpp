@@ -40,13 +40,11 @@ double semiMajorAxis(const double standardGravitationalParameter, const double s
 }
 
 double inclination(const CartesianVector& specificAngularMomentum){
-  double incl{std::acos(specificAngularMomentum.z()/specificAngularMomentum.norm())};
-  if(specificAngularMomentum.y() < 0){ incl = -incl; }
-  return incl;
+  return std::acos(specificAngularMomentum.z()/specificAngularMomentum.norm());
 }
 
 double longitudeOfAscendingNode(const CartesianVector& specificAngularMomentum){
-  return 0;
+  return std::atan2(specificAngularMomentum.x(), -specificAngularMomentum.y());
 }
 
 } // anonymous namespace
@@ -131,12 +129,25 @@ TEST_F(OrbitImpl, inclination){
 }
 
 TEST_F(OrbitImpl, longitudeOfAscendingNode){
-  const CartesianVector angularMomentum{std::sqrt(3.0)/2, -0.5, std::sqrt(3)};
-  const double expectedLongitude{-M_PI/6};
+  const double baseX{std::sqrt(3.0)/2}, baseY{0.5};
+  // array: x, y, expected longitude
+  std::array<std::array<double, 3>, 4> testData{{
+      {baseX, baseY, 2*M_PI/3},
+      {-baseX, baseY, -2*M_PI/3},
+      {-baseX, -baseY, -M_PI/3},
+      {baseX, -baseY, M_PI/3}
+  }};
 
-  const double actualLongitude{inclination(angularMomentum)};
+  for(const auto& data : testData){
+    const CartesianVector angularMomentum{data.at(0), data.at(1), std::sqrt(3)};
 
-  EXPECT_NEAR(expectedLongitude, actualLongitude, std::fabs(1e-6*expectedLongitude));
+    const double actualLongitude{longitudeOfAscendingNode(angularMomentum)};
+
+    double hypot = std::hypot(data.at(0), data.at(1));
+    double guess = std::acos(-data.at(1)/hypot);
+
+    EXPECT_NEAR(data.at(2), actualLongitude, 1e-7) << data.at(0) <<" " << data.at(1) << " " << guess;
+  }
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later
