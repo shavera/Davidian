@@ -40,7 +40,13 @@ double semiMajorAxis(const double standardGravitationalParameter, const double s
 }
 
 double inclination(const CartesianVector& specificAngularMomentum){
-  return std::acos(specificAngularMomentum.z()/specificAngularMomentum.norm());
+  double incl{std::acos(specificAngularMomentum.z()/specificAngularMomentum.norm())};
+  if(specificAngularMomentum.y() < 0){ incl = -incl; }
+  return incl;
+}
+
+double longitudeOfAscendingNode(const CartesianVector& specificAngularMomentum){
+  return 0;
 }
 
 } // anonymous namespace
@@ -52,7 +58,6 @@ OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, cons
   m_specificAngularMomentum = specificAngularMomentum(stateVector, reducedMass(barymass, leptomass));
   m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
   m_elements.semiMajorAxis = semiMajorAxis(stdGravParam, m_specificOrbitalEnergy);
-  m_elements.inclination = inclination(m_specificAngularMomentum);
 }
 
 } // namespace impl
@@ -113,16 +118,25 @@ TEST_F(OrbitImpl, semiMajorAxis){
 
   const double actualSemiMajorAxis{semiMajorAxis(stdGravParam, specificEnergy)};
 
-  EXPECT_NEAR(expectedSemiMajorAxis, actualSemiMajorAxis, -1e-6*expectedSemiMajorAxis);
+  EXPECT_NEAR(expectedSemiMajorAxis, actualSemiMajorAxis, std::fabs(1e-6*expectedSemiMajorAxis));
 }
 
 TEST_F(OrbitImpl, inclination){
-  const CartesianVector angularMomentum{std::sqrt(3/2), 1/4, std::sqrt(3)};
+  const CartesianVector angularMomentum{std::sqrt(3.0)/2, 0.5, std::sqrt(3)};
   const double expectedInclination{M_PI/6};
 
   const double actualInclination{inclination(angularMomentum)};
 
   EXPECT_NEAR(expectedInclination, actualInclination, 1e-6*expectedInclination);
+}
+
+TEST_F(OrbitImpl, longitudeOfAscendingNode){
+  const CartesianVector angularMomentum{std::sqrt(3.0)/2, -0.5, std::sqrt(3)};
+  const double expectedLongitude{-M_PI/6};
+
+  const double actualLongitude{inclination(angularMomentum)};
+
+  EXPECT_NEAR(expectedLongitude, actualLongitude, std::fabs(1e-6*expectedLongitude));
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later
