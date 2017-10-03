@@ -9,11 +9,6 @@ namespace impl{
 
 namespace {
 
-struct EnhancedOrbitalElements{
-  orbital::OrbitalElements elements;
-  double energy{0.0};
-};
-
 double reducedMass(const double m1, const double m2){
   return 1/(1/m1 + 1/m2);
 };
@@ -47,6 +42,10 @@ double longitudeOfAscendingNode(const CartesianVector& specificAngularMomentum){
   return std::atan2(specificAngularMomentum.x(), -specificAngularMomentum.y());
 }
 
+CartesianVector eccentricityVector(const StateVector& stateVector, const CartesianVector& specificAngularMomentum, const double standardGravitationalParameter){
+  return stateVector.velocity.cross(specificAngularMomentum)/standardGravitationalParameter - stateVector.position.normalizedVector();
+}
+
 } // anonymous namespace
 
 OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
@@ -54,8 +53,13 @@ OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, cons
   const double stdGravParam{standardGravitationalParameter(barymass, leptomass)};
   m_specificOrbitalEnergy = energy(stateVector, stdGravParam);
   m_specificAngularMomentum = specificAngularMomentum(stateVector, reducedMass(barymass, leptomass));
-  m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
+  m_eccentricityVector = eccentricityVector(stateVector, m_specificAngularMomentum, stdGravParam);
+//  m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
+  m_elements.eccentricity = m_eccentricityVector.norm();
   m_elements.semiMajorAxis = semiMajorAxis(stdGravParam, m_specificOrbitalEnergy);
+  m_elements.inclination = inclination(m_specificAngularMomentum);
+  m_elements.longitudeOfAscendingNode = longitudeOfAscendingNode(m_specificAngularMomentum);
+  
 }
 
 } // namespace impl
@@ -143,11 +147,17 @@ TEST_F(OrbitImpl, longitudeOfAscendingNode){
 
     const double actualLongitude{longitudeOfAscendingNode(angularMomentum)};
 
-    double hypot = std::hypot(data.at(0), data.at(1));
-    double guess = std::acos(-data.at(1)/hypot);
-
-    EXPECT_NEAR(data.at(2), actualLongitude, 1e-7) << data.at(0) <<" " << data.at(1) << " " << guess;
+    EXPECT_NEAR(data.at(2), actualLongitude, 1e-7) << data.at(0) <<" " << data.at(1) ;
   }
+}
+
+TEST_F(OrbitImpl, eccentricityVector){
+  CartesianVector expectedEccentricityVector{7,0,0};
+  StateVector initialState{{3,0,0},{0,4,0}};
+  CartesianVector specificAngularMomentum{0,0,12};
+  double stdGravParam{6.0};
+
+  EXPECT_EQ(expectedEccentricityVector, eccentricityVector(initialState, specificAngularMomentum, stdGravParam));
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later

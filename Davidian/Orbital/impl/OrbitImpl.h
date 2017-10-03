@@ -16,7 +16,7 @@ public:
 
   orbital::OrbitalElements m_elements;
   double m_specificOrbitalEnergy;
-  CartesianVector m_specificAngularMomentum;
+  CartesianVector m_specificAngularMomentum, m_eccentricityVector;
 };
 
 } // namespace impl
