@@ -4,6 +4,8 @@
 
 #include "OrbitImpl.h"
 
+#include <iostream>
+
 namespace orbital{
 namespace impl{
 
@@ -38,12 +40,21 @@ double inclination(const CartesianVector& specificAngularMomentum){
   return std::acos(specificAngularMomentum.z()/specificAngularMomentum.norm());
 }
 
-double longitudeOfAscendingNode(const CartesianVector& specificAngularMomentum){
-  return std::atan2(specificAngularMomentum.x(), -specificAngularMomentum.y());
+CartesianVector vectorOfAscendingNode(const CartesianVector& specificAngularMomentum){
+  return CartesianVector{-specificAngularMomentum.y(), specificAngularMomentum.x(), 0};
+}
+
+double longitudeOfAscendingNode(const CartesianVector& vectorOfAscendingNode){
+  return std::atan2(vectorOfAscendingNode.y(), vectorOfAscendingNode.x());
 }
 
 CartesianVector eccentricityVector(const StateVector& stateVector, const CartesianVector& specificAngularMomentum, const double standardGravitationalParameter){
   return stateVector.velocity.cross(specificAngularMomentum)/standardGravitationalParameter - stateVector.position.normalizedVector();
+}
+
+double argumentOfPeriapsis(const CartesianVector& ascendingNodeVector, const CartesianVector& eccentricityVector){
+  double candidateValue{ std::acos(ascendingNodeVector.normalizedVector().dot(eccentricityVector.normalizedVector())) };
+  return (eccentricityVector.z() > 0) ? candidateValue : 2*M_PI - candidateValue;
 }
 
 } // anonymous namespace
@@ -53,13 +64,14 @@ OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, cons
   const double stdGravParam{standardGravitationalParameter(barymass, leptomass)};
   m_specificOrbitalEnergy = energy(stateVector, stdGravParam);
   m_specificAngularMomentum = specificAngularMomentum(stateVector, reducedMass(barymass, leptomass));
-  m_eccentricityVector = eccentricityVector(stateVector, m_specificAngularMomentum, stdGravParam);
+  CartesianVector eccVector{eccentricityVector(stateVector, m_specificAngularMomentum, stdGravParam)};
 //  m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
-  m_elements.eccentricity = m_eccentricityVector.norm();
+  m_elements.eccentricity = eccVector.norm();
   m_elements.semiMajorAxis = semiMajorAxis(stdGravParam, m_specificOrbitalEnergy);
   m_elements.inclination = inclination(m_specificAngularMomentum);
-  m_elements.longitudeOfAscendingNode = longitudeOfAscendingNode(m_specificAngularMomentum);
-  
+  CartesianVector ascVector{vectorOfAscendingNode(m_specificAngularMomentum)};
+  m_elements.longitudeOfAscendingNode = longitudeOfAscendingNode(ascVector);
+  m_elements.argumentOfPeriapsis = argumentOfPeriapsis(ascVector, eccVector);
 }
 
 } // namespace impl
@@ -132,6 +144,13 @@ TEST_F(OrbitImpl, inclination){
   EXPECT_NEAR(expectedInclination, actualInclination, 1e-6*expectedInclination);
 }
 
+TEST_F(OrbitImpl, vectorOfAscendingNode){
+  CartesianVector angularMomentum{20.0, 30.0, 10.0};
+  CartesianVector expectedVector{-30.0, 20.0, 0.0};
+
+  EXPECT_EQ(expectedVector, vectorOfAscendingNode(angularMomentum));
+}
+
 TEST_F(OrbitImpl, longitudeOfAscendingNode){
   const double baseX{std::sqrt(3.0)/2}, baseY{0.5};
   // array: x, y, expected longitude
@@ -143,21 +162,36 @@ TEST_F(OrbitImpl, longitudeOfAscendingNode){
   }};
 
   for(const auto& data : testData){
-    const CartesianVector angularMomentum{data.at(0), data.at(1), std::sqrt(3)};
+    const CartesianVector vectorOfAscendingNode{-data.at(1), data.at(0), 0};
 
-    const double actualLongitude{longitudeOfAscendingNode(angularMomentum)};
+    const double actualLongitude{longitudeOfAscendingNode(vectorOfAscendingNode)};
 
     EXPECT_NEAR(data.at(2), actualLongitude, 1e-7) << data.at(0) <<" " << data.at(1) ;
   }
 }
 
 TEST_F(OrbitImpl, eccentricityVector){
-  CartesianVector expectedEccentricityVector{7,0,0};
-  StateVector initialState{{3,0,0},{0,4,0}};
-  CartesianVector specificAngularMomentum{0,0,12};
-  double stdGravParam{6.0};
+  const CartesianVector expectedEccentricityVector{7,0,0};
+  const StateVector initialState{{3,0,0},{0,4,0}};
+  const CartesianVector specificAngularMomentum{0,0,12};
+  const double stdGravParam{6.0};
 
   EXPECT_EQ(expectedEccentricityVector, eccentricityVector(initialState, specificAngularMomentum, stdGravParam));
+}
+
+TEST_F(OrbitImpl, argumentOfPeriapsis){
+  const CartesianVector eccVector{2,3,6}, ascVector{3,4,0};
+  const double expectedValue{1.030621756};
+
+  EXPECT_NEAR(expectedValue, argumentOfPeriapsis(ascVector, eccVector), 1e-6*expectedValue);
+}
+
+TEST_F(OrbitImpl, argumentOfPeriapsis_negativeEccentricityZ){
+  const CartesianVector eccVector{2,3,-6}, ascVector{3,4,0};
+  const double expectedValue{2*M_PI - 1.030621756};
+
+  EXPECT_NEAR(expectedValue, argumentOfPeriapsis(ascVector, eccVector), 1e-6*expectedValue);
+
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later
