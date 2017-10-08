@@ -53,6 +53,8 @@ CartesianVector eccentricityVector(const StateVector& stateVector, const Cartesi
 }
 
 double argumentOfPeriapsis(const CartesianVector& ascendingNodeVector, const CartesianVector& eccentricityVector){
+  if(CartesianVector{0,0,0} == ascendingNodeVector){return std::atan2(eccentricityVector.y(), eccentricityVector.x());}
+
   double candidateValue{ std::acos(ascendingNodeVector.normalizedVector().dot(eccentricityVector.normalizedVector())) };
   return (eccentricityVector.z() > 0) ? candidateValue : 2*M_PI - candidateValue;
 }
@@ -154,9 +156,25 @@ TEST_F(OrbitImpl, inclination){
   EXPECT_NEAR(expectedInclination, actualInclination, 1e-6*expectedInclination);
 }
 
+TEST_F(OrbitImpl, inclination_zeroInclination){
+  const CartesianVector angularMomentum{0, 0, 1};
+  const double expectedInclination{0};
+
+  const double actualInclination{inclination(angularMomentum)};
+
+  EXPECT_EQ(expectedInclination, actualInclination);
+}
+
 TEST_F(OrbitImpl, vectorOfAscendingNode){
   CartesianVector angularMomentum{20.0, 30.0, 10.0};
   CartesianVector expectedVector{-30.0, 20.0, 0.0};
+
+  EXPECT_EQ(expectedVector, vectorOfAscendingNode(angularMomentum));
+}
+
+TEST_F(OrbitImpl, vectorOfAscendingNode_zeroInclination){
+  CartesianVector angularMomentum{0.0, 0.0, 10.0};
+  CartesianVector expectedVector{0.0, 0.0, 0.0};
 
   EXPECT_EQ(expectedVector, vectorOfAscendingNode(angularMomentum));
 }
@@ -180,6 +198,12 @@ TEST_F(OrbitImpl, longitudeOfAscendingNode){
   }
 }
 
+TEST_F(OrbitImpl, longitudeOfAscendingNode_zeroInclination){
+  const CartesianVector vectorOfAscendingNode{0,0,0};
+  const double expectedLongitude{0.0};
+  EXPECT_EQ(expectedLongitude, longitudeOfAscendingNode(vectorOfAscendingNode));
+}
+
 TEST_F(OrbitImpl, eccentricityVector){
   const CartesianVector expectedEccentricityVector{7,0,0};
   const StateVector initialState{{3,0,0},{0,4,0}};
@@ -192,6 +216,13 @@ TEST_F(OrbitImpl, eccentricityVector){
 TEST_F(OrbitImpl, argumentOfPeriapsis){
   const CartesianVector eccVector{2,3,6}, ascVector{3,4,0};
   const double expectedValue{1.030621756};
+
+  EXPECT_NEAR(expectedValue, argumentOfPeriapsis(ascVector, eccVector), 1e-6*expectedValue);
+}
+
+TEST_F(OrbitImpl, argumentOfPeriapsis_zeroInclination){
+  const CartesianVector eccVector{2,3,6}, ascVector{0,0,0};
+  const double expectedValue{std::atan2(3,2)};
 
   EXPECT_NEAR(expectedValue, argumentOfPeriapsis(ascVector, eccVector), 1e-6*expectedValue);
 }
