@@ -57,6 +57,14 @@ double argumentOfPeriapsis(const CartesianVector& ascendingNodeVector, const Car
   return (eccentricityVector.z() > 0) ? candidateValue : 2*M_PI - candidateValue;
 }
 
+double eccentricAnomaly(double radius, double semiMajorAxis, double eccentricity){
+  return std::acos((1-radius/semiMajorAxis)/eccentricity);
+}
+
+double meanAnomaly(double eccentricAnomaly, double eccentricity){
+  return eccentricAnomaly + eccentricity * std::sin(eccentricAnomaly);
+}
+
 } // anonymous namespace
 
 OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
@@ -72,6 +80,8 @@ OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, cons
   CartesianVector ascVector{vectorOfAscendingNode(m_specificAngularMomentum)};
   m_elements.longitudeOfAscendingNode = longitudeOfAscendingNode(ascVector);
   m_elements.argumentOfPeriapsis = argumentOfPeriapsis(ascVector, eccVector);
+  const double eccAnomaly{eccentricAnomaly(stateVector.position.norm(), m_elements.semiMajorAxis, m_elements.eccentricity)};
+  m_elements.meanAnomalyAtEpoch = meanAnomaly(eccAnomaly, m_elements.eccentricity);
 }
 
 } // namespace impl
@@ -191,7 +201,20 @@ TEST_F(OrbitImpl, argumentOfPeriapsis_negativeEccentricityZ){
   const double expectedValue{2*M_PI - 1.030621756};
 
   EXPECT_NEAR(expectedValue, argumentOfPeriapsis(ascVector, eccVector), 1e-6*expectedValue);
+}
 
+TEST_F(OrbitImpl, eccentricAnomaly){
+  const double radius{11}, semiMajorAxis{12}, eccentricity{0.25};
+  const double expectedAnomaly{1.230959417};
+
+  EXPECT_NEAR(expectedAnomaly, eccentricAnomaly(radius, semiMajorAxis, eccentricity), 1e-6*expectedAnomaly);
+}
+
+TEST_F(OrbitImpl, meanAnomaly){
+  const double eccentricAnomaly{1.5}, eccentricity{0.25};
+  const double expectedAnomaly{1.7493737467};
+
+  EXPECT_NEAR(expectedAnomaly, meanAnomaly(eccentricAnomaly, eccentricity), 1e-6*expectedAnomaly);
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later
