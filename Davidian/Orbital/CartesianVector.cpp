@@ -4,15 +4,12 @@
 
 #include "CartesianVector.h"
 #include "SphericalVector.h"
-#include "impl/VectorImpl.h"
-
-#include <Eigen/Dense>
 
 namespace orbital{
 
 namespace {
 
-Array3D createVectorFromSphericalCoords(const SphericalVector& sphericalVector){
+Eigen::Vector3d createVectorFromSphericalCoords(const SphericalVector& sphericalVector){
   const double& r = sphericalVector.r();
   const double& polarAngle = sphericalVector.polarAngle();
   const double& azimuth = sphericalVector.azimuth();
@@ -21,46 +18,46 @@ Array3D createVectorFromSphericalCoords(const SphericalVector& sphericalVector){
 
 } // anonymous namespace
 
-CartesianVector::CartesianVector() : m_impl{std::make_unique<impl::VectorImpl>(0, 0, 0)} {}
+CartesianVector::CartesianVector() : m_vector{0, 0, 0} {}
 
 CartesianVector::CartesianVector(const double x, const double y, const double z)
-    : m_impl{std::make_unique<impl::VectorImpl>(x,y,z)}
+    : m_vector{x,y,z}
 {}
 
 CartesianVector::CartesianVector(const SphericalVector& otherVector)
-    : m_impl{std::make_unique<impl::VectorImpl>(createVectorFromSphericalCoords(otherVector))}
+    : m_vector{createVectorFromSphericalCoords(otherVector)}
 {}
 
 double CartesianVector::x() const{
-  return m_impl->vector.x();
+  return m_vector.x();
 }
 
 double CartesianVector::y() const{
-  return m_impl->vector.y();
+  return m_vector.y();
 }
 
 double CartesianVector::z() const {
-  return m_impl->vector.z();
+  return m_vector.z();
 }
 
 double CartesianVector::norm() const {
-  return m_impl->vector.norm();
+  return m_vector.norm();
 }
 
 CartesianVector CartesianVector::normalizedVector() const {
   CartesianVector normalizedVector;
-  normalizedVector.m_impl->vector = this->m_impl->vector.normalized();
+  normalizedVector.m_vector = this->m_vector.normalized();
   return normalizedVector;
 }
 
 double CartesianVector::dot(const CartesianVector& vector1, const CartesianVector& vector2) {
-  return vector1.m_impl->vector.dot(vector2.m_impl->vector);
+  return vector1.m_vector.dot(vector2.m_vector);
 }
 
 CartesianVector CartesianVector::cross(const CartesianVector& leftVector, const CartesianVector& rightVector) {
-  Eigen::Vector3d result = leftVector.m_impl->vector.cross(rightVector.m_impl->vector);
+  Eigen::Vector3d result = leftVector.m_vector.cross(rightVector.m_vector);
   CartesianVector returnVector;
-  returnVector.m_impl->vector = result;
+  returnVector.m_vector = result;
   return returnVector;
 }
 
@@ -77,22 +74,22 @@ double CartesianVector::separation(const CartesianVector& other) const {
 }
 
 double& CartesianVector::at(const size_t index) {
-  return m_impl->vector[index];
+  return m_vector[index];
 }
 
 const double& CartesianVector::c_at(const size_t index) const {
-  return m_impl->vector[index];
+  return m_vector[index];
 }
 
 CartesianVector CartesianVector::operator-() const {
   CartesianVector negativeVector;
-  negativeVector.m_impl->vector = -(this->m_impl->vector);
+  negativeVector.m_vector = -(this->m_vector);
   return negativeVector;
 }
 
 CartesianVector CartesianVector::operator+(const CartesianVector& otherVector) const {
   CartesianVector sumVector;
-  sumVector.m_impl->vector = m_impl->vector + otherVector.m_impl->vector;
+  sumVector.m_vector = m_vector + otherVector.m_vector;
   return sumVector;
 }
 
@@ -101,12 +98,19 @@ CartesianVector CartesianVector::operator-(const CartesianVector& otherVector) c
 }
 
 bool CartesianVector::operator==(const CartesianVector& otherVector) const {
-  return m_impl->vector == otherVector.m_impl->vector;
+  return m_vector == otherVector.m_vector;
 }
 
 bool CartesianVector::operator!=(const CartesianVector& otherVector) const {
   return !(otherVector == *this);
 }
+
+CartesianVector CartesianVector::operator/(const double& scale) const {
+    CartesianVector scaledCopy{x()/scale, y()/scale, z()/scale};
+    return scaledCopy;
+}
+
+CartesianVector::~CartesianVector() = default;
 
 } // namespace orbital
 
@@ -114,9 +118,16 @@ bool CartesianVector::operator!=(const CartesianVector& otherVector) const {
 
 #include <gtest/gtest.h>
 
+namespace orbital{
+void PrintTo(const CartesianVector& vector, std::ostream* os){
+    *os << "(" << vector.x() << ", " << vector.y() << ", " << vector.z() << ")";
+}
+} // namespace orbital
+
 namespace {
 
 class CartesianVectorTest : public ::testing::Test {
+
 public:
   const double expectedX{1.2345}, expectedY{-2.341}, expectedZ{3.0};
   const double expectedNorm{std::sqrt(std::pow(expectedX, 2) + std::pow(expectedY,2 ) + std::pow(expectedZ, 2))};
