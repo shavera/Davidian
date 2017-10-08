@@ -67,6 +67,10 @@ double meanAnomaly(double eccentricAnomaly, double eccentricity){
   return eccentricAnomaly + eccentricity * std::sin(eccentricAnomaly);
 }
 
+double period(double semiMajorAxis, double standardGravitationalParameter){
+  return 2*M_PI*std::sqrt(std::pow(semiMajorAxis, 3)/standardGravitationalParameter);
+}
+
 } // anonymous namespace
 
 OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
@@ -78,6 +82,7 @@ OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, cons
 //  m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
   m_elements.eccentricity = eccVector.norm();
   m_elements.semiMajorAxis = semiMajorAxis(stdGravParam, m_specificOrbitalEnergy);
+  m_period = period(m_elements.semiMajorAxis, stdGravParam);
   m_elements.inclination = inclination(m_specificAngularMomentum);
   CartesianVector ascVector{vectorOfAscendingNode(m_specificAngularMomentum)};
   m_elements.longitudeOfAscendingNode = longitudeOfAscendingNode(ascVector);
@@ -246,6 +251,12 @@ TEST_F(OrbitImpl, meanAnomaly){
   const double expectedAnomaly{1.7493737467};
 
   EXPECT_NEAR(expectedAnomaly, meanAnomaly(eccentricAnomaly, eccentricity), 1e-6*expectedAnomaly);
+}
+
+TEST_F(OrbitImpl, period){
+  const double semiMajorAxis{14}, stdGravParam{4}, expectedPeriod{164.56668702};
+
+  EXPECT_NEAR(expectedPeriod, period(semiMajorAxis, stdGravParam), 1e-6*expectedPeriod);
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later

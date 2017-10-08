@@ -15,7 +15,7 @@ public:
   OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass);
 
   orbital::OrbitalElements m_elements;
-  double m_specificOrbitalEnergy;
+  double m_specificOrbitalEnergy, m_period;
   CartesianVector m_specificAngularMomentum;
 };
 
