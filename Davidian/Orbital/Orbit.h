@@ -15,12 +15,9 @@ namespace impl{
 class OrbitImpl;
 } // namespace impl
 
-
-
-
 class Orbit {
 public:
-    Orbit(const StateVector& stateVector, const double barymass, const double leptomass, impl::OrbitImpl* impl);
+    Orbit(const StateVector& stateVector, double barymass, double leptomass, impl::OrbitImpl* impl);
     virtual ~Orbit();
 
 private:

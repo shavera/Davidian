@@ -7,7 +7,7 @@
 
 namespace orbital {
 
-Orbit::Orbit(const StateVector& stateVector, const double barymass, const double leptomass, impl::OrbitImpl* impl)
+Orbit::Orbit(const StateVector& stateVector, double barymass, double leptomass, impl::OrbitImpl* impl)
     : m_impl{nullptr == impl ? new impl::OrbitImpl{stateVector, barymass, leptomass} : impl}
 {
 

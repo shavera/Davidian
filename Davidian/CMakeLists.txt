@@ -17,6 +17,7 @@ if(BUILD_TESTING)
 endif ()
 
 add_subdirectory(Orbital)
+add_subdirectory(Engine)
 
 
 set(SOURCE_FILES main.cpp)

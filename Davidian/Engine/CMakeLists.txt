@@ -1,21 +1,14 @@
 cmake_minimum_required(VERSION 3.7)
-project(orbital)
+project(engine)
 
 set(CMAKE_CXX_STANDARD 14)
 
 set(SOURCES
-        Body
-        CartesianVector
-        CelestialBody
-        Orbit
-        SphericalVector
-
-        impl/OrbitImpl
+        OrbitalEngine
         )
 
 add_library(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PUBLIC Eigen)
+target_link_libraries(${PROJECT_NAME} orbital)
 
 if (BUILD_TESTING)
     target_include_directories(${PROJECT_NAME} PRIVATE ${GTEST_INCLUDE_DIR})
