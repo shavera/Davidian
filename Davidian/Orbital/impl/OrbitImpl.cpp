@@ -71,6 +71,10 @@ double period(double semiMajorAxis, double standardGravitationalParameter){
   return 2*M_PI*std::sqrt(std::pow(semiMajorAxis, 3)/standardGravitationalParameter);
 }
 
+double sweep(double period){
+  return 2*M_PI/period;
+}
+
 } // anonymous namespace
 
 OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
@@ -83,6 +87,7 @@ OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, cons
   m_elements.eccentricity = eccVector.norm();
   m_elements.semiMajorAxis = semiMajorAxis(stdGravParam, m_specificOrbitalEnergy);
   m_period = period(m_elements.semiMajorAxis, stdGravParam);
+  m_sweep = sweep(m_period);
   m_elements.inclination = inclination(m_specificAngularMomentum);
   CartesianVector ascVector{vectorOfAscendingNode(m_specificAngularMomentum)};
   m_elements.longitudeOfAscendingNode = longitudeOfAscendingNode(ascVector);
@@ -257,6 +262,13 @@ TEST_F(OrbitImpl, period){
   const double semiMajorAxis{14}, stdGravParam{4}, expectedPeriod{164.56668702};
 
   EXPECT_NEAR(expectedPeriod, period(semiMajorAxis, stdGravParam), 1e-6*expectedPeriod);
+}
+
+TEST_F(OrbitImpl, sweep){
+  const double period{2*M_PI*11.5};
+  const double expectedSweep{1/11.5};
+
+  EXPECT_NEAR(expectedSweep, sweep(period), 1e-6*expectedSweep);
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later

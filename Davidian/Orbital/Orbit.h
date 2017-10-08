@@ -17,8 +17,15 @@ class OrbitImpl;
 
 class Orbit {
 public:
-    Orbit(const StateVector& stateVector, double barymass, double leptomass, impl::OrbitImpl* impl);
-    virtual ~Orbit();
+  Orbit(const StateVector& stateVector, double barymass, double leptomass, impl::OrbitImpl* impl);
+  virtual ~Orbit();
+
+  inline const OrbitalElements& orbitalElements() const;
+
+  inline double energy() const;
+  inline const CartesianVector& angularMomentum() const;
+  inline double period() const;
+  inline double sweep() const;
 
 private:
     std::unique_ptr<impl::OrbitImpl> m_impl;

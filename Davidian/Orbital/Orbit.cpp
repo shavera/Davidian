@@ -13,27 +13,26 @@ Orbit::Orbit(const StateVector& stateVector, double barymass, double leptomass, 
 
 }
 
+double Orbit::energy() const {
+  return m_impl->m_specificOrbitalEnergy;
+}
+
+const CartesianVector& Orbit::angularMomentum() const {
+  return m_impl->m_specificAngularMomentum;
+}
+
+double Orbit::period() const {
+  return m_impl->m_period;
+}
+
+double Orbit::sweep() const {
+  return m_impl->m_sweep;
+}
+
+const OrbitalElements& Orbit::orbitalElements() const {
+  return m_impl->m_elements;
+}
+
 Orbit::~Orbit() = default;
 
 } // namespace orbital
-
-
-#ifdef BUILD_TESTS
-
-#include <gtest/gtest.h>
-
-namespace orbital{
-namespace {
-
-class OrbitTest : public ::testing::Test{
-
-};
-
-TEST_F(OrbitTest, dummy){
-//    Orbit orbit(StateVector{}, 1);
-}
-
-} // anonymous namespace
-} // namespace orbital
-
-#endif // BUILD_TESTS
