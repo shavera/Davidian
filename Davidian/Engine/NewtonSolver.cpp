@@ -6,10 +6,10 @@
 
 namespace engine {
 
-double solveEquation(const std::function<double(double)>& f,
-                     const std::function<double(double)>& derivative,
-                     double tolerance,
-                     double x0) {
+double findFunctionRoot(const std::function<double(double)>& f,
+                        const std::function<double(double)>& derivative,
+                        double x0,
+                        double tolerance) {
   double x{x0}, lastX, limit;
   do {
     lastX = x;
@@ -32,7 +32,7 @@ TEST(EquationSolver, solveFunction){
   auto testFunction = [](double x){return std::log(x+0.2) + std::pow(x, 3) + 0.908290732;};
   auto testDerivative = [](double x){return 1/(x+0.2) + 3*std::pow(x,2);};
   const double expectedValue{0.2};
-  const double actualValue{solveEquation(testFunction, testDerivative)};
+  const double actualValue{findFunctionRoot(testFunction, testDerivative, 0)};
 
   EXPECT_NEAR(expectedValue, actualValue, 1e-6*expectedValue);
 }
