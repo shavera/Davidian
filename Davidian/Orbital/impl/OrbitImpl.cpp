@@ -15,10 +15,6 @@ double reducedMass(const double m1, const double m2){
   return 1/(1/m1 + 1/m2);
 };
 
-double standardGravitationalParameter(const double m1, const double m2){
-  return orbital::G*(m1 + m2);
-};
-
 double energy(const StateVector& stateVector, const double standardGravitationalParameter){
   return stateVector.velocity.dot(stateVector.velocity)/2 - standardGravitationalParameter/stateVector.position.norm();
 }
@@ -67,17 +63,9 @@ double meanAnomaly(double eccentricAnomaly, double eccentricity){
   return eccentricAnomaly + eccentricity * std::sin(eccentricAnomaly);
 }
 
-double period(double semiMajorAxis, double standardGravitationalParameter){
-  return 2*M_PI*std::sqrt(std::pow(semiMajorAxis, 3)/standardGravitationalParameter);
-}
-
-double sweep(double period){
-  return 2*M_PI/period;
-}
-
 } // anonymous namespace
 
-OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass)
+OrbitImpl::OrbitImpl(const StateVector& stateVector, double barymass, double leptomass)
 {
   const double stdGravParam{standardGravitationalParameter(barymass, leptomass)};
   m_specificOrbitalEnergy = energy(stateVector, stdGravParam);
@@ -94,6 +82,22 @@ OrbitImpl::OrbitImpl(const StateVector& stateVector, const double barymass, cons
   m_elements.argumentOfPeriapsis = argumentOfPeriapsis(ascVector, eccVector);
   const double eccAnomaly{eccentricAnomaly(stateVector.position.norm(), m_elements.semiMajorAxis, m_elements.eccentricity)};
   m_elements.meanAnomalyAtEpoch = meanAnomaly(eccAnomaly, m_elements.eccentricity);
+}
+
+double OrbitImpl::energyFromElements(double semiMajorAxis, double standardGravitationalParameter) {
+  return 0 == semiMajorAxis ? 0 : -standardGravitationalParameter/(2*semiMajorAxis);
+}
+
+double OrbitImpl::period(double semiMajorAxis, double standardGravitationalParameter) {
+  return 2*M_PI*std::sqrt(std::pow(semiMajorAxis, 3)/standardGravitationalParameter);
+}
+
+double OrbitImpl::sweep(double period) {
+  return 2*M_PI/period;
+}
+
+double OrbitImpl::standardGravitationalParameter(double m1, double m2) {
+  return orbital::G*(m1 + m2);
 }
 
 } // namespace impl
@@ -124,7 +128,7 @@ TEST_F(OrbitImpl, reducedMass){
 TEST_F(OrbitImpl, standardGravitationalParameter){
   // approximately 1.5e12*G
   const double expectedParameter{100.1112};
-  EXPECT_NEAR(expectedParameter, standardGravitationalParameter(10e11, 5e11), .001);
+  EXPECT_NEAR(expectedParameter, orbital::impl::OrbitImpl::standardGravitationalParameter(10e11, 5e11), .001);
 }
 
 TEST_F(OrbitImpl, energy){
@@ -261,14 +265,36 @@ TEST_F(OrbitImpl, meanAnomaly){
 TEST_F(OrbitImpl, period){
   const double semiMajorAxis{14}, stdGravParam{4}, expectedPeriod{164.56668702};
 
-  EXPECT_NEAR(expectedPeriod, period(semiMajorAxis, stdGravParam), 1e-6*expectedPeriod);
+  EXPECT_NEAR(expectedPeriod, orbital::impl::OrbitImpl::period(semiMajorAxis, stdGravParam), 1e-6*expectedPeriod);
 }
 
 TEST_F(OrbitImpl, sweep){
   const double period{2*M_PI*11.5};
   const double expectedSweep{1/11.5};
 
-  EXPECT_NEAR(expectedSweep, sweep(period), 1e-6*expectedSweep);
+  EXPECT_NEAR(expectedSweep, orbital::impl::OrbitImpl::sweep(period), 1e-6*expectedSweep);
+}
+
+TEST_F(OrbitImpl, energyFromElements){
+  const double semimMajorAxis{124}, stdGravParam{93};
+  const double expectedEnergy{-0.375};
+
+  EXPECT_EQ(expectedEnergy, orbital::impl::OrbitImpl::energyFromElements(semimMajorAxis, stdGravParam));
+}
+
+
+TEST_F(OrbitImpl, energyFromElements_zeroSemiMajorAxis){
+  const double stdGravParam{93}, semiMajorAxis{0};
+
+  EXPECT_EQ(0, orbital::impl::OrbitImpl::energyFromElements(semiMajorAxis, stdGravParam));
+}
+
+TEST_F(OrbitImpl, periodFromElements){
+
+}
+
+TEST_F(OrbitImpl, sweepFromElements){
+
 }
 
 /// Need to do another test here of the actual orbit impl, will do this later

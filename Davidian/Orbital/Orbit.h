@@ -17,7 +17,8 @@ class OrbitImpl;
 
 class Orbit {
 public:
-  Orbit(const StateVector& stateVector, double barymass, double leptomass, impl::OrbitImpl* impl);
+  Orbit(const StateVector& stateVector, double barymass, double leptomass);
+  Orbit(const OrbitalElements& elements, double barymass, double leptomass);
   virtual ~Orbit();
 
   inline const OrbitalElements& orbitalElements() const;

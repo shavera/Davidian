@@ -10,12 +10,17 @@
 namespace orbital{
 namespace impl{
 
-class OrbitImpl {
-public:
-  OrbitImpl(const StateVector& stateVector, const double barymass, const double leptomass);
+struct OrbitImpl {
+  OrbitImpl(const StateVector& stateVector, double barymass, double leptomass);
+  OrbitImpl() = default;
+
+  static double standardGravitationalParameter(double m1, double m2);
+  static double energyFromElements(double semiMajorAxis, double standardGravitationalParameter);
+  static double period(double semiMajorAxis, double standardGravitationalParameter);
+  static double sweep(double period);
 
   orbital::OrbitalElements m_elements;
-  double m_specificOrbitalEnergy, m_period, m_sweep;
+  double m_specificOrbitalEnergy{0}, m_period{0}, m_sweep{0};
   CartesianVector m_specificAngularMomentum;
 };
 
