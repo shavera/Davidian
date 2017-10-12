@@ -24,6 +24,14 @@ double eccentricAnomaly(double meanAnomaly, double eccentricity){
   return findFunctionRoot(eccAnomalyFunction, eccAnomalyDerivative, 0);
 }
 
+double trueAnomaly(double eccentricAnomaly, double eccentricity){
+  return (std::cos(eccentricAnomaly) - eccentricity)/(1-eccentricity*std::cos(eccentricAnomaly));
+}
+
+double radius(double semiMajorAxis, double eccentricity, double trueAnomaly){
+  return semiMajorAxis*(1-std::pow(eccentricity, 2))/(1+eccentricity*std::cos(trueAnomaly));
+}
+
 } // anonymous namespace
 
 OrbitState::OrbitState(const orbital::Orbit& orbit, double time) {
@@ -56,6 +64,18 @@ TEST_F(OrbitState, eccentricAnomaly){
   const double expectedEccentricAnomaly{1.23}, actualEccentricAnomaly{eccentricAnomaly(meanAnomaly, eccentricity)};
 
   EXPECT_NEAR(expectedEccentricAnomaly, actualEccentricAnomaly, 1e-6*expectedEccentricAnomaly);
+}
+
+TEST_F(OrbitState, trueAnomaly){
+  const double eccentricAnomaly{1.23}, eccentricity{0.55};
+  const double expectedTrueAnomaly{-0.264359718102521}, actualTrueAnomaly{trueAnomaly(eccentricAnomaly, eccentricity)};
+  EXPECT_NEAR(expectedTrueAnomaly, actualTrueAnomaly, std::fabs(1e-6*expectedTrueAnomaly));
+}
+
+TEST_F(OrbitState, radius){
+  const double semiMajorAxis{1123}, eccentricity{0.55}, trueAnomaly{-0.264359718102521};
+  const double expectedRadius{511.6572486356}, actualRadius{radius(semiMajorAxis, eccentricity, trueAnomaly)};
+  EXPECT_NEAR(expectedRadius, actualRadius, 1e-6*expectedRadius);
 }
 
 } // anonymous namespace
