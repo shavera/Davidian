@@ -21,7 +21,7 @@ public:
   Orbit(const OrbitalElements& elements, double barymass, double leptomass);
   virtual ~Orbit();
 
-  inline const OrbitalElements& orbitalElements() const;
+  const OrbitalElements& orbitalElements() const;
 
   inline double energy() const;
   inline const CartesianVector& angularMomentum() const;
