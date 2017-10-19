@@ -67,14 +67,14 @@ double meanAnomaly(double eccentricAnomaly, double eccentricity){
 
 OrbitImpl::OrbitImpl(const StateVector& stateVector, double barymass, double leptomass)
 {
-  const double stdGravParam{standardGravitationalParameter(barymass, leptomass)};
-  m_specificOrbitalEnergy = energy(stateVector, stdGravParam);
+  m_standardGravitationalParameter = standardGravitationalParameter(barymass, leptomass);
+  m_specificOrbitalEnergy = energy(stateVector, m_standardGravitationalParameter);
   m_specificAngularMomentum = specificAngularMomentum(stateVector, reducedMass(barymass, leptomass));
-  CartesianVector eccVector{eccentricityVector(stateVector, m_specificAngularMomentum, stdGravParam)};
+  CartesianVector eccVector{eccentricityVector(stateVector, m_specificAngularMomentum, m_standardGravitationalParameter)};
 //  m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
   m_elements.eccentricity = eccVector.norm();
-  m_elements.semiMajorAxis = semiMajorAxis(stdGravParam, m_specificOrbitalEnergy);
-  m_period = period(m_elements.semiMajorAxis, stdGravParam);
+  m_elements.semiMajorAxis = semiMajorAxis(m_standardGravitationalParameter, m_specificOrbitalEnergy);
+  m_period = period(m_elements.semiMajorAxis, m_standardGravitationalParameter);
   m_sweep = sweep(m_period);
   m_elements.inclination = inclination(m_specificAngularMomentum);
   CartesianVector ascVector{vectorOfAscendingNode(m_specificAngularMomentum)};

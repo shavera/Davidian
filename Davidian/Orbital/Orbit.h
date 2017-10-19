@@ -23,6 +23,7 @@ public:
 
   const OrbitalElements& orbitalElements() const;
 
+  inline double standardGravitationalParameter() const;
   inline double energy() const;
   inline const CartesianVector& angularMomentum() const;
   inline double period() const;

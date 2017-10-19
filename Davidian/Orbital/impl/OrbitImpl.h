@@ -20,7 +20,7 @@ struct OrbitImpl {
   static double sweep(double period);
 
   orbital::OrbitalElements m_elements;
-  double m_specificOrbitalEnergy{0}, m_period{0}, m_sweep{0};
+  double m_standardGravitationalParameter{0}, m_specificOrbitalEnergy{0}, m_period{0}, m_sweep{0};
   CartesianVector m_specificAngularMomentum;
 };
 
