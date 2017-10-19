@@ -34,12 +34,13 @@ public:
   double separation(const CartesianVector& other) const;
 
   /// bounds checking member access by 0-based index (0->x, 1->y, 2->z)
-  double& at(const size_t index);
-  const double& c_at(const size_t index) const;
+  double& at(size_t index);
+  const double& c_at(size_t index) const;
 
   CartesianVector operator-() const;
   CartesianVector operator+(const CartesianVector& otherVector) const;
   CartesianVector operator-(const CartesianVector& otherVector) const;
+  CartesianVector operator*(const double& scale) const;
   CartesianVector operator/(const double& scale) const;
   bool operator==(const CartesianVector& otherVector) const;
   bool operator!=(const CartesianVector& otherVector) const;
@@ -47,6 +48,8 @@ public:
 private:
   Eigen::Vector3d m_vector;
 };
+
+CartesianVector operator*(const double& factor, const CartesianVector& vector);
 
 } // namespace orbital
 

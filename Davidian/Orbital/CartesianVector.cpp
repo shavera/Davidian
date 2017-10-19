@@ -73,11 +73,11 @@ double CartesianVector::separation(const CartesianVector& other) const {
   return (*this - other).norm();
 }
 
-double& CartesianVector::at(const size_t index) {
+double& CartesianVector::at(size_t index) {
   return m_vector[index];
 }
 
-const double& CartesianVector::c_at(const size_t index) const {
+const double& CartesianVector::c_at(size_t index) const {
   return m_vector[index];
 }
 
@@ -98,11 +98,19 @@ CartesianVector CartesianVector::operator-(const CartesianVector& otherVector) c
 }
 
 bool CartesianVector::operator==(const CartesianVector& otherVector) const {
-  return m_vector == otherVector.m_vector;
+  return m_vector.isApprox(otherVector.m_vector);
 }
 
 bool CartesianVector::operator!=(const CartesianVector& otherVector) const {
   return !(otherVector == *this);
+}
+
+CartesianVector CartesianVector::operator*(const double& scale) const {
+  return CartesianVector{scale*this->x(), scale*this->y(), scale*this->z()};
+}
+
+CartesianVector operator*(const double& scale, const CartesianVector& vector){
+  return CartesianVector{scale*vector.x(), scale*vector.y(), scale*vector.z()};
 }
 
 CartesianVector CartesianVector::operator/(const double& scale) const {
@@ -290,6 +298,20 @@ TEST_F(CartesianVectorOperationsTest, inequality_operator){
   EXPECT_FALSE(congruentToLeftVector != leftVector);
   EXPECT_TRUE(rightVector != congruentToLeftVector);
   EXPECT_NE(rightVector, congruentToLeftVector);
+}
+
+TEST_F(CartesianVectorOperationsTest, multiplication_operator){
+  const orbital::CartesianVector initialVector{1, -2, 3.5}, expectedVector{14, -28, 49};
+  const double factor{14};
+  const orbital::CartesianVector vectorFromRight{initialVector*factor}, vectorFromLeft{factor*initialVector};
+  EXPECT_EQ(expectedVector, vectorFromRight);
+  EXPECT_EQ(expectedVector, vectorFromLeft);
+}
+
+TEST_F(CartesianVectorOperationsTest, division_operator){
+  const orbital::CartesianVector initialVector{39, -15.3, 64.2}, expectedVector{13, -5.1, 21.4};
+  const double divisor{3};
+  EXPECT_EQ(expectedVector, initialVector/divisor);
 }
 
 } // anonymous namespace for testing
