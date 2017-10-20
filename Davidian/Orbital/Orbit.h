@@ -23,11 +23,11 @@ public:
 
   const OrbitalElements& orbitalElements() const;
 
-  inline double standardGravitationalParameter() const;
-  inline double energy() const;
-  inline const CartesianVector& angularMomentum() const;
-  inline double period() const;
-  inline double sweep() const;
+  double standardGravitationalParameter() const;
+  double energy() const;
+  const CartesianVector& angularMomentum() const;
+  double period() const;
+  double sweep() const;
 
 private:
     std::unique_ptr<impl::OrbitImpl> m_impl;
