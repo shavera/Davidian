@@ -4,6 +4,7 @@
 
 #include "OrbitState.h"
 #include "NewtonSolver.h"
+#include "RotationMatrices.h"
 
 using orbital::Orbit;
 using orbital::OrbitalElements;
@@ -47,11 +48,7 @@ StateVector orbitCoordinateStateVector(const Orbit& orbit, double radius, double
 }
 
 StateVector globalCoordinateStateVector(const StateVector& orbitCoordinateVector, const Eigen::Matrix3d& orbitToGlobalTxfm){
-//  CartesianVector position = orbitToGlobalTxfm * orbitCoordinateVector.position;
-//  CartesianVector velocity = orbitToGlobalTxfm * orbitCoordinateVector.velocity;
-
-//  return StateVector{position, velocity};
-  return StateVector{};
+  return orbitToGlobalTxfm * orbitCoordinateVector;
 }
 
 } // anonymous namespace
@@ -126,7 +123,7 @@ TEST_F(OrbitState, globalCoordinateStateVector){
 
   StateVector orbitalState{{18.0814907049, 9.6145077816, 0},{-1.8324404306, 1.2574985215, 0}};
 
-  StateVector expectedState{{19.4217, 6.09371, -2.24552},{-1.56909, 1.57245, 0.0670943}};
+  StateVector expectedState{{19.421724826, 6.09371, -2.24552},{-1.56909, 1.57245, 0.0670943}};
 
   StateVector actualState = globalCoordinateStateVector(orbitalState, rotationMatrix);
 

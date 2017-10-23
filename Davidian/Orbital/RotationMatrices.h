@@ -14,6 +14,8 @@ Eigen::Matrix3d GlobalToOrbit(const Orbit& orbit);
 
 Eigen::Matrix3d OrbitToGlobal(const Orbit& orbit);
 
+StateVector operator*(const Eigen::Matrix3d& transform, const StateVector& stateVector);
+
 } // namespace orbital
 
 #endif //DAVIDIAN_ROTATIONMATRICES_H

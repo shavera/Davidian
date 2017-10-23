@@ -12,6 +12,7 @@ namespace orbital{
 class SphericalVector;
 
 class CartesianVector {
+  friend CartesianVector operator*(const Eigen::Matrix3d& transform, const CartesianVector& vector);
 public:
   CartesianVector();
   CartesianVector(const double x, const double y, const double z);
@@ -50,6 +51,8 @@ private:
 };
 
 CartesianVector operator*(const double& factor, const CartesianVector& vector);
+
+CartesianVector operator*(const Eigen::Matrix3d& transform, const CartesianVector& vector);
 
 } // namespace orbital
 

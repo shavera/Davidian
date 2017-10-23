@@ -19,6 +19,10 @@ Eigen::Matrix3d OrbitToGlobal(const Orbit& orbit) {
           Eigen::AngleAxisd(-elements.argumentOfPeriapsis, Eigen::Vector3d::UnitZ())).toRotationMatrix();
 }
 
+StateVector operator*(const Eigen::Matrix3d& transform, const StateVector& stateVector) {
+  return StateVector{transform*stateVector.position, transform*stateVector.velocity};
+}
+
 } // namespace orbital
 
 #ifdef BUILD_TESTS
@@ -70,6 +74,26 @@ TEST_F(RotationMatrices, OrbitToGlobal){
                             -0.184745715,	0.9812450651,	0.0550194789,
                             -0.0859565838,	-0.0719015291,	0.9937009791;
   actualRotationMatrix = OrbitToGlobal(*orbit);
+}
+
+TEST(RotationMatrixOperation, StateVector){
+  Eigen::Matrix3d rotationMatrix;
+  rotationMatrix << 0.9790201665,	0.1788527114,	0.0976279731,
+                    -0.184745715,	0.9812450651,	0.0550194789,
+                    -0.0859565838,	-0.0719015291,	0.9937009791;
+
+  StateVector initialState{{18.0814907049, 9.6145077816, 0},{-1.8324404306, 1.2574985215, 0}};
+
+  StateVector expectedState{{19.421724826, 6.09371, -2.24552},{-1.56909, 1.57245, 0.0670943}};
+
+  StateVector actualState = rotationMatrix * initialState;
+
+  for(int i{0}; i < 3; ++i){
+    EXPECT_NEAR(expectedState.position.at(i), actualState.position.at(i), std::fabs(1e-6*expectedState.position.at(i)))
+              << "position " << i;
+    EXPECT_NEAR(expectedState.velocity.at(i), actualState.velocity.at(i), std::fabs(1e-6*expectedState.velocity.at(i)))
+              << "velocity " << i;
+  }
 }
 
 } // anonymous namespace
