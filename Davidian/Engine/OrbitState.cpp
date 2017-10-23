@@ -44,7 +44,14 @@ StateVector orbitCoordinateStateVector(const Orbit& orbit, double radius, double
                             std::sqrt(1-std::pow(orbit.orbitalElements().eccentricity,2))*std::cos(eccentricAnomaly),
                             0 };
   return StateVector{position, velocityFactor*velocity};
-//  return StateVector{};
+}
+
+StateVector globalCoordinateStateVector(const StateVector& orbitCoordinateVector, const Eigen::Matrix3d& orbitToGlobalTxfm){
+//  CartesianVector position = orbitToGlobalTxfm * orbitCoordinateVector.position;
+//  CartesianVector velocity = orbitToGlobalTxfm * orbitCoordinateVector.velocity;
+
+//  return StateVector{position, velocity};
+  return StateVector{};
 }
 
 } // anonymous namespace
@@ -109,6 +116,26 @@ TEST_F(OrbitState, orbitCoordinateStateVector){
   }
   EXPECT_EQ(0, actualState.position.z());
   EXPECT_EQ(0, actualState.velocity.z());
+}
+
+TEST_F(OrbitState, globalCoordinateStateVector){
+  Eigen::Matrix3d rotationMatrix;
+  rotationMatrix << 0.9790201665,	0.1788527114,	0.0976279731,
+                    -0.184745715,	0.9812450651,	0.0550194789,
+                    -0.0859565838,	-0.0719015291,	0.9937009791;
+
+  StateVector orbitalState{{18.0814907049, 9.6145077816, 0},{-1.8324404306, 1.2574985215, 0}};
+
+  StateVector expectedState{{19.4217, 6.09371, -2.24552},{-1.56909, 1.57245, 0.0670943}};
+
+  StateVector actualState = globalCoordinateStateVector(orbitalState, rotationMatrix);
+
+  for(int i{0}; i < 3; ++i){
+    EXPECT_NEAR(expectedState.position.at(i), actualState.position.at(i), std::fabs(1e-6*expectedState.position.at(i)))
+              << "position " << i;
+    EXPECT_NEAR(expectedState.velocity.at(i), actualState.velocity.at(i), std::fabs(1e-6*expectedState.velocity.at(i)))
+              << "velocity " << i;
+  }
 }
 
 } // anonymous namespace
