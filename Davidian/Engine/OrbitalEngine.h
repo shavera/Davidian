@@ -11,6 +11,10 @@
 namespace engine {
 
 class OrbitalEngine{
+public:
+  std::vector<OrbitState> generateOrbitalHistory(double numberOfPeriods,
+                                                 int numberOfTimeDivisions,
+                                                 const orbital::Orbit& orbit);
 
 };
 
