@@ -15,11 +15,11 @@ namespace engine {
 
 namespace{
 
-double meanAnomaly(double meanAnomalyAtEpoch, double sweep, double time){
+double meanAnomaly_f(double meanAnomalyAtEpoch, double sweep, double time){
   return meanAnomalyAtEpoch + sweep*time;
 }
 
-double eccentricAnomaly(double meanAnomaly, double eccentricity){
+double eccentricAnomaly_f(double meanAnomaly, double eccentricity){
   auto eccAnomalyFunction = [meanAnomaly, eccentricity](double eccentricAnomaly){
     return eccentricAnomaly - eccentricity*std::sin(eccentricAnomaly) - meanAnomaly;
   };
@@ -30,11 +30,11 @@ double eccentricAnomaly(double meanAnomaly, double eccentricity){
   return findFunctionRoot(eccAnomalyFunction, eccAnomalyDerivative, 0);
 }
 
-double trueAnomaly(double eccentricAnomaly, double eccentricity){
+double trueAnomaly_f(double eccentricAnomaly, double eccentricity){
   return (std::cos(eccentricAnomaly) - eccentricity)/(1-eccentricity*std::cos(eccentricAnomaly));
 }
 
-double radius(double semiMajorAxis, double eccentricity, double trueAnomaly){
+double radius_f(double semiMajorAxis, double eccentricity, double trueAnomaly){
   return semiMajorAxis*(1-std::pow(eccentricity, 2))/(1+eccentricity*std::cos(trueAnomaly));
 }
 
@@ -53,8 +53,15 @@ StateVector globalCoordinateStateVector(const StateVector& orbitCoordinateVector
 
 } // anonymous namespace
 
-OrbitState::OrbitState(const orbital::Orbit& orbit, double time) {
-
+OrbitState::OrbitState(const orbital::Orbit& orbit, double time) : time{time}
+{
+  const double meanAnom{meanAnomaly_f(orbit.orbitalElements().meanAnomalyAtEpoch, orbit.sweep(), time)};
+  const double eccAnom{eccentricAnomaly_f(meanAnom, orbit.orbitalElements().eccentricity)};
+  this->trueAnomaly = trueAnomaly_f(eccAnom, orbit.orbitalElements().eccentricity);
+  const double r{radius_f(orbit.orbitalElements().semiMajorAxis,  orbit.orbitalElements().eccentricity, trueAnomaly)};
+  const StateVector orbitCoordState = orbitCoordinateStateVector(orbit, r, this->trueAnomaly, eccAnom);
+  const Eigen::Matrix3d rotationMatrix{orbital::OrbitToGlobal(orbit)};
+  stateVector = globalCoordinateStateVector(orbitCoordState, rotationMatrix);
 }
 
 } // namespace engine
@@ -73,27 +80,27 @@ class OrbitState : public ::testing::Test {
 
 TEST_F(OrbitState, meanAnomaly) {
   const double M0{1.23}, sweep{.123}, time{57};
-  const double expectedMeanAnomaly{8.241}, actualMeanAnomaly{meanAnomaly(M0, sweep, time)};
+  const double expectedMeanAnomaly{8.241}, actualMeanAnomaly{meanAnomaly_f(M0, sweep, time)};
 
   EXPECT_NEAR(expectedMeanAnomaly, actualMeanAnomaly, 1e-6 * expectedMeanAnomaly);
 }
 
 TEST_F(OrbitState, eccentricAnomaly){
   const double meanAnomaly{0.71163115893}, eccentricity{0.55};
-  const double expectedEccentricAnomaly{1.23}, actualEccentricAnomaly{eccentricAnomaly(meanAnomaly, eccentricity)};
+  const double expectedEccentricAnomaly{1.23}, actualEccentricAnomaly{eccentricAnomaly_f(meanAnomaly, eccentricity)};
 
   EXPECT_NEAR(expectedEccentricAnomaly, actualEccentricAnomaly, 1e-6*expectedEccentricAnomaly);
 }
 
 TEST_F(OrbitState, trueAnomaly){
   const double eccentricAnomaly{1.23}, eccentricity{0.55};
-  const double expectedTrueAnomaly{-0.264359718102521}, actualTrueAnomaly{trueAnomaly(eccentricAnomaly, eccentricity)};
+  const double expectedTrueAnomaly{-0.264359718102521}, actualTrueAnomaly{trueAnomaly_f(eccentricAnomaly, eccentricity)};
   EXPECT_NEAR(expectedTrueAnomaly, actualTrueAnomaly, std::fabs(1e-6*expectedTrueAnomaly));
 }
 
 TEST_F(OrbitState, radius){
   const double semiMajorAxis{1123}, eccentricity{0.55}, trueAnomaly{-0.264359718102521};
-  const double expectedRadius{511.6572486356}, actualRadius{radius(semiMajorAxis, eccentricity, trueAnomaly)};
+  const double expectedRadius{511.6572486356}, actualRadius{radius_f(semiMajorAxis, eccentricity, trueAnomaly)};
   EXPECT_NEAR(expectedRadius, actualRadius, 1e-6*expectedRadius);
 }
 

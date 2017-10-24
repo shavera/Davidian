@@ -6,6 +6,7 @@
 #define DAVIDIAN_ORBITSTATE_H
 
 #include <CartesianVector.h>
+#include <impl/GlobalDefinitions.h>
 #include <Orbit.h>
 
 namespace engine{
@@ -13,7 +14,7 @@ namespace engine{
 struct OrbitState{
   OrbitState(const orbital::Orbit& orbit, double time);
   double time, trueAnomaly;
-  orbital::CartesianVector position, velocity;
+  orbital::StateVector stateVector;
 };
 
 } // namespace engine
