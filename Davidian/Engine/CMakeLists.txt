@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
         OrbitalEngine
+        OrbitalHistory
         OrbitState
         NewtonSolver
         )

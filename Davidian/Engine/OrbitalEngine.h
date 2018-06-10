@@ -5,6 +5,7 @@
 #ifndef DAVIDIAN_ORBITALENGINE_H
 #define DAVIDIAN_ORBITALENGINE_H
 
+#include "OrbitalHistory.h"
 #include "OrbitState.h"
 #include <CartesianVector.h>
 
@@ -12,9 +13,9 @@ namespace engine {
 
 class OrbitalEngine{
 public:
-  std::vector<OrbitState> generateOrbitalHistory(double numberOfPeriods,
-                                                 int numberOfTimeDivisions,
-                                                 const orbital::Orbit& orbit);
+  OrbitalHistory generateOrbitalHistory(double numberOfPeriods,
+                                        int numberOfTimeDivisions,
+                                        const orbital::Orbit& orbit);
 
 };
 

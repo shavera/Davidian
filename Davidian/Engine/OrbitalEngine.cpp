@@ -6,11 +6,11 @@
 
 namespace engine{
 
-std::vector<OrbitState>
-OrbitalEngine::generateOrbitalHistory(double numberOfPeriods, int numberOfTimeDivisions, const orbital::Orbit& orbit) {
-  std::vector<OrbitState> states(numberOfTimeDivisions,0);
-  std::iota(states.begin(), states.end(), 0);
-  return states;
+OrbitalHistory OrbitalEngine::generateOrbitalHistory(double numberOfPeriods,
+                                                     int numberOfTimeDivisions,
+                                                     const orbital::Orbit& orbit){
+    OrbitalHistory history;
+    return history;
 }
 
 }
