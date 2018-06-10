@@ -5,7 +5,7 @@
 #ifndef DAVIDIAN_GLOBALDEFINITIONS_H
 #define DAVIDIAN_GLOBALDEFINITIONS_H
 
-#include "../CartesianVector.h"
+#include "CartesianVector.h"
 
 namespace orbital{
 

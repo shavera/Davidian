@@ -27,7 +27,6 @@ StateVector operator*(const Eigen::Matrix3d& transform, const StateVector& state
 
 #ifdef BUILD_TESTS
 
-#include "impl/OrbitImpl.h"
 #include <gtest/gtest.h>
 
 namespace orbital{

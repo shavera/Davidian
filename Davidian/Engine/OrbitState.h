@@ -6,7 +6,7 @@
 #define DAVIDIAN_ORBITSTATE_H
 
 #include <CartesianVector.h>
-#include <impl/GlobalDefinitions.h>
+#include <GlobalDefinitions.h>
 #include <Orbit.h>
 
 namespace engine{

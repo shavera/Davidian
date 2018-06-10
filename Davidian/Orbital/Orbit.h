@@ -5,7 +5,7 @@
 #ifndef DAVIDIAN_ORBIT_H
 #define DAVIDIAN_ORBIT_H
 
-#include "impl/GlobalDefinitions.h"
+#include "GlobalDefinitions.h"
 
 namespace orbital{
 

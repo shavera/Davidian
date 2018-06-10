@@ -5,7 +5,7 @@
 #include "Body.h"
 #include "Orbit.h"
 #include "CelestialBody.h"
-#include "impl/GlobalDefinitions.h"
+#include "GlobalDefinitions.h"
 
 namespace orbital{
 Body::Body(const double& mass, CelestialBody* parent, const StateVector* /*initialState*/, const double& /*time*/)

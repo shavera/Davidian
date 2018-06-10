@@ -140,32 +140,17 @@ TEST(OrbitState_CalculationHelpers, globalCoordinateStateVector){
   }
 }
 
-StateVector calculateInitialVector(OrbitalElements elements){
-  auto MeanEccAnom_f = [](double eccentricity, double M0, double eccentricAnomaly){
-    return eccentricAnomaly - eccentricity * std::sin(eccentricAnomaly) - M0;
-  };
-  auto MeanEccAnom_d = [](double eccentricity, double eccentricAnomaly){
-    return 1 - eccentricity * std::sin(eccentricAnomaly);
-  };
-  auto eccAnom = findFunctionRoot(std::bind(MeanEccAnom_f, elements.eccentricity, elements.meanAnomalyAtEpoch, _1),
-                                  std::bind(MeanEccAnom_d, elements.eccentricity, _1),
-                                  elements.meanAnomalyAtEpoch);
-  auto trueAnom = std::acos((cos(eccAnom)-elements.eccentricity)/(1-elements.eccentricity*std::sin(eccAnom)));
-  auto totalAngle = elements.argumentOfPeriapsis + trueAnom;
-
-  auto radius = elements.semiMajorAxis*(1-elements.eccentricity*(std::cos(eccAnom)));
-  orbital::SphericalVector sphVec{radius, M_PI/2, totalAngle};
-  orbital::CartesianVector position{sphVec};
-  return StateVector{position, {}};
-}
-
 // this test is very hard to calculate by hand what even the initial state should be much less a resulting state.
-TEST(OrbitState, DISABLED_calculateOrbitState){
+TEST(OrbitState, calculateOrbitState){
   const double M=1.495e30, m=3.333853e27;
   StateVector initialState{{-750076382836.7954, -239384315897.20627, 0},{-3870.2776276002724, -4593.496383019142, 0}};
   const Orbit orbit{initialState, M, m};
 
-  OrbitState stateAtQuarterPeriod{calculateOrbitState(orbit, orbit.period()/4.0)};
+  OrbitState state{calculateOrbitState(orbit, 0)};
+  for(int i{0}; i < 0; ++i){
+    EXPECT_NEAR(state.stateVector.position.at(i), initialState.position.at(i), 1e-6*initialState.position.at(i));
+    EXPECT_NEAR(state.stateVector.velocity.at(i), initialState.velocity.at(i), 1e-6*initialState.velocity.at(i));
+  }
 
 }
 
