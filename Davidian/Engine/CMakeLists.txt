@@ -7,7 +7,6 @@ set(SOURCES
         OrbitalEngine
         OrbitalHistory
         OrbitState
-        NewtonSolver
         )
 
 add_library(${PROJECT_NAME} ${SOURCES})

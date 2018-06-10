@@ -4,7 +4,7 @@
 
 #include "Orbit.h"
 
-#include "../Engine/NewtonSolver.h"
+#include "NewtonSolver.h"
 
 namespace orbital {
 namespace {
