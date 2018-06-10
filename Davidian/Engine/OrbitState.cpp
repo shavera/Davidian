@@ -19,17 +19,6 @@ double meanAnomaly_f(double meanAnomalyAtEpoch, double sweep, double time){
   return meanAnomalyAtEpoch + sweep*time;
 }
 
-double eccentricAnomaly_f(double meanAnomaly, double eccentricity){
-  auto eccAnomalyFunction = [meanAnomaly, eccentricity](double eccentricAnomaly){
-    return eccentricAnomaly - eccentricity*std::sin(eccentricAnomaly) - meanAnomaly;
-  };
-  auto eccAnomalyDerivative = [eccentricity](double eccentricAnomaly){
-    return 1-eccentricity*std::cos(eccentricAnomaly);
-  };
-
-  return findFunctionRoot(eccAnomalyFunction, eccAnomalyDerivative, 0);
-}
-
 double trueAnomaly_f(double eccentricAnomaly, double eccentricity){
   return (std::cos(eccentricAnomaly) - eccentricity)/(1-eccentricity*std::cos(eccentricAnomaly));
 }
@@ -57,7 +46,7 @@ const OrbitState calculateOrbitState(const orbital::Orbit &orbit, double time)
 {
     OrbitState state;
     const double meanAnom{meanAnomaly_f(orbit.orbitalElements().meanAnomalyAtEpoch, orbit.sweep(), time)};
-    const double eccAnom{eccentricAnomaly_f(meanAnom, orbit.orbitalElements().eccentricity)};
+    const double eccAnom{orbital::findEccentricAnomaly(meanAnom, orbit.orbitalElements().eccentricity)};
     state.trueAnomaly = trueAnomaly_f(eccAnom, orbit.orbitalElements().eccentricity);
     state.radius = radius_f(orbit.orbitalElements().semiMajorAxis,  orbit.orbitalElements().eccentricity, state.trueAnomaly);
     const StateVector orbitCoordState = orbitCoordinateStateVector(orbit, state.radius, state.trueAnomaly, eccAnom);
@@ -81,13 +70,6 @@ TEST(OrbitState_CalculationHelpers, meanAnomaly) {
   const double expectedMeanAnomaly{8.241}, actualMeanAnomaly{meanAnomaly_f(M0, sweep, time)};
 
   EXPECT_NEAR(expectedMeanAnomaly, actualMeanAnomaly, 1e-6 * expectedMeanAnomaly);
-}
-
-TEST(OrbitState_CalculationHelpers, eccentricAnomaly){
-  const double meanAnomaly{0.71163115893}, eccentricity{0.55};
-  const double expectedEccentricAnomaly{1.23}, actualEccentricAnomaly{eccentricAnomaly_f(meanAnomaly, eccentricity)};
-
-  EXPECT_NEAR(expectedEccentricAnomaly, actualEccentricAnomaly, 1e-6*expectedEccentricAnomaly);
 }
 
 TEST(OrbitState_CalculationHelpers, trueAnomaly){

@@ -77,18 +77,22 @@ double meanAnomaly_f(double eccentricAnomaly, double eccentricity){
   return eccentricAnomaly + eccentricity * std::sin(eccentricAnomaly);
 }
 
-double angularMomentumMagnitude_f(double stdGravParam, double semiMajorAxis, double eccentricity){
-  return std::sqrt(stdGravParam*semiMajorAxis*(1-(std::pow(eccentricity, 2))));
+double angularMomentumMagnitudeSquared_f(double stdGravParam, double semiMajorAxis, double eccentricity){
+  return stdGravParam*semiMajorAxis*(1-(std::pow(eccentricity, 2)));
 }
 
-double eccentricAnomaly_f(double meanAnomaly, double eccentricity){
-  auto eccAnom_f = [meanAnomaly, eccentricity](const double eccAnom){
-    return eccAnom - eccentricity * std::sin(eccAnom) - meanAnomaly;
-  };
-  auto eccAnom_d = [eccentricity](const double eccAnom){
-    return 1 - eccentricity * std::cos(eccAnom);
-  };
+double trueAnomaly_f(double eccentricAnomaly, double eccentricity){
+  return (std::cos(eccentricAnomaly)-eccentricity)/(1-eccentricity*std::sin(eccentricAnomaly));
+}
 
+double radius_f(double semiMajorAxis, double eccentricity, double eccentricAnomaly){
+  return semiMajorAxis*(1-eccentricity*std::cos(eccentricAnomaly));
+}
+
+std::pair<double, double> quadraticSolver(double a, double b, double c){
+  auto BAC = b*b - 4*a*c;
+  if(0 > BAC){return {0, 0};}
+  else return {(-b + std::sqrt(BAC))/(2*a), (-b - std::sqrt(BAC))/(2*a)};
 }
 
 } // anonymous namespace
@@ -116,13 +120,38 @@ Orbit::Orbit(const OrbitalElements& elements, double barymass, double leptomass)
   : m_elements{elements}
   , m_standardGravitationalParameter{standardGravitationalParameter_f(barymass, leptomass)}
 {
+  // I realized after doing all this work that it only really holds in the case of planar orbits so will have to redo
+  // when we start addressing full 3d orbits. Probably move more of the functionality in engine that calculates and
+  // rotates the vectors relative is probably more useful.
   m_specificOrbitalEnergy = energy_f(m_elements.semiMajorAxis, m_standardGravitationalParameter);
   m_period = period_f(m_elements.semiMajorAxis, m_standardGravitationalParameter);
   m_sweep = sweep_f(m_period);
-//  m_impl->m_specificOrbitalEnergy = impl::OrbitImpl::energyFromElements(m_impl->m_elements.semiMajorAxis, stdGravParam);
-//  m_impl->m_period = impl::OrbitImpl::period(m_impl->m_elements.semiMajorAxis, stdGravParam);
-//  m_impl->m_sweep = impl::OrbitImpl::sweep(m_impl->m_period);
-//  m_impl->initializeStateVector();
+  const auto angularMomentumMagnitudeSquared = angularMomentumMagnitudeSquared_f(m_standardGravitationalParameter,
+                                                                                 m_elements.semiMajorAxis,
+                                                                                 m_elements.eccentricity);
+  const auto eccentricAnomaly = findEccentricAnomaly(m_elements.meanAnomalyAtEpoch, m_elements.eccentricity);
+  const auto trueAnomaly = trueAnomaly_f(eccentricAnomaly, m_elements.eccentricity);
+  const auto totalAngle = std::fmod(m_elements.longitudeOfAscendingNode + m_elements.argumentOfPeriapsis + trueAnomaly
+                                    , 2 * M_PI);
+  const auto radius = radius_f(m_elements.semiMajorAxis, m_elements.eccentricity, eccentricAnomaly);
+  CartesianVector position{radius*std::sin(totalAngle), radius*std::cos(totalAngle), 0};
+
+  // at this point velocity has a quadratic equation for x and a linear one for y:
+  // using vx_quad_b/c to represent the b/c constants in the standard quadratic equation
+  const double vx_quad_c = -m_specificOrbitalEnergy
+      -(m_standardGravitationalParameter/radius)
+      +angularMomentumMagnitudeSquared;
+  const double vx_quad_b = std::sqrt(angularMomentumMagnitudeSquared)*std::tan(totalAngle);
+  auto [vx0, vx1] = quadraticSolver(1, vx_quad_b, vx_quad_c);
+  auto vy0 = std::sqrt(angularMomentumMagnitudeSquared) + std::tan(totalAngle)*vx0;
+  auto vy1 = std::sqrt(angularMomentumMagnitudeSquared) + std::tan(totalAngle)*vx1;
+  auto diff0 = std::fabs(position.x()*vy0 - position.y()*vx0 - std::sqrt(angularMomentumMagnitudeSquared));
+  auto diff1 = std::fabs(position.x()*vy1 - position.y()*vy1 - std::sqrt(angularMomentumMagnitudeSquared));
+  if(diff0 < diff1){
+    m_initialVector = StateVector{position, {vx0, vy0, 0}};
+  } else {
+    m_initialVector = StateVector{position, {vx1, vy1, 0}};
+  }
 }
 
 Orbit::~Orbit() = default;
@@ -306,9 +335,24 @@ TEST_F(OrbitImplTest, sweep){
 
 TEST_F(OrbitImplTest, angularMomentumMagnitude){
   const double semiMajorAxis{15}, stdGravParam{34}, eccentricity{0.25};
-  const double expectedMagnitude{21.8660696};
+  const double expectedMagnitudeSquared{478.125};
 
-  EXPECT_NEAR(expectedMagnitude, angularMomentumMagnitude_f(stdGravParam, semiMajorAxis, eccentricity), std::fabs(1e-6*expectedMagnitude));
+  EXPECT_NEAR(expectedMagnitudeSquared, angularMomentumMagnitudeSquared_f(stdGravParam, semiMajorAxis, eccentricity),
+              std::fabs(1e-6*expectedMagnitudeSquared));
+}
+
+TEST_F(OrbitImplTest, trueAnomaly){
+  const double eccentricity{0.3}, eccentricAnomaly{1.24};
+  const double expectedTrueAnomaly{0.034618879};
+
+  EXPECT_NEAR(expectedTrueAnomaly, trueAnomaly_f(eccentricAnomaly, eccentricity), 1e-6*expectedTrueAnomaly);
+}
+
+TEST_F(OrbitImplTest, trueRadius){
+  const double semiMajorAxis{1e6}, eccentricity{0.12}, eccentricAnomaly{0.5235987756};
+  const double expectedRadius{896076.95};
+
+  EXPECT_NEAR(expectedRadius, radius_f(semiMajorAxis, eccentricity, eccentricAnomaly), 1e-6*expectedRadius);
 }
 
 } // anonymous namespace

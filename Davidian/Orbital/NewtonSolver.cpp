@@ -4,7 +4,9 @@
 #include "NewtonSolver.h"
 #include <cmath>
 
-namespace engine {
+using namespace std::placeholders;
+
+namespace orbital {
 
 double findFunctionRoot(const std::function<double(double)>& f,
                         const std::function<double(double)>& derivative,
@@ -19,13 +21,30 @@ double findFunctionRoot(const std::function<double(double)>& f,
   return x;
 }
 
-} // namespace engine
+namespace{
+double eccentricAnomaly_f(double meanAnomaly, double eccentricity, double eccentricAnomaly){
+  return eccentricAnomaly - eccentricity*std::sin(eccentricAnomaly) - meanAnomaly;
+}
+
+double eccentricAnomaly_d(double eccentricity, double eccentricAnomaly){
+  return 1 - eccentricity*std::cos(eccentricAnomaly);
+}
+} // anonymous namespace
+
+double findEccentricAnomaly(double meanAnomaly, double eccentricity)
+{
+  return findFunctionRoot(std::bind(&eccentricAnomaly_f, meanAnomaly, eccentricity, _1),
+                          std::bind(&eccentricAnomaly_d, eccentricity, _1),
+                          meanAnomaly);
+}
+
+} // namespace orbital
 
 #ifdef BUILD_TESTS
 
 #include <gtest/gtest.h>
 
-namespace engine{
+namespace orbital{
 namespace {
 
 TEST(EquationSolver, solveFunction){
@@ -37,7 +56,15 @@ TEST(EquationSolver, solveFunction){
   EXPECT_NEAR(expectedValue, actualValue, 1e-6*expectedValue);
 }
 
+
+TEST(EccentricAnomalySolver, eccentricAnomaly){
+  const double meanAnomaly{0.71163115893}, eccentricity{0.55};
+  const double expectedEccentricAnomaly{1.23}, actualEccentricAnomaly{findEccentricAnomaly(meanAnomaly, eccentricity)};
+
+  EXPECT_NEAR(expectedEccentricAnomaly, actualEccentricAnomaly, 1e-6*expectedEccentricAnomaly);
+}
+
 } // anonymous namespace
-} // namespace engine
+} // namespace orbital
 
 #endif // BUILD_TESTS
