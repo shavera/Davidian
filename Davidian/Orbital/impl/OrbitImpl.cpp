@@ -289,11 +289,11 @@ TEST_F(OrbitImpl, energyFromElements_zeroSemiMajorAxis){
   EXPECT_EQ(0, orbital::impl::OrbitImpl::energyFromElements(semiMajorAxis, stdGravParam));
 }
 
-TEST_F(OrbitImpl, periodFromElements){
+TEST_F(OrbitImpl, DISABLED_periodFromElements){
 
 }
 
-TEST_F(OrbitImpl, sweepFromElements){
+TEST_F(OrbitImpl, DISABLED_sweepFromElements){
 
 }
 
