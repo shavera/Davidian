@@ -7,13 +7,7 @@
 
 #include "impl/GlobalDefinitions.h"
 
-#include <memory>
-
 namespace orbital{
-
-namespace impl{
-class OrbitImpl;
-} // namespace impl
 
 class Orbit {
 public:
@@ -21,16 +15,20 @@ public:
   Orbit(const OrbitalElements& elements, double barymass, double leptomass);
   virtual ~Orbit();
 
-  const OrbitalElements& orbitalElements() const;
+  const OrbitalElements& orbitalElements() const {return m_elements;}
 
-  double standardGravitationalParameter() const;
-  double energy() const;
-  const CartesianVector& angularMomentum() const;
-  double period() const;
-  double sweep() const;
+  double standardGravitationalParameter() const {return m_standardGravitationalParameter;}
+  double energy() const {return m_specificOrbitalEnergy;}
+  const CartesianVector& angularMomentum() const {return m_specificAngularMomentum;}
+  double period() const {return m_period;}
+  double sweep() const {return m_sweep;}
+  const StateVector& initialVector() const {return initialVector();}
 
 private:
-    std::unique_ptr<impl::OrbitImpl> m_impl;
+  orbital::OrbitalElements m_elements;
+  double m_standardGravitationalParameter{0}, m_specificOrbitalEnergy{0}, m_period{0}, m_sweep{0};
+  CartesianVector m_specificAngularMomentum;
+  StateVector m_initialVector;
 };
 
 } // namespace orbital
