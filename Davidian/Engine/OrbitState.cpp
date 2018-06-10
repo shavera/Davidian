@@ -53,15 +53,17 @@ StateVector globalCoordinateStateVector(const StateVector& orbitCoordinateVector
 
 } // anonymous namespace
 
-OrbitState::OrbitState(const orbital::Orbit& orbit, double time) : time{time}
+const OrbitState calculateOrbitState(const orbital::Orbit &orbit, double time)
 {
-  const double meanAnom{meanAnomaly_f(orbit.orbitalElements().meanAnomalyAtEpoch, orbit.sweep(), time)};
-  const double eccAnom{eccentricAnomaly_f(meanAnom, orbit.orbitalElements().eccentricity)};
-  this->trueAnomaly = trueAnomaly_f(eccAnom, orbit.orbitalElements().eccentricity);
-  const double r{radius_f(orbit.orbitalElements().semiMajorAxis,  orbit.orbitalElements().eccentricity, trueAnomaly)};
-  const StateVector orbitCoordState = orbitCoordinateStateVector(orbit, r, this->trueAnomaly, eccAnom);
-  const Eigen::Matrix3d rotationMatrix{orbital::OrbitToGlobal(orbit)};
-  stateVector = globalCoordinateStateVector(orbitCoordState, rotationMatrix);
+    OrbitState state;
+    const double meanAnom{meanAnomaly_f(orbit.orbitalElements().meanAnomalyAtEpoch, orbit.sweep(), time)};
+    const double eccAnom{eccentricAnomaly_f(meanAnom, orbit.orbitalElements().eccentricity)};
+    state.trueAnomaly = trueAnomaly_f(eccAnom, orbit.orbitalElements().eccentricity);
+    state.radius = radius_f(orbit.orbitalElements().semiMajorAxis,  orbit.orbitalElements().eccentricity, state.trueAnomaly);
+    const StateVector orbitCoordState = orbitCoordinateStateVector(orbit, state.radius, state.trueAnomaly, eccAnom);
+    const Eigen::Matrix3d rotationMatrix{orbital::OrbitToGlobal(orbit)};
+    state.stateVector = globalCoordinateStateVector(orbitCoordState, rotationMatrix);
+    return state;
 }
 
 } // namespace engine

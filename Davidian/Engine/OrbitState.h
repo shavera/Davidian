@@ -12,10 +12,11 @@
 namespace engine{
 
 struct OrbitState{
-  OrbitState(const orbital::Orbit& orbit, double time);
-  double time, trueAnomaly;
+  double time, radius, trueAnomaly;
   orbital::StateVector stateVector;
 };
+
+const OrbitState calculateOrbitState(const orbital::Orbit& orbit, double time);
 
 } // namespace engine
 
