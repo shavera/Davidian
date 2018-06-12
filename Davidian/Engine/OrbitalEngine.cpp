@@ -22,13 +22,7 @@ OrbitalHistory OrbitalEngine::generateOrbitalHistory(double numberOfPeriods,
 namespace engine{
 namespace {
 
-class OrbitTest : public ::testing::Test{
 
-};
-
-TEST_F(OrbitTest, dummy){
-//    Orbit orbit(StateVector{}, 1);
-}
 
 } // anonymous namespace
 } // namespace engine

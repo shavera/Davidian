@@ -23,12 +23,12 @@ double trueAnomaly_f(double eccentricAnomaly, double eccentricity){
   return (std::cos(eccentricAnomaly) - eccentricity)/(1-eccentricity*std::cos(eccentricAnomaly));
 }
 
-double radius_f(double semiMajorAxis, double eccentricity, double trueAnomaly){
-  return semiMajorAxis*(1-std::pow(eccentricity, 2))/(1+eccentricity*std::cos(trueAnomaly));
+double radius_f(double semiMajorAxis, double eccentricity, double eccentricAnomaly){
+  return semiMajorAxis*(1-eccentricity*std::cos(eccentricAnomaly));
 }
 
 StateVector orbitCoordinateStateVector(const Orbit& orbit, double radius, double trueAnomaly, double eccentricAnomaly){
-  CartesianVector position{radius*std::cos(trueAnomaly), radius*std::sin(trueAnomaly), 0};
+  CartesianVector position{radius*std::sin(trueAnomaly), radius*std::cos(trueAnomaly), 0};
   double velocityFactor{std::sqrt(orbit.standardGravitationalParameter()*orbit.orbitalElements().semiMajorAxis)/radius};
   CartesianVector velocity{ -std::sin(eccentricAnomaly),
                             std::sqrt(1-std::pow(orbit.orbitalElements().eccentricity,2))*std::cos(eccentricAnomaly),
@@ -45,12 +45,13 @@ StateVector globalCoordinateStateVector(const StateVector& orbitCoordinateVector
 const OrbitState calculateOrbitState(const orbital::Orbit &orbit, double time)
 {
     OrbitState state;
-    const double meanAnom{meanAnomaly_f(orbit.orbitalElements().meanAnomalyAtEpoch, orbit.sweep(), time)};
-    const double eccAnom{orbital::findEccentricAnomaly(meanAnom, orbit.orbitalElements().eccentricity)};
-    state.trueAnomaly = trueAnomaly_f(eccAnom, orbit.orbitalElements().eccentricity);
-    state.radius = radius_f(orbit.orbitalElements().semiMajorAxis,  orbit.orbitalElements().eccentricity, state.trueAnomaly);
+    const auto& elements = orbit.orbitalElements();
+    const double meanAnom{meanAnomaly_f(elements.meanAnomalyAtEpoch, orbit.sweep(), time)};
+    const double eccAnom{orbital::findEccentricAnomaly(meanAnom, elements.eccentricity)};
+    state.trueAnomaly = trueAnomaly_f(eccAnom, elements.eccentricity);
+    state.radius = radius_f(elements.semiMajorAxis,  elements.eccentricity, eccAnom);
     const StateVector orbitCoordState = orbitCoordinateStateVector(orbit, state.radius, state.trueAnomaly, eccAnom);
-    const Eigen::Matrix3d rotationMatrix{orbital::OrbitToGlobal(orbit)};
+    const Eigen::Matrix3d rotationMatrix{orbital::GlobalToOrbit(orbit)};
     state.stateVector = globalCoordinateStateVector(orbitCoordState, rotationMatrix);
     return state;
 }
@@ -79,8 +80,8 @@ TEST(OrbitState_CalculationHelpers, trueAnomaly){
 }
 
 TEST(OrbitState_CalculationHelpers, radius){
-  const double semiMajorAxis{1123}, eccentricity{0.55}, trueAnomaly{-0.264359718102521};
-  const double expectedRadius{511.6572486356}, actualRadius{radius_f(semiMajorAxis, eccentricity, trueAnomaly)};
+  const double semiMajorAxis{1123}, eccentricity{0.55}, eccentricAnomaly{-0.264359718102521};
+  const double expectedRadius{526.8071617363}, actualRadius{radius_f(semiMajorAxis, eccentricity, eccentricAnomaly)};
   EXPECT_NEAR(expectedRadius, actualRadius, 1e-6*expectedRadius);
 }
 
@@ -125,15 +126,21 @@ TEST(OrbitState_CalculationHelpers, globalCoordinateStateVector){
 // this test is very hard to calculate by hand what even the initial state should be much less a resulting state.
 TEST(OrbitState, calculateOrbitState){
   const double M=1.495e30, m=3.333853e27;
-  StateVector initialState{{-750076382836.7954, -239384315897.20627, 0},{-3870.2776276002724, -4593.496383019142, 0}};
+  StateVector initialState{{-333833694311, 378875701458, 0},{-11374.999, -8165.466, 0}};
   const Orbit orbit{initialState, M, m};
 
-  OrbitState state{calculateOrbitState(orbit, 0)};
-  for(int i{0}; i < 0; ++i){
-    EXPECT_NEAR(state.stateVector.position.at(i), initialState.position.at(i), 1e-6*initialState.position.at(i));
-    EXPECT_NEAR(state.stateVector.velocity.at(i), initialState.velocity.at(i), 1e-6*initialState.velocity.at(i));
-  }
+    OrbitState state0{calculateOrbitState(orbit, 0)};
+    for(int i{0}; i < 3; ++i) {
+      EXPECT_NEAR(state0.stateVector.position.at(i), initialState.position.at(i), std::fabs(0.002 * initialState.position.at(i))) << i;
+      EXPECT_NEAR(state0.stateVector.velocity.at(i), initialState.velocity.at(i), std::fabs(1e-6 * initialState.velocity.at(i))) << i;
+    }
 
+    OrbitState state_period{calculateOrbitState(orbit, orbit.period())};
+    for(int i{0}; i < 3; ++i) {
+      EXPECT_NEAR(state0.stateVector.position.at(i), state_period.stateVector.position.at(i), std::fabs(1e-6 * state0.stateVector.position.at(i))) << i;
+      EXPECT_NEAR(state_period.stateVector.position.at(i), initialState.position.at(i), std::fabs(0.002 * initialState.position.at(i))) << i;
+      EXPECT_NEAR(state_period.stateVector.velocity.at(i), initialState.velocity.at(i), std::fabs(1e-6 * initialState.velocity.at(i))) << i;
+    }
 }
 
 } // anonymous namespace
