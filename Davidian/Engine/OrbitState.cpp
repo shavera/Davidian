@@ -91,7 +91,7 @@ TEST(OrbitState_CalculationHelpers, orbitCoordinateStateVector){
   elements.eccentricity = 0.11;
   Orbit orbit{elements, 1.3e12, 7e10};
   const double eccAnom{0.966520515}, trueAnom{0.488709809}, r{20.47874669};
-  StateVector expectedState{{18.0814907049, 9.6145077816, 0},{-1.8324404306, 1.2574985215, 0}};
+  StateVector expectedState{{9.6145077816, 18.0814907049, 0},{-1.8324404306, 1.2574985215, 0}};
   StateVector actualState = orbitCoordinateStateVector(orbit,r, trueAnom, eccAnom);
   for(int i{0}; i < 2; ++i){
     EXPECT_NEAR(expectedState.position.at(i), actualState.position.at(i), std::fabs(1e-6*expectedState.position.at(i)))

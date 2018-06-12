@@ -8,8 +8,8 @@ namespace orbital {
 Eigen::Matrix3d GlobalToOrbit(const orbital::Orbit& orbit) {
   const OrbitalElements& elements{orbit.orbitalElements()};
   return (Eigen::AngleAxisd(elements.argumentOfPeriapsis, Eigen::Vector3d::UnitZ()) *
-      Eigen::AngleAxisd(elements.inclination, Eigen::Vector3d::UnitX()) *
-      Eigen::AngleAxisd(elements.longitudeOfAscendingNode, Eigen::Vector3d::UnitZ())).toRotationMatrix();
+          Eigen::AngleAxisd(elements.inclination, Eigen::Vector3d::UnitX()) *
+          Eigen::AngleAxisd(elements.longitudeOfAscendingNode, Eigen::Vector3d::UnitZ())).toRotationMatrix();
 }
 
 Eigen::Matrix3d OrbitToGlobal(const Orbit& orbit) {
