@@ -20,7 +20,8 @@ double meanAnomaly_f(double meanAnomalyAtEpoch, double sweep, double time){
 }
 
 double trueAnomaly_f(double eccentricAnomaly, double eccentricity){
-  return (std::cos(eccentricAnomaly) - eccentricity)/(1-eccentricity*std::cos(eccentricAnomaly));
+  return 2*std::atan2(std::sqrt(1+eccentricity)*std::sin(eccentricAnomaly/2),
+                      std::sqrt(1-eccentricity)*std::cos(eccentricAnomaly/2));
 }
 
 double radius_f(double semiMajorAxis, double eccentricity, double eccentricAnomaly){
@@ -68,34 +69,27 @@ namespace {
 
 void compareStateVectors(const StateVector& expected, const StateVector& actual, const std::string label =""){
   for(auto i=0; i < 3; ++i){
-    EXPECT_NEAR(expected.position.c_at(i), actual.position.c_at(i),
-                std::fabs(0.002 * expected.position.c_at(i))) << i <<" "<<label;
-    EXPECT_NEAR(expected.velocity.c_at(i), actual.velocity.c_at(i),
-                std::fabs(1e-6 * expected.velocity.c_at(i))) << i <<" "<<label;
+    const double &expectedX{expected.position.c_at(i)}, &expectedV{expected.velocity.c_at(i)};
+    double positionComparitor{(0 != expectedX) ? std::fabs(1e-6 * expectedX) : 5e-6 };
+    double velocityComparitor{(0 != expectedV) ? std::fabs(1e-6 * expectedV) : 5e-6};
+    EXPECT_NEAR(expectedX, actual.position.c_at(i), positionComparitor) << i <<" "<<label;
+    EXPECT_NEAR(expectedV, actual.velocity.c_at(i), velocityComparitor) << i <<" "<<label;
   }
 }
 
 class OrbitState_trivialOrbitTests : public ::testing::Test{
 public:
   const double barymass{1.0/orbital::G}, leptomass{0.0};
-  const OrbitalElements simpleOrbitElements{
-    1,
-    std::pow(2, -20),
-    0.0,
-    0.0,
-    0.0,
-    0.0
-  };
+  const StateVector initialState{{1,0,0},{0,1,0}};
 
-  const Orbit orbit{simpleOrbitElements, barymass, leptomass};
+  const Orbit orbit{initialState, barymass, leptomass};
 };
 
 TEST_F(OrbitState_trivialOrbitTests, state_at_0){
-  StateVector expectedState{{1,0,0},{0,1,0}};
 
   auto orbitState = calculateOrbitState(orbit, 0.0);
 
-  compareStateVectors(expectedState, orbitState.stateVector);
+  compareStateVectors(initialState, orbitState.stateVector);
 }
 
 TEST_F(OrbitState_trivialOrbitTests, state_at_quarters){
@@ -111,9 +105,8 @@ TEST_F(OrbitState_trivialOrbitTests, state_at_quarters){
   auto orbitState3 = calculateOrbitState(orbit, 1.5*M_PI);
   compareStateVectors(expectedState_3, orbitState3.stateVector, "State 3");
 
-  StateVector expectedState_4{{1,0,0},{0,1,0}};
   auto orbitState4 = calculateOrbitState(orbit, 2*M_PI);
-  compareStateVectors(expectedState_4, orbitState4.stateVector, "State 4");
+  compareStateVectors(initialState, orbitState4.stateVector, "State 4");
 
   auto orbitState5 = calculateOrbitState(orbit, 2.5*M_PI);
   compareStateVectors(expectedState_1, orbitState5.stateVector, "State 5");
@@ -147,12 +140,7 @@ TEST(OrbitState_CalculationHelpers, orbitCoordinateStateVector){
   const double eccAnom{0.966520515}, trueAnom{0.488709809}, r{20.47874669};
   StateVector expectedState{{9.6145077816, 18.0814907049, 0},{-1.8324404306, 1.2574985215, 0}};
   StateVector actualState = orbitCoordinateStateVector(orbit,r, trueAnom, eccAnom);
-  for(int i{0}; i < 2; ++i){
-    EXPECT_NEAR(expectedState.position.at(i), actualState.position.at(i), std::fabs(1e-6*expectedState.position.at(i)))
-              << "position " << i;
-    EXPECT_NEAR(expectedState.velocity.at(i), actualState.velocity.at(i), std::fabs(1e-6*expectedState.velocity.at(i)))
-              << "velocity " << i;
-  }
+  compareStateVectors(expectedState, actualState);
   EXPECT_EQ(0, actualState.position.z());
   EXPECT_EQ(0, actualState.velocity.z());
 }
@@ -169,12 +157,7 @@ TEST(OrbitState_CalculationHelpers, globalCoordinateStateVector){
 
   StateVector actualState = globalCoordinateStateVector(orbitalState, rotationMatrix);
 
-  for(int i{0}; i < 3; ++i){
-    EXPECT_NEAR(expectedState.position.at(i), actualState.position.at(i), std::fabs(1e-6*expectedState.position.at(i)))
-              << "position " << i;
-    EXPECT_NEAR(expectedState.velocity.at(i), actualState.velocity.at(i), std::fabs(1e-6*expectedState.velocity.at(i)))
-              << "velocity " << i;
-  }
+  compareStateVectors(expectedState, actualState);
 }
 
 // this test is very hard to calculate by hand what even the initial state should be much less a resulting state.
@@ -183,18 +166,12 @@ TEST(OrbitState, calculateOrbitState){
   StateVector initialState{{-333833694311, 378875701458, 0},{-11374.999, -8165.466, 0}};
   const Orbit orbit{initialState, M, m};
 
-    OrbitState state0{calculateOrbitState(orbit, 0)};
-    for(int i{0}; i < 3; ++i) {
-      EXPECT_NEAR(state0.stateVector.position.at(i), initialState.position.at(i), std::fabs(0.002 * initialState.position.at(i))) << i;
-      EXPECT_NEAR(state0.stateVector.velocity.at(i), initialState.velocity.at(i), std::fabs(1e-6 * initialState.velocity.at(i))) << i;
-    }
+  OrbitState state0{calculateOrbitState(orbit, 0)};
+  compareStateVectors(initialState, state0.stateVector, "state0");
 
-    OrbitState state_period{calculateOrbitState(orbit, orbit.period())};
-    for(int i{0}; i < 3; ++i) {
-      EXPECT_NEAR(state0.stateVector.position.at(i), state_period.stateVector.position.at(i), std::fabs(1e-6 * state0.stateVector.position.at(i))) << i;
-      EXPECT_NEAR(state_period.stateVector.position.at(i), initialState.position.at(i), std::fabs(0.002 * initialState.position.at(i))) << i;
-      EXPECT_NEAR(state_period.stateVector.velocity.at(i), initialState.velocity.at(i), std::fabs(1e-6 * initialState.velocity.at(i))) << i;
-    }
+  OrbitState state_period{calculateOrbitState(orbit, orbit.period())};
+  compareStateVectors(initialState, state_period.stateVector, "State at period to initial vector");
+  compareStateVectors(state0.stateVector, state_period.stateVector, "States at 0 and Period");
 }
 
 } // anonymous namespace

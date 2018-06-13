@@ -66,7 +66,7 @@ double argumentOfPeriapsis_f(const CartesianVector& ascendingNodeVector, const C
 }
 
 double eccentricAnomaly_f(double radius, double semiMajorAxis, double eccentricity){
-  return std::acos((1-radius/semiMajorAxis)/eccentricity);
+  return (0==eccentricity) ? 0.0 : std::acos((1-radius/semiMajorAxis)/eccentricity);
 }
 
 double meanAnomaly_f(double eccentricAnomaly, double eccentricity){
@@ -334,6 +334,30 @@ TEST(OrbitTest, fromStateVector){
             std::fabs(1e-6*expectedElements.argumentOfPeriapsis));
   EXPECT_NEAR(expectedElements.meanAnomalyAtEpoch, actualElements.meanAnomalyAtEpoch,
             std::fabs(1e-5*expectedElements.meanAnomalyAtEpoch ));
+}
+
+TEST(OrbitTest, fromTrivialStateVector){
+  const double M={1/G}, m{0};
+  StateVector initalState{{1,0,0},{0,1,0}};
+  const OrbitalElements expectedElements{
+      1,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0};
+
+  Orbit orbit{initalState, M, m};
+
+  const auto& actualElements = orbit.orbitalElements();
+  EXPECT_NEAR(expectedElements.semiMajorAxis, actualElements.semiMajorAxis,
+              std::fabs(1e-6*expectedElements.semiMajorAxis));
+  EXPECT_NEAR(expectedElements.eccentricity, actualElements.eccentricity, 1e-6); // about as close as I could get
+  EXPECT_NEAR(expectedElements.inclination, actualElements.inclination, 1e-6);
+  EXPECT_NEAR(expectedElements.longitudeOfAscendingNode, actualElements.longitudeOfAscendingNode, 1e-6);
+  EXPECT_NEAR(expectedElements.argumentOfPeriapsis, actualElements.argumentOfPeriapsis, 1e-6);
+  EXPECT_NEAR(expectedElements.meanAnomalyAtEpoch, actualElements.meanAnomalyAtEpoch, 1e-6);
+
 }
 
 } // anonymous namespace
