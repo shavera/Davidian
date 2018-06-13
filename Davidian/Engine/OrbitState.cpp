@@ -28,7 +28,7 @@ double radius_f(double semiMajorAxis, double eccentricity, double eccentricAnoma
 }
 
 StateVector orbitCoordinateStateVector(const Orbit& orbit, double radius, double trueAnomaly, double eccentricAnomaly){
-  CartesianVector position{radius*std::sin(trueAnomaly), radius*std::cos(trueAnomaly), 0};
+  CartesianVector position{radius*std::cos(trueAnomaly), radius*std::sin(trueAnomaly), 0};
   double velocityFactor{std::sqrt(orbit.standardGravitationalParameter()*orbit.orbitalElements().semiMajorAxis)/radius};
   CartesianVector velocity{ -std::sin(eccentricAnomaly),
                             std::sqrt(1-std::pow(orbit.orbitalElements().eccentricity,2))*std::cos(eccentricAnomaly),
@@ -51,7 +51,7 @@ const OrbitState calculateOrbitState(const orbital::Orbit &orbit, double time)
     state.trueAnomaly = trueAnomaly_f(eccAnom, elements.eccentricity);
     state.radius = radius_f(elements.semiMajorAxis,  elements.eccentricity, eccAnom);
     const StateVector orbitCoordState = orbitCoordinateStateVector(orbit, state.radius, state.trueAnomaly, eccAnom);
-    const Eigen::Matrix3d rotationMatrix{orbital::GlobalToOrbit(orbit)};
+    const Eigen::Matrix3d rotationMatrix{orbital::OrbitToGlobal(orbit)};
     state.stateVector = globalCoordinateStateVector(orbitCoordState, rotationMatrix);
     return state;
 }
@@ -65,6 +65,60 @@ const OrbitState calculateOrbitState(const orbital::Orbit &orbit, double time)
 namespace engine{
 namespace test {
 namespace {
+
+void compareStateVectors(const StateVector& expected, const StateVector& actual, const std::string label =""){
+  for(auto i=0; i < 3; ++i){
+    EXPECT_NEAR(expected.position.c_at(i), actual.position.c_at(i),
+                std::fabs(0.002 * expected.position.c_at(i))) << i <<" "<<label;
+    EXPECT_NEAR(expected.velocity.c_at(i), actual.velocity.c_at(i),
+                std::fabs(1e-6 * expected.velocity.c_at(i))) << i <<" "<<label;
+  }
+}
+
+class OrbitState_trivialOrbitTests : public ::testing::Test{
+public:
+  const double barymass{1.0/orbital::G}, leptomass{0.0};
+  const OrbitalElements simpleOrbitElements{
+    1,
+    std::pow(2, -20),
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  };
+
+  const Orbit orbit{simpleOrbitElements, barymass, leptomass};
+};
+
+TEST_F(OrbitState_trivialOrbitTests, state_at_0){
+  StateVector expectedState{{1,0,0},{0,1,0}};
+
+  auto orbitState = calculateOrbitState(orbit, 0.0);
+
+  compareStateVectors(expectedState, orbitState.stateVector);
+}
+
+TEST_F(OrbitState_trivialOrbitTests, state_at_quarters){
+  StateVector expectedState_1{{0,1,0}, {-1,0,0}};
+  auto orbitState1 = calculateOrbitState(orbit, 0.5*M_PI);
+  compareStateVectors(expectedState_1, orbitState1.stateVector, "State 1");
+
+  StateVector expectedState_2{{-1,0,0}, {0, -1, 0}};
+  auto orbitState2 = calculateOrbitState(orbit, M_PI);
+  compareStateVectors(expectedState_2, orbitState2.stateVector, "State 2");
+
+  StateVector expectedState_3{{0,-1,0}, {1,0,0}};
+  auto orbitState3 = calculateOrbitState(orbit, 1.5*M_PI);
+  compareStateVectors(expectedState_3, orbitState3.stateVector, "State 3");
+
+  StateVector expectedState_4{{1,0,0},{0,1,0}};
+  auto orbitState4 = calculateOrbitState(orbit, 2*M_PI);
+  compareStateVectors(expectedState_4, orbitState4.stateVector, "State 4");
+
+  auto orbitState5 = calculateOrbitState(orbit, 2.5*M_PI);
+  compareStateVectors(expectedState_1, orbitState5.stateVector, "State 5");
+
+}
 
 TEST(OrbitState_CalculationHelpers, meanAnomaly) {
   const double M0{1.23}, sweep{.123}, time{57};
