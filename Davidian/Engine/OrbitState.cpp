@@ -38,7 +38,8 @@ StateVector orbitCoordinateStateVector(const Orbit& orbit, double radius, double
 }
 
 StateVector globalCoordinateStateVector(const StateVector& orbitCoordinateVector, const Eigen::Matrix3d& orbitToGlobalTxfm){
-  return orbitToGlobalTxfm * orbitCoordinateVector;
+  StateVector stateVector{orbitToGlobalTxfm * orbitCoordinateVector};
+  return stateVector;
 }
 
 } // anonymous namespace
@@ -53,7 +54,8 @@ const OrbitState calculateOrbitState(const orbital::Orbit &orbit, double time)
     state.radius = radius_f(elements.semiMajorAxis,  elements.eccentricity, eccAnom);
     const StateVector orbitCoordState = orbitCoordinateStateVector(orbit, state.radius, state.trueAnomaly, eccAnom);
     const Eigen::Matrix3d rotationMatrix{orbital::OrbitToGlobal(orbit)};
-    state.stateVector = globalCoordinateStateVector(orbitCoordState, rotationMatrix);
+    const StateVector globalVector{globalCoordinateStateVector(orbitCoordState, rotationMatrix)};
+    state.stateVector = globalVector;
     return state;
 }
 
@@ -122,7 +124,7 @@ TEST(OrbitState_CalculationHelpers, meanAnomaly) {
 
 TEST(OrbitState_CalculationHelpers, trueAnomaly){
   const double eccentricAnomaly{1.23}, eccentricity{0.55};
-  const double expectedTrueAnomaly{-0.264359718102521}, actualTrueAnomaly{trueAnomaly_f(eccentricAnomaly, eccentricity)};
+  const double expectedTrueAnomaly{1.838336207}, actualTrueAnomaly{trueAnomaly_f(eccentricAnomaly, eccentricity)};
   EXPECT_NEAR(expectedTrueAnomaly, actualTrueAnomaly, std::fabs(1e-6*expectedTrueAnomaly));
 }
 
@@ -138,7 +140,7 @@ TEST(OrbitState_CalculationHelpers, orbitCoordinateStateVector){
   elements.eccentricity = 0.11;
   Orbit orbit{elements, 1.3e12, 7e10};
   const double eccAnom{0.966520515}, trueAnom{0.488709809}, r{20.47874669};
-  StateVector expectedState{{9.6145077816, 18.0814907049, 0},{-1.8324404306, 1.2574985215, 0}};
+  StateVector expectedState{{18.0814907049, 9.6145077816,0},{-1.8324404306, 1.2574985215, 0}};
   StateVector actualState = orbitCoordinateStateVector(orbit,r, trueAnom, eccAnom);
   compareStateVectors(expectedState, actualState);
   EXPECT_EQ(0, actualState.position.z());
