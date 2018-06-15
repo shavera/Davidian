@@ -13,9 +13,7 @@ namespace engine {
 
 class OrbitalEngine{
 public:
-  OrbitalHistory generateOrbitalHistory(double numberOfPeriods,
-                                        int numberOfTimeDivisions,
-                                        const orbital::Orbit& orbit);
+  OrbitalHistory generateOrbitalHistory(const orbital::Orbit& orbit);
 
 };
 

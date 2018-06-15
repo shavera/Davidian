@@ -6,10 +6,8 @@
 
 namespace engine{
 
-OrbitalHistory OrbitalEngine::generateOrbitalHistory(double numberOfPeriods,
-                                                     int numberOfTimeDivisions,
-                                                     const orbital::Orbit& orbit){
-    OrbitalHistory history;
+OrbitalHistory OrbitalEngine::generateOrbitalHistory(const orbital::Orbit& orbit){
+    OrbitalHistory history{orbit};
     return history;
 }
 
