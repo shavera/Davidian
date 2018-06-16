@@ -91,6 +91,8 @@ TEST_F(OrbitState_trivialOrbitTests, state_at_0){
 
   auto orbitState = calculateOrbitState(orbit, 0.0);
 
+  size_t orbitSize = sizeof(orbitState);
+
   compareStateVectors(initialState, orbitState.stateVector);
 }
 

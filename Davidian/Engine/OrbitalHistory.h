@@ -1,22 +1,22 @@
 #ifndef ORBITALHISTORY_H
 #define ORBITALHISTORY_H
 
-#include "dynarray.h"
 #include "OrbitState.h"
 
 #include "Orbit.h"
 
 namespace engine {
 
+template<size_t precision = 1e6>
 class OrbitalHistory
 {
 public:
   OrbitalHistory(const orbital::Orbit& orbit);
 
-  OrbitState stateAtTime(size_t seconds);
+  OrbitState stateAtTime(double seconds);
 
 private:
-  dynarray<OrbitState> m_history;
+  std::array<OrbitState, precision> m_history;
 };
 
 } // namespace engine

@@ -2,11 +2,12 @@
 
 namespace engine {
 
-OrbitalHistory::OrbitalHistory(const orbital::Orbit& orbit) {
+OrbitalHistory::OrbitalHistory(const orbital::Orbit& orbit)
+{
 
 }
 
-OrbitState OrbitalHistory::stateAtTime(size_t seconds) {
+OrbitState OrbitalHistory::stateAtTime(double seconds) {
   return OrbitState();
 }
 
