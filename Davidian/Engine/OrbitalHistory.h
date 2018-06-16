@@ -7,11 +7,12 @@
 
 namespace engine {
 
-template<size_t precision = 1e6>
+// default precision = 2e6 * pi + 1;
+template<size_t precision = 6'283'186>
 class OrbitalHistory
 {
 public:
-  OrbitalHistory(const orbital::Orbit& orbit);
+  explicit OrbitalHistory(const orbital::Orbit& orbit);
 
   OrbitState stateAtTime(double seconds);
 

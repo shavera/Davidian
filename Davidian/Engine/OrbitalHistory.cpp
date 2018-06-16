@@ -2,12 +2,17 @@
 
 namespace engine {
 
-OrbitalHistory::OrbitalHistory(const orbital::Orbit& orbit)
+template <size_t precision>
+OrbitalHistory<precision>::OrbitalHistory(const orbital::Orbit& orbit)
 {
-
+  std::generate(m_history.begin(), m_history.end(), [orbit, m = 0]() mutable {
+    double time = orbit.sweep() * m++;
+    return calculateOrbitState(orbit, time);
+  });
 }
 
-OrbitState OrbitalHistory::stateAtTime(double seconds) {
+template <size_t precision>
+OrbitState OrbitalHistory<precision>::stateAtTime(double seconds) {
   return OrbitState();
 }
 

@@ -6,10 +6,10 @@
 
 namespace engine{
 
-OrbitalHistory OrbitalEngine::generateOrbitalHistory(const orbital::Orbit& orbit){
-    OrbitalHistory history{orbit};
-    return history;
-}
+//OrbitalHistory OrbitalEngine::generateOrbitalHistory(const orbital::Orbit& orbit){
+//    OrbitalHistory history{orbit};
+//    return history;
+//}
 
 }
 
