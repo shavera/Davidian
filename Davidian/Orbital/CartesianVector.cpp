@@ -119,6 +119,10 @@ CartesianVector operator*(const Eigen::Matrix3d& transform, const CartesianVecto
   return outputVector;
 }
 
+::std::ostream& operator<<(::std::ostream& os, const CartesianVector& v) {
+  return os << "<" << v.x() << "," << v.y() << "," << v.z() <<">";
+}
+
 CartesianVector CartesianVector::operator/(const double& scale) const {
     CartesianVector scaledCopy{x()/scale, y()/scale, z()/scale};
     return scaledCopy;
@@ -133,9 +137,6 @@ CartesianVector::~CartesianVector() = default;
 #include <gtest/gtest.h>
 
 namespace orbital {
-void PrintTo(const CartesianVector& vector, std::ostream* os) {
-  *os << "(" << vector.x() << ", " << vector.y() << ", " << vector.z() << ")";
-}
 
 namespace {
 

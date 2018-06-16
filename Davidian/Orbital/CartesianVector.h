@@ -54,6 +54,8 @@ CartesianVector operator*(const double& factor, const CartesianVector& vector);
 
 CartesianVector operator*(const Eigen::Matrix3d& transform, const CartesianVector& vector);
 
+::std::ostream& operator<<(::std::ostream& os, const CartesianVector& v);
+
 } // namespace orbital
 
 
