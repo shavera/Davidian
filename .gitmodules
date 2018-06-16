@@ -1,6 +1,3 @@
 [submodule "Davidian/3rd_party/googletest"]
 	path = Davidian/3rd_party/googletest
 	url = git@github.com:google/googletest.git
-[submodule "dynarray"]
-	path = Davidian/dynarray
-	url = https://github.com/shavera/dynarray

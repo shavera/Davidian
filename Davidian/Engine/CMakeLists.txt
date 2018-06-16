@@ -11,7 +11,6 @@ set(SOURCES
 
 add_library(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} orbital)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/dynarray)
 
 if (BUILD_TESTING)
     target_include_directories(${PROJECT_NAME} PRIVATE ${GTEST_INCLUDE_DIR})
