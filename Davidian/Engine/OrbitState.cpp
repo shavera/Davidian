@@ -47,8 +47,9 @@ StateVector globalCoordinateStateVector(const StateVector& orbitCoordinateVector
 const OrbitState calculateOrbitState(const orbital::Orbit &orbit, double time)
 {
     OrbitState state;
+    state.time = time;
     const auto& elements = orbit.orbitalElements();
-    const double meanAnom{meanAnomaly_f(elements.meanAnomalyAtEpoch, orbit.sweep(), time)};
+    const double meanAnom{meanAnomaly_f(elements.meanAnomalyAtEpoch, orbit.sweep(), state.time)};
     const double eccAnom{orbital::findEccentricAnomaly(meanAnom, elements.eccentricity)};
     state.trueAnomaly = trueAnomaly_f(eccAnom, elements.eccentricity);
     state.radius = radius_f(elements.semiMajorAxis,  elements.eccentricity, eccAnom);
@@ -172,10 +173,12 @@ TEST(OrbitState, calculateOrbitState){
 
   OrbitState state0{calculateOrbitState(orbit, 0)};
   compareStateVectors(initialState, state0.stateVector, "state0");
+  EXPECT_EQ(0, state0.time);
 
   OrbitState state_period{calculateOrbitState(orbit, orbit.period())};
   compareStateVectors(initialState, state_period.stateVector, "State at period to initial vector");
   compareStateVectors(state0.stateVector, state_period.stateVector, "States at 0 and Period");
+  EXPECT_NEAR(orbit.period(), state_period.time, 1e-6);
 }
 
 } // anonymous namespace
