@@ -25,7 +25,7 @@ OrbitalHistory<precision>::OrbitalHistory(const orbital::Orbit& orbit)
 }
 
 template <size_t precision>
-orbital::StateVector OrbitalHistory<precision>::stateAtTime(double seconds) {
+orbital::StateVector OrbitalHistory<precision>::approximateStateAtTime(double seconds) {
   double adjustedTime = std::fmod(seconds, m_orbit.period());
   if(adjustedTime < 0) {adjustedTime += m_orbit.period();}
 
@@ -63,7 +63,7 @@ TEST(OrbitalHistoryTest, simpleOrbit){
   for(double s{0}; s < 10; ++s){
     orbital::StateVector expectedState{{std::cos(s), std::sin(s), 0}, {-std::sin(s), std::cos(s), 0}};
 
-    orbital::StateVector actualState{simpleHistory.stateAtTime(s)};
+    orbital::StateVector actualState{simpleHistory.approximateStateAtTime(s)};
     EXPECT_LT(expectedState.position.separation(actualState.position), 1e-6)
               << "X " << s << " " << expectedState.position << " " << actualState.position;
     EXPECT_LT(expectedState.velocity.separation(actualState.velocity), 1e-6)
