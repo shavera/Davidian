@@ -9,6 +9,8 @@ include(CTest)
 
 add_subdirectory(3rd_party/eigen-3.3)
 
+find_package(Protobuf REQUIRED)
+
 if(BUILD_TESTING)
     add_subdirectory(3rd_party/googletest)
     set(GTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/3rd_party/googletest/googletest/include)

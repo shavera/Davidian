@@ -3,14 +3,21 @@ project(engine)
 
 set(CMAKE_CXX_STANDARD 17)
 
+
+
 set(SOURCES
         OrbitalEngine
         OrbitalHistory
         OrbitState
         )
 
-add_library(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} orbital)
+include_directories(${Protobuf_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS Engine.proto)
+
+add_library(${PROJECT_NAME} ${SOURCES} ${PROTO_SRCS})
+target_link_libraries(${PROJECT_NAME} orbital ${Protobuf_LIBRARIES})
 
 if (BUILD_TESTING)
     target_include_directories(${PROJECT_NAME} PRIVATE ${GTEST_INCLUDE_DIR})

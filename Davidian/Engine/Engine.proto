@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package Davidian.engine;
+
+message Body{
+    double name = 1;
+    double mass = 2;
+}
