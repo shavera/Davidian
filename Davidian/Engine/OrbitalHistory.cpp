@@ -57,7 +57,7 @@ TEST(OrbitalHistoryTest, simpleOrbit){
   orbital::Orbit simpleOrbit{{{1,0,0}, {0,1,0}}, 1/orbital::G, 0};
 
   // note: at size ~30, error was ~0.3 percent, at size 1000 error was ~3e-6
-  OrbitalHistory<10000> simpleHistory{simpleOrbit};
+  OrbitalHistory<4096> simpleHistory{simpleOrbit};
 
   // for unit circle orbit, period is 2pi, so have a few more than 2pi values to calculate.
   for(double s{0}; s < 10; ++s){

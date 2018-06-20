@@ -7,8 +7,14 @@
 
 namespace engine {
 
-// default precision = 2e6 * pi + 1;
-template<size_t precision = 6'283'186>
+/**
+ * @brief OrbitalHistory is a calculated-on-construction class that generates a series of Orbit states as a function of
+ * time around an orbit. It provides a utility to find approximate state vectors (interpolated between these
+ * pre-calculated states). In initial testing, in a circular orbit, 5000 points was sufficient to get 1 part in a
+ * million accuracy.
+ * @tparam precision Number of bins to calculate. Default is 2^13, approximately 2pi * 1e4, so approximately .0001 rad
+ */
+template<size_t precision = 65536>
 class OrbitalHistory
 {
 public:
