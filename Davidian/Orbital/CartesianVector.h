@@ -54,6 +54,18 @@ CartesianVector operator*(const double& factor, const CartesianVector& vector);
 
 CartesianVector operator*(const Eigen::Matrix3d& transform, const CartesianVector& vector);
 
+/**
+ * @brief interpolate between two other vectors at two times for a third time in between them
+ * @param t0 (earlier) time at which v0 is calculated
+ * @param v0
+ * @param t1 (later) time at which v1 is calculated
+ * @param v1
+ * @param t time in between t1 and t0 to calculate an intermediate vector for
+ * @return Cartesian vector between the other two; if t is not between t1 and t0 then behaviour is undefined but likely
+ * to be reasonable (just applying the interpolation as an extrapolation). If t1 == t0, return zero vector
+ */
+CartesianVector interpolate(double t0, CartesianVector v0, double t1, CartesianVector v1, double t);
+
 ::std::ostream& operator<<(::std::ostream& os, const CartesianVector& v);
 
 } // namespace orbital

@@ -123,6 +123,17 @@ CartesianVector operator*(const Eigen::Matrix3d& transform, const CartesianVecto
   return os << "<" << v.x() << "," << v.y() << "," << v.z() <<">";
 }
 
+CartesianVector interpolate(double t0, CartesianVector v0, double t1, CartesianVector v1, double t) {
+  const double deltaT{t1-t0};
+  if(0 == deltaT){return CartesianVector{};}
+  const double dT{t-t0};
+  const double timeRatio{dT/deltaT};
+
+  const auto difference = v1-v0;
+
+  return v0 + (timeRatio*difference);
+}
+
 CartesianVector CartesianVector::operator/(const double& scale) const {
     CartesianVector scaledCopy{x()/scale, y()/scale, z()/scale};
     return scaledCopy;
@@ -331,6 +342,16 @@ TEST_F(CartesianVectorOperationsTest, transformMatrix) {
   for(int i{0}; i < 3; ++i){
     EXPECT_NEAR(expectedVector.c_at(i), actualVector.c_at(i), std::fabs(1e-6*expectedVector.c_at(i)));
   }
+}
+
+TEST_F(CartesianVectorOperationsTest, interpolate){
+  const double t0{23.72}, t1{31.42}, t{26.43};
+
+  const CartesianVector expectedVector{1.6347402631, -0.6144675328, 1.0124285716};
+
+  const CartesianVector actualVector{interpolate(t0, leftVector, t1, rightVector, t)};
+
+  EXPECT_GT(1e-6, expectedVector.separation(actualVector)) << actualVector;
 }
 
 } // anonymous namespace for testing
