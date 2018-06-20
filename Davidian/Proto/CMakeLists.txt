@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.5)
 project (davidian_proto)
 
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS Engine.proto)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS Engine.proto Orbital.proto)
 
 include_directories(${Protobuf_INCLUDE_DIRS})
 

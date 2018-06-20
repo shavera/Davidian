@@ -16,3 +16,8 @@ message CartesianVector{
     double y = 2;
     double z = 3;
 }
+
+message StateVector{
+    CartesianVector position = 1;
+    CartesianVector velocity = 2;
+}

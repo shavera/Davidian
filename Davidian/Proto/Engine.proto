@@ -2,7 +2,17 @@ syntax = "proto3";
 
 package Davidian.engine;
 
+import "Orbital.proto";
+
 message Body{
-    double name = 1;
+    string name = 1;
     double mass = 2;
+
+    string parent_body_name = 3;
+
+    orbital.OrbitalElements orbit = 4;
+}
+
+message System{
+    repeated Body body = 1;
 }
