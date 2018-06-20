@@ -12,14 +12,9 @@ set(SOURCES
         SphericalVector
         RotationMatrices)
 
-include_directories(${Protobuf_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS Orbital.proto)
-
-add_library(${PROJECT_NAME} ${SOURCES} ${PROTO_SRCS})
+add_library(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PUBLIC Eigen ${Protobuf_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen davidian_proto)
 
 if (BUILD_TESTING)
     target_include_directories(${PROJECT_NAME} PRIVATE ${GTEST_INCLUDE_DIR})
