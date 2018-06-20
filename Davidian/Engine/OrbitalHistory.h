@@ -14,9 +14,11 @@ class OrbitalHistory
 public:
   explicit OrbitalHistory(const orbital::Orbit& orbit);
 
-  OrbitState stateAtTime(double seconds);
+  orbital::StateVector stateAtTime(double seconds);
 
 private:
+  const orbital::Orbit m_orbit;
+
   std::array<OrbitState, precision> m_history;
 };
 
