@@ -4,6 +4,7 @@ project(engine)
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
+        CelestialSystemFileManager
         OrbitalEngine
         OrbitalHistory
         OrbitState
