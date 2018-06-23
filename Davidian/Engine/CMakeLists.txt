@@ -18,6 +18,6 @@ target_link_libraries(${PROJECT_NAME} orbital)
 
 if (BUILD_TESTING)
     target_include_directories(${PROJECT_NAME} PRIVATE ${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR})
-    add_executable(${PROJECT_NAME}_TEST ${SOURCES})
+    add_executable(${PROJECT_NAME}_TEST ${SOURCES} UnitTestHelpers.cpp UnitTestHelpers.h)
     target_link_libraries(${PROJECT_NAME}_TEST gmock gmock_main gtest ${PROJECT_NAME})
 endif()

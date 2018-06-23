@@ -36,6 +36,8 @@ CelestialSystemFileManager::~CelestialSystemFileManager() = default;
 
 #ifdef BUILD_TESTS
 
+#include "UnitTestHelpers.h"
+
 #include <gtest/gtest.h>
 #include <google/protobuf/util/message_differencer.h>
 
@@ -46,34 +48,11 @@ namespace {
 
 using namespace testing;
 
-System createTestSystem(){
-  System system;
-
-  auto* rootBody = system.add_body();
-  rootBody->set_mass(12340);
-  rootBody->set_name("Root Body");
-
-  auto* childBody = system.add_body();
-  childBody->set_mass(567);
-  childBody->set_name("Child");
-  childBody->set_parent_body_name("Root Body");
-  auto* childOrbit = childBody->mutable_orbit();
-  childOrbit->set_semimajor_axis(12.34);
-  childOrbit->set_eccentricity(0.6);
-  childOrbit->set_longitude_asc_node(1.75);
-  childOrbit->set_inclination(0.12);
-  childOrbit->set_arg_periapsis(0.45);
-  childOrbit->set_mean_anomaly_0(2.33);
-
-  return system;
-};
-
-class CSFileManagerTest : public Test{
+class CSFileManagerTest : public Test, public TestProtoInterface{
 public:
 
   void SetUp() override{
     remove(filePath.c_str());
-    protoDifferencer.ReportDifferencesToString(&differenceString);
   }
 
   void TearDown() override{
@@ -100,9 +79,6 @@ public:
   const System kTestSystem{createTestSystem()};
 
   CelestialSystemFileManager csFileManager;
-
-  google::protobuf::util::MessageDifferencer protoDifferencer;
-  std::string differenceString;
 };
 
 TEST_F(CSFileManagerTest, loadSystem){
@@ -110,14 +86,14 @@ TEST_F(CSFileManagerTest, loadSystem){
 
   auto system = csFileManager.loadSystem(filePath);
 
-  EXPECT_TRUE(protoDifferencer.Compare(kTestSystem, system)) << differenceString;
+  compareProtos(kTestSystem, system);
 }
 
 TEST_F(CSFileManagerTest, loadSystem_fileNotPresent){
   System system;
   ASSERT_NO_THROW(system = csFileManager.loadSystem(filePath));
 
-  EXPECT_TRUE(protoDifferencer.Compare(System{}, system)) << differenceString;
+  compareProtos(System{}, system);
 }
 
 TEST_F(CSFileManagerTest, saveSystem){
@@ -125,7 +101,7 @@ TEST_F(CSFileManagerTest, saveSystem){
 
   auto readInSystem = readSystemFromTestFile();
 
-  EXPECT_TRUE(protoDifferencer.Compare(kTestSystem, readInSystem)) << differenceString;
+  compareProtos(kTestSystem, readInSystem);
 }
 
 TEST_F(CSFileManagerTest, saveSystem_saveOverOldFile){
@@ -138,7 +114,7 @@ TEST_F(CSFileManagerTest, saveSystem_saveOverOldFile){
 
   auto readInSystem = readSystemFromTestFile();
 
-  EXPECT_TRUE(protoDifferencer.Compare(system, readInSystem)) << differenceString;
+  compareProtos(system, readInSystem);
 }
 
 } // anonymous namespace
