@@ -3,17 +3,31 @@
 //
 
 #include "CelestialSystemFileManager.h"
+#include <google/protobuf/io/zero_copy_stream_impl.h>
 
 using Davidian::engine::System;
 
 namespace engine {
 
 System CelestialSystemFileManager::loadSystem(const std::string &filename) const {
-    return Davidian::engine::System();
+  System system;
+
+  auto* file = std::fopen(filename.c_str(), "r");
+  if(nullptr == file) {return system;}
+
+  google::protobuf::io::FileInputStream inputStream{fileno(file)};
+  system.ParseFromZeroCopyStream(&inputStream);
+  inputStream.Close();
+  return system;
 }
 
 void CelestialSystemFileManager::saveSystem(const System &system, const std::string &filename) const {
+  auto* file = std::fopen(filename.c_str(), "w");
+  if(nullptr == file) {return;}
 
+  google::protobuf::io::FileOutputStream outputStream{fileno(file)};
+  system.SerializeToZeroCopyStream(&outputStream);
+  outputStream.Close();
 }
 
 } // namespace engine
@@ -98,7 +112,8 @@ TEST_F(CSFileManagerTest, loadSystem){
 }
 
 TEST_F(CSFileManagerTest, loadSystem_fileNotPresent){
-  auto system = csFileManager.loadSystem(filePath);
+  System system;
+  ASSERT_NO_THROW(system = csFileManager.loadSystem(filePath));
 
   EXPECT_TRUE(protoDifferencer.Compare(System{}, system)) << differenceString;
 }
@@ -109,6 +124,19 @@ TEST_F(CSFileManagerTest, saveSystem){
   auto readInSystem = readSystemFromTestFile();
 
   EXPECT_TRUE(protoDifferencer.Compare(kTestSystem, readInSystem)) << differenceString;
+}
+
+TEST_F(CSFileManagerTest, saveSystem_saveOverOldFile){
+  csFileManager.saveSystem(kTestSystem, filePath);
+  System system;
+  auto* body = system.add_body();
+  body->set_name("New Body");
+
+  csFileManager.saveSystem(system, filePath);
+
+  auto readInSystem = readSystemFromTestFile();
+
+  EXPECT_TRUE(protoDifferencer.Compare(system, readInSystem)) << differenceString;
 }
 
 } // anonymous namespace
