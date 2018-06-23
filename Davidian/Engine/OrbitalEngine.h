@@ -25,6 +25,10 @@ public:
 
   System_proto getCurrentSystem() override;
 
+  System_proto advanceSystemToTime(const double t) override;
+
+  std::optional<StateVector_proto> bodyStateAtTime(const std::string& bodyName, const double t) const override;
+
 protected:
   explicit OrbitalEngine(std::unique_ptr<CelestialSystemFileManager>&& fileManager);
 

@@ -5,6 +5,9 @@
 #include "OrbitalEngine.h"
 #include "CelestialSystemFileManager.h"
 
+#include "Engine.pb.h"
+#include "Orbital.pb.h"
+
 using ProtoSystem = Davidian::engine::System;
 
 namespace engine{
@@ -33,14 +36,23 @@ bool OrbitalEngine::hasValidSystem() const {
   return false;
 }
 
+System_proto OrbitalEngine::advanceSystemToTime(const double t) {
+  return engine::System_proto();
+}
+
+std::optional<StateVector_proto> OrbitalEngine::bodyStateAtTime(const std::string& bodyName, const double t) const {
+  return std::optional<StateVector_proto>();
+}
+
 OrbitalEngine::~OrbitalEngine() = default;
 
 } // namespace engine
 
 #ifdef BUILD_TESTS
 
+#include "UnitTestHelpers.h"
+
 #include <gmock/gmock.h>
-#include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
 namespace engine{
@@ -61,32 +73,45 @@ public:
   {}
 };
 
-class OrbitalEngineTest : public Test{
+class OrbitalEngineTest : public Test, public TestProtoInterface{
 public:
   OrbitalEngineTest(){
     auto managedFileManager = std::make_unique<MockCSFileManager>();
     mockFileManager = managedFileManager.get();
 
     orbitalEngine = std::make_unique<InjectableOrbitalEngine>(std::move(managedFileManager));
-
-    protoDifferencer.ReportDifferencesToString(&differenceString);
   }
 
   MockCSFileManager* mockFileManager{nullptr};
   std::unique_ptr<OrbitalEngine> orbitalEngine{nullptr};
-
-  google::protobuf::util::MessageDifferencer protoDifferencer;
-  std::string differenceString;
+  ProtoSystem kTestSystem{createTestSystem()};
 };
 
 TEST_F(OrbitalEngineTest, noSystemLoaded){
   EXPECT_FALSE(orbitalEngine->hasValidSystem());
 
-  EXPECT_TRUE(protoDifferencer.Compare(System_proto{}, orbitalEngine->getCurrentSystem())) << differenceString;
+  compareProtos(System_proto{}, orbitalEngine->getCurrentSystem());
 }
 
 TEST_F(OrbitalEngineTest, loadSystem){
+  const std::string dummyFileName{"Dummy File Name"};
+  std::string actualFileName;
+  EXPECT_CALL(*mockFileManager, loadSystem(_))
+              .WillOnce(DoAll(SaveArg<0>(&actualFileName),
+                  Return(kTestSystem)));
 
+  orbitalEngine->loadSystem(dummyFileName);
+
+  EXPECT_EQ(dummyFileName, actualFileName);
+  EXPECT_TRUE(orbitalEngine->hasValidSystem());
+  compareProtos(kTestSystem, orbitalEngine->getCurrentSystem());
+}
+
+TEST_F(OrbitalEngineTest, useSystem){
+  orbitalEngine->useSystem(kTestSystem);
+
+  EXPECT_TRUE(orbitalEngine->hasValidSystem());
+  compareProtos(kTestSystem, orbitalEngine->getCurrentSystem());
 }
 
 } // anonymous namespace

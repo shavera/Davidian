@@ -17,7 +17,7 @@ public:
   TestProtoInterface(){
     protoDifferencer.ReportDifferencesToString(&differenceString);
   }
-  virtual ~TestProtoInterface(){}
+  virtual ~TestProtoInterface() = default;
 
   void compareProtos(const google::protobuf::Message& m1, const google::protobuf::Message& m2);
 
