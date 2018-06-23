@@ -5,16 +5,21 @@
 #ifndef DAVIDIAN_ORBITALENGINE_H
 #define DAVIDIAN_ORBITALENGINE_H
 
-#include "OrbitalHistory.h"
-#include "OrbitState.h"
-#include <CartesianVector.h>
+#include <memory>
 
 namespace engine {
 
+class CelestialSystemFileManager;
+
 class OrbitalEngine{
 public:
-//  OrbitalHistory generateOrbitalHistory(const orbital::Orbit& orbit);
+  OrbitalEngine();
 
+protected:
+  explicit OrbitalEngine(std::unique_ptr<CelestialSystemFileManager>&& fileManager);
+
+private:
+  std::unique_ptr<CelestialSystemFileManager> m_fileManager;
 };
 
 } // namespace engine

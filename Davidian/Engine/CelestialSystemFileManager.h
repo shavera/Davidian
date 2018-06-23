@@ -11,9 +11,11 @@ namespace engine {
 
 class CelestialSystemFileManager {
 public:
-  Davidian::engine::System loadSystem(const std::string& filename) const;
+  virtual ~CelestialSystemFileManager();
 
-  void saveSystem(const Davidian::engine::System& system, const std::string& filename) const;
+  virtual Davidian::engine::System loadSystem(const std::string& filename) const;
+
+  virtual void saveSystem(const Davidian::engine::System& system, const std::string& filename) const;
 };
 
 } // namespace engine

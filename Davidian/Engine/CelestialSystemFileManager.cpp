@@ -30,6 +30,8 @@ void CelestialSystemFileManager::saveSystem(const System &system, const std::str
   outputStream.Close();
 }
 
+CelestialSystemFileManager::~CelestialSystemFileManager() = default;
+
 } // namespace engine
 
 #ifdef BUILD_TESTS
