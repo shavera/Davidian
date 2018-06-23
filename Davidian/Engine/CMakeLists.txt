@@ -10,6 +10,9 @@ set(SOURCES
         OrbitState
         )
 
+set(INTERFACES
+        EngineInterface.h)
+
 add_library(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} orbital)
 

@@ -17,6 +17,16 @@ OrbitalEngine::OrbitalEngine(std::unique_ptr<CelestialSystemFileManager>&& fileM
   : m_fileManager{std::move(fileManager)}
 {}
 
+void OrbitalEngine::loadSystem(const std::string& filename) {
+
+}
+
+System_proto OrbitalEngine::getCurrentSystem() {
+  return engine::System_proto();
+}
+
+OrbitalEngine::~OrbitalEngine() = default;
+
 } // namespace engine
 
 #ifdef BUILD_TESTS
