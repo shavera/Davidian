@@ -13,7 +13,7 @@ set(SOURCES
 set(INTERFACES
         EngineInterface.h)
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${INTERFACES})
 target_link_libraries(${PROJECT_NAME} orbital)
 
 if (BUILD_TESTING)

@@ -25,6 +25,14 @@ System_proto OrbitalEngine::getCurrentSystem() {
   return engine::System_proto();
 }
 
+void OrbitalEngine::useSystem(const System_proto& system) {
+
+}
+
+bool OrbitalEngine::hasValidSystem() const {
+  return false;
+}
+
 OrbitalEngine::~OrbitalEngine() = default;
 
 } // namespace engine
@@ -32,6 +40,7 @@ OrbitalEngine::~OrbitalEngine() = default;
 #ifdef BUILD_TESTS
 
 #include <gmock/gmock.h>
+#include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
 namespace engine{
@@ -47,7 +56,7 @@ public:
 
 class InjectableOrbitalEngine : public OrbitalEngine{
 public:
-  InjectableOrbitalEngine(std::unique_ptr<CelestialSystemFileManager>&& fileManager)
+  explicit InjectableOrbitalEngine(std::unique_ptr<CelestialSystemFileManager>&& fileManager)
       : OrbitalEngine{std::move(fileManager)}
   {}
 };
@@ -59,11 +68,26 @@ public:
     mockFileManager = managedFileManager.get();
 
     orbitalEngine = std::make_unique<InjectableOrbitalEngine>(std::move(managedFileManager));
+
+    protoDifferencer.ReportDifferencesToString(&differenceString);
   }
 
   MockCSFileManager* mockFileManager{nullptr};
   std::unique_ptr<OrbitalEngine> orbitalEngine{nullptr};
+
+  google::protobuf::util::MessageDifferencer protoDifferencer;
+  std::string differenceString;
 };
+
+TEST_F(OrbitalEngineTest, noSystemLoaded){
+  EXPECT_FALSE(orbitalEngine->hasValidSystem());
+
+  EXPECT_TRUE(protoDifferencer.Compare(System_proto{}, orbitalEngine->getCurrentSystem())) << differenceString;
+}
+
+TEST_F(OrbitalEngineTest, loadSystem){
+
+}
 
 } // anonymous namespace
 } // namespace engine

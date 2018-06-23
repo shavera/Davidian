@@ -26,7 +26,11 @@ using CartesianVector_proto = Davidian::orbitial::CartesianVector;
 class EngineInterface{
 public:
   virtual ~EngineInterface(){};
+
   virtual void loadSystem(const std::string& filename) = 0;
+  virtual void useSystem(const System_proto& system) = 0;
+
+  virtual bool hasValidSystem() const = 0;
 
   virtual System_proto getCurrentSystem() = 0;
 };

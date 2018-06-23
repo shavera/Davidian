@@ -19,6 +19,9 @@ public:
   virtual ~OrbitalEngine();
 
   void loadSystem(const std::string& filename) override;
+  void useSystem(const System_proto& system) override;
+
+  bool hasValidSystem() const override;
 
   System_proto getCurrentSystem() override;
 
