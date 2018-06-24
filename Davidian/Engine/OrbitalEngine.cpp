@@ -114,6 +114,30 @@ TEST_F(OrbitalEngineTest, useSystem){
   compareProtos(kTestSystem, orbitalEngine->getCurrentSystem());
 }
 
+/// @test As of issue 4, we're not yet handling body transfers, should just be simple orbit.
+TEST_F(OrbitalEngineTest, advanceSystemToTime_simpleOrbit){
+  orbitalEngine->useSystem(unitCircleSystem());
+
+  orbitalEngine->advanceSystemToTime(2*M_PI/4);
+
+  auto expectedSystem = unitCircleSystem();
+  expectedSystem.mutable_body(1)->mutable_orbit()->set_mean_anomaly_0(2*M_PI/4);
+
+  compareProtos(expectedSystem, orbitalEngine->getCurrentSystem());
+}
+
+TEST_F(OrbitalEngineTest, bodyStateAtTime){
+
+}
+
+TEST_F(OrbitalEngineTest, bodyStateAtTime_invalidSystem){
+
+}
+
+TEST_F(OrbitalEngineTest, bodyStateAtTime_bodyNameNotFound){
+
+}
+
 } // anonymous namespace
 } // namespace engine
 

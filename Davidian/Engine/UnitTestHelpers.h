@@ -25,7 +25,11 @@ public:
   std::string differenceString;
 };
 
+/// @brief creates a system with more-or-less arbitrary values for testing
 Davidian::engine::System createTestSystem();
+
+/// @brief creates a system with a child body in a unit circle orbit
+Davidian::engine::System unitCircleSystem();
 
 } // namespace engine
 
