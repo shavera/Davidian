@@ -21,3 +21,12 @@ message StateVector{
     CartesianVector position = 1;
     CartesianVector velocity = 2;
 }
+
+message Body{
+    string name = 1;
+    double mass = 2;
+
+    string parent_body_name = 3;
+
+    OrbitalElements orbit = 4;
+}
