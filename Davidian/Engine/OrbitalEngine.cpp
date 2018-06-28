@@ -107,11 +107,37 @@ TEST_F(OrbitalEngineTest, loadSystem){
   compareProtos(kTestSystem, orbitalEngine->getCurrentSystem());
 }
 
+/// @test if loaded system has no root body, then the system is invalid
+TEST_F(OrbitalEngineTest, loadSystem_noRootBody){
+  const std::string dummyFileName{"Dummy File Name"};
+  const auto system = createRootlessSystem();
+  std::string actualFileName;
+  EXPECT_CALL(*mockFileManager, loadSystem(_))
+      .WillOnce(DoAll(SaveArg<0>(&actualFileName),
+                      Return(kTestSystem)));
+
+  orbitalEngine->loadSystem(dummyFileName);
+
+  EXPECT_EQ(dummyFileName, actualFileName);
+  EXPECT_FALSE(orbitalEngine->hasValidSystem());
+  compareProtos(ProtoSystem{}, orbitalEngine->getCurrentSystem());
+}
+
 TEST_F(OrbitalEngineTest, useSystem){
   orbitalEngine->useSystem(kTestSystem);
 
   EXPECT_TRUE(orbitalEngine->hasValidSystem());
   compareProtos(kTestSystem, orbitalEngine->getCurrentSystem());
+}
+
+/// @test if provided system has no root body, then system is invalid, don't bother constructing anything
+TEST_F(OrbitalEngineTest, useSystem_NoRootBody){
+  const auto system = createRootlessSystem();
+
+  orbitalEngine->useSystem(kTestSystem);
+
+  EXPECT_FALSE(orbitalEngine->hasValidSystem());
+  compareProtos(ProtoSystem{}, orbitalEngine->getCurrentSystem());
 }
 
 /// @test As of issue 4, we're not yet handling body transfers, should just be simple orbit.

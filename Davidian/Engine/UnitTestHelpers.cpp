@@ -15,6 +15,7 @@ System_proto createTestSystem() {
   System_proto system;
 
   auto* rootBody = system.add_body();
+  rootBody->mutable_root_body();
   rootBody->set_mass(12340);
   rootBody->set_name("Root Body");
 
@@ -37,6 +38,7 @@ Davidian::engine::System unitCircleSystem() {
   System_proto system;
 
   auto* rootBody = system.add_body();
+  rootBody->mutable_root_body();
   rootBody->set_mass(1/orbital::G);
   rootBody->set_name("Root Body");
 
@@ -50,6 +52,22 @@ Davidian::engine::System unitCircleSystem() {
   // all other values default to 0
 
   return system;
+}
+
+Davidian::engine::System createRootlessSystem(){
+  System_proto system;
+
+  auto* childBody = system.add_body();
+  childBody->set_mass(0);
+  childBody->set_name("Child");
+  childBody->mutable_celestial_body()->set_parent_body_name("Root Body");
+  auto* childOrbit = childBody->mutable_celestial_body()->mutable_orbit();
+  childOrbit->set_semimajor_axis(1);
+  childOrbit->set_eccentricity(1);
+  // all other values default to 0
+
+  return system;
+
 }
 
 void TestProtoInterface::compareProtos(const google::protobuf::Message& m1, const google::protobuf::Message& m2){

@@ -31,6 +31,9 @@ Davidian::engine::System createTestSystem();
 /// @brief creates a system with a child body in a unit circle orbit
 Davidian::engine::System unitCircleSystem();
 
+/// @brief creates a system with no root body for testing error cases
+Davidian::engine::System createRootlessSystem();
+
 } // namespace engine
 
 #endif //DAVIDIAN_UNITTESTHELPERS_H
