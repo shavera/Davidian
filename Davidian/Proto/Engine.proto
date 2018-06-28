@@ -5,5 +5,5 @@ package Davidian.engine;
 import "Orbital.proto";
 
 message System{
-    repeated orbital.Body system_body = 1;
+    repeated orbital.Body body = 1;
 }

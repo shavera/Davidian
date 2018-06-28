@@ -121,7 +121,7 @@ TEST_F(OrbitalEngineTest, advanceSystemToTime_simpleOrbit){
   orbitalEngine->advanceSystemToTime(2*M_PI/4);
 
   auto expectedSystem = unitCircleSystem();
-  expectedSystem.mutable_body(1)->mutable_orbit()->set_mean_anomaly_0(2*M_PI/4);
+  expectedSystem.mutable_body(1)->mutable_celestial_body()->mutable_orbit()->set_mean_anomaly_0(2*M_PI/4);
 
   compareProtos(expectedSystem, orbitalEngine->getCurrentSystem());
 }

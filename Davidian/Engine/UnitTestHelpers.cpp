@@ -21,8 +21,8 @@ System_proto createTestSystem() {
   auto* childBody = system.add_body();
   childBody->set_mass(567);
   childBody->set_name("Child");
-  childBody->set_parent_body_name("Root Body");
-  auto* childOrbit = childBody->mutable_orbit();
+  childBody->mutable_celestial_body()->set_parent_body_name("Root Body");
+  auto* childOrbit = childBody->mutable_celestial_body()->mutable_orbit();
   childOrbit->set_semimajor_axis(12.34);
   childOrbit->set_eccentricity(0.6);
   childOrbit->set_longitude_asc_node(1.75);
@@ -43,8 +43,8 @@ Davidian::engine::System unitCircleSystem() {
   auto* childBody = system.add_body();
   childBody->set_mass(0);
   childBody->set_name("Child");
-  childBody->set_parent_body_name("Root Body");
-  auto* childOrbit = childBody->mutable_orbit();
+  childBody->mutable_celestial_body()->set_parent_body_name("Root Body");
+  auto* childOrbit = childBody->mutable_celestial_body()->mutable_orbit();
   childOrbit->set_semimajor_axis(1);
   childOrbit->set_eccentricity(1);
   // all other values default to 0

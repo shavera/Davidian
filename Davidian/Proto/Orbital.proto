@@ -23,23 +23,20 @@ message StateVector{
 }
 
 message BodyData{
-    string name = 1;
-    double mass = 2;
-
-    string parent_body_name = 3;
-
-    OrbitalElements orbit = 4;
+    string parent_body_name = 1;
+    OrbitalElements orbit = 2;
 }
 
 message RootBodyData{
-    string name = 1;
-    double mass = 2;
 }
 
 message Body{
-    oneof body{
-        RootBodyData root_body = 1;
-        BodyData celestial_body = 2;
-        BodyData free_body = 3;
+    string name = 1;
+    double mass = 2;
+
+    oneof body_data{
+        RootBodyData root_body = 3;
+        BodyData celestial_body = 4;
+        BodyData free_body = 5;
     };
 }
