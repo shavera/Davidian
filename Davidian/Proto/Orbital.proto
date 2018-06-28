@@ -22,11 +22,24 @@ message StateVector{
     CartesianVector velocity = 2;
 }
 
-message Body{
+message BodyData{
     string name = 1;
     double mass = 2;
 
     string parent_body_name = 3;
 
     OrbitalElements orbit = 4;
+}
+
+message RootBodyData{
+    string name = 1;
+    double mass = 2;
+}
+
+message Body{
+    oneof body{
+        RootBodyData root_body = 1;
+        BodyData celestial_body = 2;
+        BodyData free_body = 3;
+    };
 }
