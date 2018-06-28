@@ -25,7 +25,6 @@ namespace engine {
 class CelestialSystem {
   using CelestialSystem_proto = Davidian::engine::CelestialSystem;
 public:
-
   explicit CelestialSystem(const CelestialSystem_proto& systemProto);
 
   orbital::Body* body(const std::string& bodyName);

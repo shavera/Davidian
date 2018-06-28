@@ -3,6 +3,7 @@
 //
 
 #include "CelestialSystem.h"
+#include "Body.h"
 
 namespace engine {
 

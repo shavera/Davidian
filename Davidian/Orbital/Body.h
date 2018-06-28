@@ -20,11 +20,12 @@ public:
 //       const double& time = 0);
 
   Body(const double& mass, const OrbitalElements& orbitalElements, CelestialBody* parent);
+  virtual ~Body();
 
   /// Using the more precise definition of GM_1 + GM_2, rather than just approximating it to be GM_1 (as appropriate)
-  const double standardGravitationalParameter() const;
+  double standardGravitationalParameter() const;
   /// Just the mass of this body.
-  const double mass() const;
+  double mass() const;
 
 private:
   // allowing mass to be mutable if we wish to do more general cases like rockets that lose mass during burns.
