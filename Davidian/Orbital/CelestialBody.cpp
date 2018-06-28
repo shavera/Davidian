@@ -5,7 +5,11 @@
 #include "CelestialBody.h"
 #include "Orbit.h"
 
-orbital::CelestialBody::CelestialBody(const double& mass,
+orbital::CelestialBody::CelestialBody(const double mass)
+  : Body{mass}
+{}
+
+orbital::CelestialBody::CelestialBody(const double mass,
                                       OrbitalElements elements,
                                       CelestialBody* parent)
     : Body(mass, elements, parent){}

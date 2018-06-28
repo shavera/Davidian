@@ -16,16 +16,28 @@ class StateVector;
 
 class Body {
 public:
-//  Body(const double& mass, CelestialBody* parent = nullptr, const StateVector* initialState = nullptr,
-//       const double& time = 0);
-
-  Body(const double& mass, const OrbitalElements& orbitalElements, CelestialBody* parent);
+  /**
+   * Constructing a Generic body that is in orbit around some other body. The parent and orbit may change as the system
+   * evolves over time.
+   * @param mass Mass, in kg, of this body
+   * @param orbitalElements Description of (initial) orbit around (initial) parent body using orbital elements
+   * @param parent Pointer to the (Celestial) body this body orbits.
+   */
+  Body(double mass, const OrbitalElements& orbitalElements, CelestialBody* parent);
   virtual ~Body();
 
   /// Using the more precise definition of GM_1 + GM_2, rather than just approximating it to be GM_1 (as appropriate)
   double standardGravitationalParameter() const;
   /// Just the mass of this body.
   double mass() const;
+
+protected:
+  /**
+   * Construct a 'root' parent body that is at the origin of the coordinate system and does not orbit or move.
+   * Protected because CelestialBody subclass is what needs access to it.
+   * @param mass
+   */
+  explicit Body(double mass);
 
 private:
   // allowing mass to be mutable if we wish to do more general cases like rockets that lose mass during burns.

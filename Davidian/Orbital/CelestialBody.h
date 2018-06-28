@@ -10,9 +10,21 @@
 namespace orbital{
 class CelestialBody : public Body{
 public:
-  CelestialBody(const double& mass,
+  /**
+   * @brief Construct a 'root' Celestial body with no parent or meaningful orbit
+   * @param mass Mass, in kg, of this body
+   */
+  explicit CelestialBody(double mass);
+
+  /**
+   * @brief Construct a Celestial body that is in orbit around some other Celestial Body
+   * @param mass Mass, in kg, of this body
+   * @param elements Orbital Element description of orbit this body occupies around its parent
+   * @param parent pointer to the parent body
+   */
+  CelestialBody(double mass,
                 OrbitalElements elements,
-                CelestialBody* parent = nullptr);
+                CelestialBody* parent);
 
 };
 }

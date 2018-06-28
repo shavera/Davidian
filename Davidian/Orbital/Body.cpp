@@ -8,18 +8,16 @@
 #include "GlobalDefinitions.h"
 
 namespace orbital{
-//Body::Body(const double& mass, CelestialBody* parent, const StateVector* /*initialState*/, const double& /*time*/)
-//: m_mass{mass}, _parent{parent}, m_orbit{nullptr}
-//{
-//}
 
-Body::Body(const double& mass, const OrbitalElements& orbitalElements, CelestialBody* parent)
+Body::Body(const double mass, const OrbitalElements& orbitalElements, CelestialBody* parent)
   : m_mass{mass}
   , _parent{parent}
   , m_orbit{std::make_unique<Orbit>(orbitalElements, parent->mass(), m_mass)}
-{
+{}
 
-}
+Body::Body(const double mass)
+  : m_mass{mass}, _parent{nullptr}, m_orbit{nullptr}
+{}
 
 double Body::standardGravitationalParameter() const {
   double totalMass = m_mass + ((nullptr != _parent) ? _parent->mass() : 0.0);
@@ -48,12 +46,13 @@ public:
   static constexpr OrbitalElements elements{
       5'263'138'304,
       0.2,
-      (70/360)*2*M_PI,
-      (7/360)*2*M_PI,
-      (15/360)*2*M_PI,
+      (70.0/360)*2*M_PI,
+      (7.0/360)*2*M_PI,
+      (15.0/360)*2*M_PI,
       3.14
   };
-  orbital::CelestialBody parentBody{expectedParentMass, {}}, childBody{expectedChildMass, elements, &parentBody};
+
+  CelestialBody parentBody{expectedParentMass}, childBody{expectedChildMass, elements, &parentBody};
 };
 
 TEST_F(BodyTest, mass) {
