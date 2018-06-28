@@ -5,6 +5,7 @@
 #include "CelestialBody.h"
 #include "Orbit.h"
 
-orbital::CelestialBody::CelestialBody(const double& mass, orbital::CelestialBody* parent,
-                                      const orbital::StateVector* initialState, const double& time)
-    : Body(mass, parent, initialState, time){}
+orbital::CelestialBody::CelestialBody(const double& mass,
+                                      OrbitalElements elements,
+                                      CelestialBody* parent)
+    : Body(mass, elements, parent){}

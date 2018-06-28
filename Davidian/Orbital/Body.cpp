@@ -13,6 +13,14 @@ Body::Body(const double& mass, CelestialBody* parent, const StateVector* /*initi
 {
 }
 
+Body::Body(const double& mass, const OrbitalElements& orbitalElements, CelestialBody* parent)
+  : m_mass{mass}
+  , _parent{parent}
+  , m_orbit{std::make_unique<Orbit>(orbitalElements, parent->mass(), m_mass)}
+{
+
+}
+
 const double Body::standardGravitationalParameter() const {
   double totalMass = m_mass + ((nullptr != _parent) ? _parent->mass() : 0.0);
   return totalMass*orbital::G;
