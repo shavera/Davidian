@@ -29,8 +29,6 @@ public:
 
   orbital::Body* body(const std::string& bodyName);
 
-
-
 private:
   std::vector<std::unique_ptr<orbital::Body>> m_bodies;
 };

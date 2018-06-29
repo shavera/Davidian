@@ -12,6 +12,7 @@
 namespace engine {
 
 class CelestialSystemFileManager;
+class CelestialSystem;
 
 class OrbitalEngine : public EngineInterface{
 public:
@@ -34,6 +35,7 @@ protected:
 
 private:
   std::unique_ptr<CelestialSystemFileManager> m_fileManager;
+  std::unique_ptr<CelestialSystem> m_celestialSystem;
 };
 
 } // namespace engine

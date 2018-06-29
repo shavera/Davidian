@@ -21,7 +21,7 @@ OrbitalEngine::OrbitalEngine(std::unique_ptr<CelestialSystemFileManager>&& fileM
 {}
 
 void OrbitalEngine::loadSystem(const std::string& filename) {
-
+  useSystem(m_fileManager->loadSystem(filename));
 }
 
 System_proto OrbitalEngine::getCurrentSystem() {
@@ -29,7 +29,7 @@ System_proto OrbitalEngine::getCurrentSystem() {
 }
 
 void OrbitalEngine::useSystem(const System_proto& system) {
-
+  m_celestialSystem = std::make_unique<CelestialSystem>(system);
 }
 
 bool OrbitalEngine::hasValidSystem() const {
