@@ -9,6 +9,7 @@
 
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
+#include <GlobalDefinitions.h>
 
 namespace engine {
 
@@ -25,7 +26,10 @@ public:
   std::string differenceString;
 };
 
-/// @brief creates a system with more-or-less arbitrary values for testing
+/// @brief creates a set of more-or-less arbitrary orbital element parameters
+orbital::OrbitalElements retrieveTestOrbitalElements();
+
+/// @brief creates a system using the above parameters plus some more arbitrary ones
 Davidian::engine::System createTestSystem();
 
 /// @brief creates a system with a child body in a unit circle orbit

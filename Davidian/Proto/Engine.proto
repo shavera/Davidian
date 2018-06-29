@@ -7,3 +7,8 @@ import "Orbital.proto";
 message System{
     repeated orbital.Body body = 1;
 }
+
+message OrbitState{
+    double time = 1;
+    orbital.StateVector state_vector = 2;
+}

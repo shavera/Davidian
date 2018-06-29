@@ -51,9 +51,9 @@ const OrbitState calculateOrbitState(const orbital::Orbit &orbit, double time)
     const auto& elements = orbit.orbitalElements();
     const double meanAnom{meanAnomaly_f(elements.meanAnomalyAtEpoch, orbit.sweep(), state.time)};
     const double eccAnom{orbital::findEccentricAnomaly(meanAnom, elements.eccentricity)};
-    state.trueAnomaly = trueAnomaly_f(eccAnom, elements.eccentricity);
-    state.radius = radius_f(elements.semiMajorAxis,  elements.eccentricity, eccAnom);
-    const StateVector orbitCoordState = orbitCoordinateStateVector(orbit, state.radius, state.trueAnomaly, eccAnom);
+    const double trueAnomaly{trueAnomaly_f(eccAnom, elements.eccentricity)};
+    const double radius{radius_f(elements.semiMajorAxis,  elements.eccentricity, eccAnom)};
+    const StateVector orbitCoordState = orbitCoordinateStateVector(orbit, radius, trueAnomaly, eccAnom);
     const Eigen::Matrix3d rotationMatrix{orbital::OrbitToGlobal(orbit)};
     const StateVector globalVector{globalCoordinateStateVector(orbitCoordState, rotationMatrix)};
     state.stateVector = globalVector;

@@ -7,6 +7,7 @@
 
 #include <optional>
 #include <string>
+#include <Engine.pb.h>
 
 namespace Davidian{
 namespace engine{
@@ -22,7 +23,7 @@ class StateVector;
 namespace engine{
 
 using System_proto = Davidian::engine::System;
-using StateVector_proto = Davidian::orbital::StateVector;
+using OrbitState_proto = Davidian::engine::OrbitState;
 
 class EngineInterface{
 public:
@@ -50,7 +51,7 @@ public:
    * @return optional state vector. If the body exists and the system is valid, it will be valued with the state vector
    * of the body at the given time. Else, it will not be valued.
    */
-  virtual std::optional<StateVector_proto> bodyStateAtTime(const std::string& bodyName, const double t) const = 0;
+  virtual std::optional<OrbitState_proto> bodyStateAtTime(const std::string& bodyName, const double t) const = 0;
 };
 } // namespace engine
 

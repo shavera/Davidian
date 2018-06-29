@@ -11,6 +11,10 @@ using System_proto = Davidian::engine::System;
 
 namespace engine{
 
+orbital::OrbitalElements retrieveTestOrbitalElements() {
+  return orbital::OrbitalElements{12.34, 0.6, 1.75, 0.12, 0.45, 2.33};
+}
+
 System_proto createTestSystem() {
   System_proto system;
 
@@ -24,12 +28,13 @@ System_proto createTestSystem() {
   childBody->set_name("Child");
   childBody->mutable_celestial_body()->set_parent_body_name("Root Body");
   auto* childOrbit = childBody->mutable_celestial_body()->mutable_orbit();
-  childOrbit->set_semimajor_axis(12.34);
-  childOrbit->set_eccentricity(0.6);
-  childOrbit->set_longitude_asc_node(1.75);
-  childOrbit->set_inclination(0.12);
-  childOrbit->set_arg_periapsis(0.45);
-  childOrbit->set_mean_anomaly_0(2.33);
+  auto elements = retrieveTestOrbitalElements();
+  childOrbit->set_semimajor_axis(elements.semiMajorAxis);
+  childOrbit->set_eccentricity(elements.eccentricity);
+  childOrbit->set_longitude_asc_node(elements.longitudeOfAscendingNode);
+  childOrbit->set_inclination(elements.inclination);
+  childOrbit->set_arg_periapsis(elements.argumentOfPeriapsis);
+  childOrbit->set_mean_anomaly_0(elements.meanAnomalyAtEpoch);
 
   return system;
 }

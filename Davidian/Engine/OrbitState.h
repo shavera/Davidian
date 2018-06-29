@@ -12,7 +12,7 @@
 namespace engine{
 
 struct OrbitState{
-  double time, radius, trueAnomaly;
+  double time;
   orbital::StateVector stateVector;
 };
 

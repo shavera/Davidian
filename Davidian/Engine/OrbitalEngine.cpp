@@ -40,8 +40,8 @@ System_proto OrbitalEngine::advanceSystemToTime(const double t) {
   return engine::System_proto();
 }
 
-std::optional<StateVector_proto> OrbitalEngine::bodyStateAtTime(const std::string& bodyName, const double t) const {
-  return std::optional<StateVector_proto>();
+std::optional<OrbitState_proto> OrbitalEngine::bodyStateAtTime(const std::string& bodyName, const double t) const {
+  return std::optional<OrbitState_proto>();
 }
 
 OrbitalEngine::~OrbitalEngine() = default;
@@ -51,6 +51,8 @@ OrbitalEngine::~OrbitalEngine() = default;
 #ifdef BUILD_TESTS
 
 #include "UnitTestHelpers.h"
+
+#include "OrbitState.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -153,15 +155,39 @@ TEST_F(OrbitalEngineTest, advanceSystemToTime_simpleOrbit){
 }
 
 TEST_F(OrbitalEngineTest, bodyStateAtTime){
+  orbitalEngine->useSystem(kTestSystem);
+  auto testElements = retrieveTestOrbitalElements();
+  orbital::Orbit childOrbit{testElements, kTestSystem.body(0).mass(), kTestSystem.body(1).mass()};
+  const double time {(2.0/7)*childOrbit.period()};
+  auto expectedOrbitState = calculateOrbitState(childOrbit, time);
 
+  auto state = orbitalEngine->bodyStateAtTime("Child", time);
+  ASSERT_TRUE(state.has_value());
+  auto stateProto = state.value();
+
+  EXPECT_EQ(time, stateProto.time());
+  auto protoPosition = stateProto.state_vector().position();
+  orbital::CartesianVector actualPosition{protoPosition.x(), protoPosition.y(), protoPosition.z()};
+  EXPECT_GT(1e-6, expectedOrbitState.stateVector.position.separation(actualPosition));
+  auto protoVelocity = stateProto.state_vector().velocity();
+  orbital::CartesianVector actualVelocity{protoVelocity.x(), protoVelocity.y(), protoVelocity.z()};
+  EXPECT_GT(1e-6, expectedOrbitState.stateVector.velocity.separation(actualVelocity));
 }
 
 TEST_F(OrbitalEngineTest, bodyStateAtTime_invalidSystem){
+  orbitalEngine->useSystem(createRootlessSystem());
 
+  auto state = orbitalEngine->bodyStateAtTime("Child", 0.0);
+
+  EXPECT_FALSE(state.has_value());
 }
 
 TEST_F(OrbitalEngineTest, bodyStateAtTime_bodyNameNotFound){
+  orbitalEngine->useSystem(kTestSystem);
 
+  auto state = orbitalEngine->bodyStateAtTime("Should not be a body with this name", 0.0);
+
+  EXPECT_FALSE(state.has_value());
 }
 
 } // anonymous namespace
