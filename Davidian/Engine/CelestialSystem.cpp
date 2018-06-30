@@ -112,7 +112,7 @@ orbital::Body* CelestialSystem::body(const std::string& bodyName) {
 }
 
 bool CelestialSystem::isValidSystem() const {
-  return m_bodies.empty();
+  return !m_bodies.empty();
 }
 
 CelestialSystem::~CelestialSystem() = default;
@@ -162,7 +162,7 @@ TEST(CelestialSystemTest, testSystem){
 
   EXPECT_TRUE(testSystem.isValidSystem());
 
-  auto* parent = testSystem.body("Parent");
+  auto* parent = testSystem.body("Root Body");
   ASSERT_THAT(parent, NotNull());
   EXPECT_EQ(testSystemProto.body(0).mass(), parent->mass());
 
