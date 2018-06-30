@@ -6,6 +6,7 @@
 
 #include "Body.h"
 #include "CelestialBody.h"
+#include "Orbit.h"
 
 #include <Orbital.pb.h>
 #include <Engine.pb.h>
@@ -18,6 +19,7 @@ namespace engine {
 namespace {
 
 using System_proto = Davidian::engine::System;
+using BodiesMap = std::unordered_map<std::string, std::unique_ptr<orbital::Body>>;
 
 ::orbital::OrbitalElements fromProto(const Davidian::orbital::OrbitalElements& proto){
   return ::orbital::OrbitalElements{
@@ -30,10 +32,19 @@ using System_proto = Davidian::engine::System;
   };
 }
 
+Davidian::orbital::OrbitalElements toProto(const ::orbital::OrbitalElements& elements){
+  Davidian::orbital::OrbitalElements proto;
+  proto.set_semimajor_axis(elements.semiMajorAxis);
+  proto.set_eccentricity(elements.eccentricity);
+  proto.set_inclination(elements.inclination);
+  proto.set_longitude_asc_node(elements.longitudeOfAscendingNode);
+  proto.set_arg_periapsis(elements.argumentOfPeriapsis);
+  proto.set_mean_anomaly_0(elements.meanAnomalyAtEpoch);
+  return proto;
+}
 
 struct CelestialSystemConstructionHelper{
-  CelestialSystemConstructionHelper(const System_proto& proto,
-                                    std::unordered_map<std::string, std::unique_ptr<orbital::Body>>& bodiesRef)
+  CelestialSystemConstructionHelper(const System_proto& proto, BodiesMap& bodiesRef)
   : systemProto{proto}, m_bodiesRef{bodiesRef}{}
 
   std::optional<int> indexOfRootBody(const System_proto& systemProto){
@@ -86,7 +97,67 @@ struct CelestialSystemConstructionHelper{
 
   const System_proto& systemProto;
 
-  std::unordered_map<std::string, std::unique_ptr<orbital::Body>>& m_bodiesRef;
+  BodiesMap& m_bodiesRef;
+};
+
+struct BodyProtoBuildHelper{
+  explicit BodyProtoBuildHelper(const BodiesMap& bodiesRef)
+  : m_bodiesRef{bodiesRef}
+  {}
+
+  std::tuple<const ::orbital::Body*, Davidian::orbital::Body*> setCommonData(System_proto& proto, const BodiesMap::value_type& bodyPair) const
+  {
+    const auto* body = bodyPair.second.get();
+    auto* bodyProto = proto.add_body();
+    bodyProto->set_name(bodyPair.first);
+    bodyProto->set_mass(body->mass());
+    return {body, bodyProto};
+  }
+
+  Davidian::orbital::BodyData* setBodyType(const ::orbital::Body* body, Davidian::orbital::Body* bodyProto) const{
+    const auto* celestialBody = dynamic_cast<const CelestialBody*>(body);
+    Davidian::orbital::BodyData* nonRootBodyData{nullptr};
+    if(nullptr != celestialBody){
+      if(nullptr == celestialBody->orbit()){
+        bodyProto->mutable_root_body();
+      } else {
+        nonRootBodyData = bodyProto->mutable_celestial_body();
+      }
+    } else {
+      nonRootBodyData = bodyProto->mutable_free_body();
+    }
+    return nonRootBodyData;
+  }
+
+  std::string parentName(const ::orbital::Body* body) const{
+    const auto* parent = body->parent();
+    auto parentBodyIt = std::find_if(m_bodiesRef.cbegin(), m_bodiesRef.cend(),
+                                     [parent](const auto& bodyPair){ return bodyPair.second.get() == parent; });
+    if(parentBodyIt != m_bodiesRef.cend()){
+      return parentBodyIt->first;
+    }
+    return {};
+  }
+
+  void setNonRootBodyData(Davidian::orbital::BodyData* data, const ::orbital::Body* body) const{
+    data->set_parent_body_name(parentName(body));
+    const auto* orbit = body->orbit();
+    data->mutable_orbit()->CopyFrom(toProto(orbit->orbitalElements()));
+  }
+
+  System_proto constructSystemProto() const{
+    System_proto proto;
+    for(const auto& bodyPair : m_bodiesRef){
+      auto [body, bodyProto] = setCommonData(proto, bodyPair);
+      auto* nonRootBodyData = setBodyType(body, bodyProto);
+      if(nullptr != nonRootBodyData){
+        setNonRootBodyData(nonRootBodyData, body);
+      }
+    }
+    return proto;
+  }
+
+  const BodiesMap& m_bodiesRef;
 };
 
 } // anonymous namespace
@@ -115,6 +186,10 @@ bool CelestialSystem::isValidSystem() const {
   return !m_bodies.empty();
 }
 
+Davidian::engine::System CelestialSystem::constructCurrentSystem() const {
+  return BodyProtoBuildHelper{m_bodies}.constructSystemProto();
+}
+
 CelestialSystem::~CelestialSystem() = default;
 
 } // namespace engine
@@ -126,6 +201,7 @@ CelestialSystem::~CelestialSystem() = default;
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <google/protobuf/util/message_differencer.h>
 
 using namespace ::testing;
 
@@ -265,6 +341,20 @@ TEST(CelestialSystemTest, complexTestSystem){
   EXPECT_NO_FATAL_FAILURE(testCelestialBody(system, complexSystemProto, "Duna"));
   EXPECT_NO_FATAL_FAILURE(testCelestialBody(system, complexSystemProto, "Ike"));
   EXPECT_NO_FATAL_FAILURE(testFreeBody(system, complexSystemProto, "Ship"));
+}
+
+TEST(CelestialSystemTest, constructCurrentSystem){
+  auto complexSystemProto = createComplicatedSystem();
+  CelestialSystem system{complexSystemProto};
+  auto currentSystemProto = system.constructCurrentSystem();
+
+  google::protobuf::util::MessageDifferencer protoDifferencer;
+  std::string differenceString;
+  protoDifferencer.ReportDifferencesToString(&differenceString);
+  auto* systemDescriptor = currentSystemProto.GetDescriptor();
+  auto* bodyDescriptor = systemDescriptor->FindFieldByName("body");
+  protoDifferencer.TreatAsSet(bodyDescriptor);
+  EXPECT_TRUE(protoDifferencer.Compare(complexSystemProto, currentSystemProto)) << differenceString;
 }
 
 } // anonymous namespace

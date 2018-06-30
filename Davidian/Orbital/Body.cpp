@@ -92,6 +92,10 @@ TEST_F(BodyTest, setParentAndOrbit){
   EXPECT_EQ(newOrbit.semiMajorAxis, actualOrbit->orbitalElements().semiMajorAxis);
 }
 
+TEST_F(BodyTest, rootBodyOrbit_Null){
+  EXPECT_EQ(nullptr, parentBody.orbit());
+}
+
 } // anonymous namespace for testing
 } // namespace orbital
 

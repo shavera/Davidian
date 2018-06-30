@@ -31,7 +31,9 @@ public:
   /// Just the mass of this body.
   double mass() const {return m_mass;}
 
-  Orbit const *const orbit() const {return m_orbit.get();}
+  const Orbit* orbit() const {return m_orbit.get();}
+
+  const CelestialBody* parent() const {return _parent;}
 
   /**
    * Generally speaking, these are likely to be updated together as a body transfers from one parent to another

@@ -41,6 +41,8 @@ public:
   const orbital::Body* body(const std::string& bodyName) const;
   orbital::Body* body(const std::string& bodyName);
 
+  Davidian::engine::System constructCurrentSystem() const;
+
 private:
   std::unordered_map<std::string, std::unique_ptr<orbital::Body>> m_bodies;
 };
