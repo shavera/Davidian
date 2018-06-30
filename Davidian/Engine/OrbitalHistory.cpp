@@ -10,11 +10,10 @@ StateVector interpolate(double t0, const StateVector& s0, double t1, const State
 }
 } // anonymous namespace
 
-template <size_t precision>
-OrbitalHistory<precision>::OrbitalHistory(const orbital::Orbit& orbit)
+OrbitalHistory::OrbitalHistory(const orbital::Orbit& orbit)
   : m_orbit{orbit}
 {
-  const double deltaT{m_orbit.period()/precision};
+  const double deltaT{m_orbit.period()/m_history.size()};
   double time = 0;
   std::generate(m_history.begin(), m_history.end(), [orbit, deltaT, &time](){
     //double time = deltaT * m++;
@@ -24,8 +23,7 @@ OrbitalHistory<precision>::OrbitalHistory(const orbital::Orbit& orbit)
   });
 }
 
-template <size_t precision>
-orbital::StateVector OrbitalHistory<precision>::approximateStateAtTime(double seconds) {
+orbital::StateVector OrbitalHistory::approximateStateAtTime(double seconds) const {
   double adjustedTime = std::fmod(seconds, m_orbit.period());
   if(adjustedTime < 0) {adjustedTime += m_orbit.period();}
 
@@ -48,6 +46,7 @@ orbital::StateVector OrbitalHistory<precision>::approximateStateAtTime(double se
 
 #ifdef BUILD_TESTS
 
+#include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
 namespace engine{
@@ -57,7 +56,7 @@ TEST(OrbitalHistoryTest, simpleOrbit){
   orbital::Orbit simpleOrbit{{{1,0,0}, {0,1,0}}, 1/orbital::G, 0};
 
   // note: at size ~30, error was ~0.3 percent, at size 1000 error was ~3e-6
-  OrbitalHistory<4096> simpleHistory{simpleOrbit};
+  OrbitalHistory simpleHistory{simpleOrbit};
 
   // for unit circle orbit, period is 2pi, so have a few more than 2pi values to calculate.
   for(double s{0}; s < 10; ++s){

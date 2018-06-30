@@ -3,6 +3,7 @@
 //
 
 #include "CelestialSystem.h"
+#include "OrbitalHistory.h"
 
 #include "Body.h"
 #include "CelestialBody.h"
@@ -190,6 +191,16 @@ Davidian::engine::System CelestialSystem::constructCurrentSystem() const {
   return BodyProtoBuildHelper{m_bodies}.constructSystemProto();
 }
 
+OrbitalHistoryMap CelestialSystem::calculateHistories() const {
+  OrbitalHistoryMap historyMap;
+  for(const auto& bodyPair : m_bodies){
+    if(nullptr != bodyPair.second->orbit()){
+      historyMap.emplace(bodyPair.first, std::make_unique<OrbitalHistory>(*(bodyPair.second->orbit())));
+    }
+  }
+  return historyMap;
+}
+
 CelestialSystem::~CelestialSystem() = default;
 
 } // namespace engine
@@ -355,6 +366,27 @@ TEST(CelestialSystemTest, constructCurrentSystem){
   auto* bodyDescriptor = systemDescriptor->FindFieldByName("body");
   protoDifferencer.TreatAsSet(bodyDescriptor);
   EXPECT_TRUE(protoDifferencer.Compare(complexSystemProto, currentSystemProto)) << differenceString;
+}
+
+TEST(CelestialSystemTest, calculateHistories_simpleSystem){
+  auto testSystem = createTestSystem();
+  CelestialSystem system{testSystem};
+
+  auto testElements = retrieveTestOrbitalElements();
+  orbital::Orbit testOrbit{testElements, system.body("Root Body")->mass(), system.body("Child")->mass()};
+  OrbitalHistory expectedHistory{testOrbit};
+  const double testTime{0.7*testOrbit.period()};
+  auto expectedState = expectedHistory.approximateStateAtTime(testTime);
+
+  auto histories = system.calculateHistories();
+
+  ASSERT_EQ(1u, histories.size());
+  ASSERT_EQ(1u, histories.count("Child"));
+  const auto* childHistory = histories.at("Child").get();
+  auto actualState = childHistory->approximateStateAtTime(testTime);
+
+  EXPECT_GT(1e-6, expectedState.position.separation(actualState.position));
+  EXPECT_GT(1e-6, expectedState.velocity.separation(actualState.velocity));
 }
 
 } // anonymous namespace

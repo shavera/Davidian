@@ -22,6 +22,9 @@ class Orbit;
 
 namespace engine {
 
+class OrbitalHistory;
+using OrbitalHistoryMap = std::unordered_map<std::string, std::unique_ptr<OrbitalHistory>>;
+
 class CelestialSystem {
 public:
   /**
@@ -42,6 +45,16 @@ public:
   orbital::Body* body(const std::string& bodyName);
 
   Davidian::engine::System constructCurrentSystem() const;
+
+  /**
+   * Calculate orbital histories for all bodies in the Celestial System.
+   *
+   * @note if there is a costly function call in this whole program, this will probably be it.
+   * Consider how parallelization might be an effective tool here.
+   *
+   * @returns a map of body names to orbital histories to refer to.
+   */
+  OrbitalHistoryMap calculateHistories() const;
 
 private:
   std::unordered_map<std::string, std::unique_ptr<orbital::Body>> m_bodies;
