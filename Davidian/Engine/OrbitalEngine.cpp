@@ -34,7 +34,7 @@ void OrbitalEngine::useSystem(const System_proto& system) {
 }
 
 bool OrbitalEngine::hasValidSystem() const {
-  return false;
+  return (nullptr == m_celestialSystem) ? false : m_celestialSystem->isValidSystem();
 }
 
 System_proto OrbitalEngine::advanceSystemToTime(const double t) {
