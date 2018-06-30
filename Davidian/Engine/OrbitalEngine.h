@@ -8,11 +8,13 @@
 #include "EngineInterface.h"
 
 #include <memory>
+#include <unordered_map>
 
 namespace engine {
 
 class CelestialSystemFileManager;
 class CelestialSystem;
+class OrbitalHistory;
 
 class OrbitalEngine : public EngineInterface{
 public:
@@ -28,7 +30,7 @@ public:
 
   System_proto advanceSystemToTime(double t) override;
 
-  std::optional<OrbitState_proto> bodyStateAtTime(const std::string& bodyName, double t) const override;
+  std::optional<OrbitState_proto> bodyStateAtTime(const std::string& bodyName, const double seconds) const override;
 
 protected:
   explicit OrbitalEngine(std::unique_ptr<CelestialSystemFileManager>&& fileManager);
@@ -36,6 +38,7 @@ protected:
 private:
   std::unique_ptr<CelestialSystemFileManager> m_fileManager;
   std::unique_ptr<CelestialSystem> m_celestialSystem;
+  std::unordered_map<std::string, std::unique_ptr<OrbitalHistory>> m_histories;
 };
 
 } // namespace engine

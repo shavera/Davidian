@@ -47,11 +47,11 @@ public:
   /**
    * Without evolving the state (transfers, eg) get the state vector for a named body at a given time
    * @param bodyName The name of the body
-   * @param t time in seconds
+   * @param seconds time in seconds
    * @return optional state vector. If the body exists and the system is valid, it will be valued with the state vector
    * of the body at the given time. Else, it will not be valued.
    */
-  virtual std::optional<OrbitState_proto> bodyStateAtTime(const std::string& bodyName, const double t) const = 0;
+  virtual std::optional<OrbitState_proto> bodyStateAtTime(const std::string& bodyName, const double seconds) const = 0;
 };
 } // namespace engine
 

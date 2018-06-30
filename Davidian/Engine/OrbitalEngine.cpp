@@ -5,6 +5,10 @@
 #include "OrbitalEngine.h"
 #include "CelestialSystem.h"
 #include "CelestialSystemFileManager.h"
+#include "OrbitalHistory.h"
+
+#include "Body.h"
+#include "Orbit.h"
 
 #include "Engine.pb.h"
 #include "Orbital.pb.h"
@@ -12,6 +16,22 @@
 using ProtoSystem = Davidian::engine::System;
 
 namespace engine{
+
+namespace {
+
+OrbitState_proto toProto(const orbital::StateVector& state, const double time){
+  OrbitState_proto proto;
+  proto.set_time(time);
+  proto.mutable_state_vector()->mutable_position()->set_x(state.position.x());
+  proto.mutable_state_vector()->mutable_position()->set_y(state.position.y());
+  proto.mutable_state_vector()->mutable_position()->set_z(state.position.z());
+  proto.mutable_state_vector()->mutable_velocity()->set_x(state.velocity.x());
+  proto.mutable_state_vector()->mutable_velocity()->set_y(state.velocity.y());
+  proto.mutable_state_vector()->mutable_velocity()->set_z(state.velocity.z());
+  return proto;
+}
+
+} // anonymous namespace
 
 OrbitalEngine::OrbitalEngine()
   : OrbitalEngine{std::make_unique<CelestialSystemFileManager>()}
@@ -31,6 +51,7 @@ System_proto OrbitalEngine::getCurrentSystem() {
 
 void OrbitalEngine::useSystem(const System_proto& system) {
   m_celestialSystem = std::make_unique<CelestialSystem>(system);
+  m_histories = m_celestialSystem->calculateHistories();
 }
 
 bool OrbitalEngine::hasValidSystem() const {
@@ -41,8 +62,13 @@ System_proto OrbitalEngine::advanceSystemToTime(const double t) {
   return engine::System_proto();
 }
 
-std::optional<OrbitState_proto> OrbitalEngine::bodyStateAtTime(const std::string& bodyName, const double t) const {
-  return std::optional<OrbitState_proto>();
+std::optional<OrbitState_proto> OrbitalEngine::bodyStateAtTime(const std::string& bodyName,
+                                                               const double seconds) const {
+  if(m_histories.empty() || 0 == m_histories.count(bodyName)){return {};}
+
+  auto bodyState = m_histories.at(bodyName)->approximateStateAtTime(seconds);
+
+  return toProto(bodyState, seconds);
 }
 
 OrbitalEngine::~OrbitalEngine() = default;
