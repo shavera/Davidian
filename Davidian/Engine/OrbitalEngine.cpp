@@ -26,7 +26,7 @@ void OrbitalEngine::loadSystem(const std::string& filename) {
 }
 
 System_proto OrbitalEngine::getCurrentSystem() {
-  return engine::System_proto();
+  return (nullptr == m_celestialSystem) ? System_proto{} : m_celestialSystem->constructCurrentSystem();
 }
 
 void OrbitalEngine::useSystem(const System_proto& system) {
@@ -83,6 +83,10 @@ public:
     mockFileManager = managedFileManager.get();
 
     orbitalEngine = std::make_unique<InjectableOrbitalEngine>(std::move(managedFileManager));
+
+    auto* systemDescriptor = kTestSystem.GetDescriptor();
+    auto* bodyDescriptor = systemDescriptor->FindFieldByName("body");
+    protoDifferencer.TreatAsSet(bodyDescriptor);
   }
 
   MockCSFileManager* mockFileManager{nullptr};
@@ -134,7 +138,7 @@ TEST_F(OrbitalEngineTest, useSystem){
 }
 
 /// @test if provided system has no root body, then system is invalid, don't bother constructing anything
-TEST_F(OrbitalEngineTest, useSystem_NoRootBody){
+TEST_F(OrbitalEngineTest, useSystem_noRootBody){
   const auto system = createRootlessSystem();
 
   orbitalEngine->useSystem(kTestSystem);
