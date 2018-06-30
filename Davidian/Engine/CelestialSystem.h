@@ -10,7 +10,7 @@
 
 namespace Davidian{
 namespace engine{
-class CelestialSystem;
+class System;
 } // namespace engine
 } // namesapace Davidian
 
@@ -23,9 +23,10 @@ class Orbit;
 namespace engine {
 
 class CelestialSystem {
-  using CelestialSystem_proto = Davidian::engine::CelestialSystem;
+  using System_proto = Davidian::engine::System;
 public:
-  explicit CelestialSystem(const CelestialSystem_proto& systemProto);
+  explicit CelestialSystem(const System_proto& systemProto);
+  ~CelestialSystem();
 
   orbital::Body* body(const std::string& bodyName);
 

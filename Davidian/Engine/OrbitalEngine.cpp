@@ -3,6 +3,7 @@
 //
 
 #include "OrbitalEngine.h"
+#include "CelestialSystem.h"
 #include "CelestialSystemFileManager.h"
 
 #include "Engine.pb.h"

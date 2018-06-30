@@ -24,8 +24,11 @@ double Body::standardGravitationalParameter() const {
   return totalMass*orbital::G;
 }
 
-double Body::mass() const {
-  return m_mass;
+void Body::setParentAndOrbit(CelestialBody* parent, const OrbitalElements& orbitalElements) {
+  _parent = parent;
+  if(nullptr != _parent) {
+    m_orbit = std::make_unique<Orbit>(orbitalElements, _parent->mass(), m_mass);
+  }
 }
 
 Body::~Body() = default;
@@ -42,7 +45,7 @@ namespace {
 class BodyTest : public ::testing::Test {
 public:
   // functionally Kerbol and Moho
-  const double expectedChildMass{1.7565459e28}, expectedParentMass{2.5263314e21};
+  const double expectedParentMass{1.7565459e28}, expectedChildMass{2.5263314e21};
   static constexpr OrbitalElements elements{
       5'263'138'304,
       0.2,
@@ -71,6 +74,22 @@ TEST_F(BodyTest, standardGravitationalParameter_doesNotGrabGrandparentsMass) {
   orbital::Body grandchildBody{grandChildMass,grandChildOrbit, &childBody};
 
   EXPECT_EQ((expectedChildMass + grandChildMass) * orbital::G, grandchildBody.standardGravitationalParameter());
+}
+
+TEST_F(BodyTest, setParentAndOrbit){
+  const double newParentMass{1.5*expectedChildMass};
+  constexpr OrbitalElements newOrbit{500'000, 0.1, 0.2, 0.3, 0.4, 0.5};
+  CelestialBody newParentBody{newParentMass};
+
+  childBody.setParentAndOrbit(&newParentBody, newOrbit);
+
+  EXPECT_NEAR(2.5*expectedChildMass*orbital::G, childBody.standardGravitationalParameter(),
+              std::fabs(1e-8*2.5*expectedChildMass*orbital::G));
+
+  ASSERT_NE(nullptr, childBody.orbit());
+  auto* actualOrbit = childBody.orbit();
+  // for example
+  EXPECT_EQ(newOrbit.semiMajorAxis, actualOrbit->orbitalElements().semiMajorAxis);
 }
 
 } // anonymous namespace for testing

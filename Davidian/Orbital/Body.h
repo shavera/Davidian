@@ -29,7 +29,19 @@ public:
   /// Using the more precise definition of GM_1 + GM_2, rather than just approximating it to be GM_1 (as appropriate)
   double standardGravitationalParameter() const;
   /// Just the mass of this body.
-  double mass() const;
+  double mass() const {return m_mass;}
+
+  Orbit const *const orbit() const {return m_orbit.get();}
+
+  /**
+   * Generally speaking, these are likely to be updated together as a body transfers from one parent to another
+   *
+   * @note depending on threading, we may want to consider adding "truer" atomicity to this operation
+   *
+   * @param parent New parent body of this body
+   * @param orbitalElements New orbit around parent body that this body occupies.
+   */
+  void setParentAndOrbit(CelestialBody* parent, const OrbitalElements& orbitalElements);
 
 protected:
   /**
