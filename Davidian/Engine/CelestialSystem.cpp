@@ -103,15 +103,17 @@ CelestialSystem::CelestialSystem(const System_proto& systemProto) {
 }
 
 const orbital::Body* CelestialSystem::body(const std::string& bodyName) const{
-  return nullptr;
+  if(0 == m_bodies.count(bodyName)){return nullptr;}
+  return m_bodies.at(bodyName).get();
 }
 
 orbital::Body* CelestialSystem::body(const std::string& bodyName) {
-  return nullptr;
+  if(0 == m_bodies.count(bodyName)){return nullptr;}
+  return m_bodies.at(bodyName).get();
 }
 
 bool CelestialSystem::isValidSystem() const {
-  return false;
+  return m_bodies.empty();
 }
 
 CelestialSystem::~CelestialSystem() = default;
