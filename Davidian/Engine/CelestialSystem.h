@@ -39,6 +39,7 @@ public:
 
   bool isValidSystem() const;
 
+  const orbital::Body* body(const std::string& bodyName) const;
   orbital::Body* body(const std::string& bodyName);
 
 private:

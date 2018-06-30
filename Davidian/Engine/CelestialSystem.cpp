@@ -27,13 +27,6 @@ using System_proto = Davidian::engine::System;
   };
 }
 
-std::optional<int> indexOfBodyNamed(const System_proto& systemProto, const std::string& name){
-  for(auto i=0; i < systemProto.body_size(); ++i){
-    if(systemProto.body(i).name() == name){return i;}
-  }
-  return std::optional<int>();
-}
-
 std::optional<int> indexOfRootBody(const System_proto& systemProto){
   for(auto i=0; i < systemProto.body_size(); ++i){
     if(systemProto.body(i).has_root_body()){return i;}
@@ -59,8 +52,12 @@ CelestialSystem::CelestialSystem(const System_proto& systemProto) {
   }
 }
 
-orbital::Body* CelestialSystem::body(const std::string& bodyName){
+const orbital::Body* CelestialSystem::body(const std::string& bodyName) const{
+  return nullptr;
+}
 
+orbital::Body* CelestialSystem::body(const std::string& bodyName) {
+  return nullptr;
 }
 
 bool CelestialSystem::isValidSystem() const {
@@ -141,6 +138,82 @@ TEST(CelestialSystemTest, invalidTestSystem){
 
   auto* child = invalidSystem.body("Child");
   ASSERT_THAT(child, IsNull());
+}
+
+int indexOfBodyNamed(const System_proto& systemProto, const std::string& name){
+  for(auto i=0; i < systemProto.body_size(); ++i){
+    if(systemProto.body(i).name() == name){return i;}
+  }
+  return -1;
+}
+
+void testMainBody(const CelestialSystem& system, const System_proto& systemProto, const std::string& name){
+  SCOPED_TRACE(name);
+  int index{indexOfBodyNamed(systemProto, name)};
+  const auto& proto = systemProto.body(index);
+  ASSERT_EQ(name, proto.name());
+  auto* body = system.body(name);
+  ASSERT_THAT(body, NotNull());
+  EXPECT_NEAR(proto.mass(), body->mass(), 1e-6 * proto.mass());
+}
+
+void testElements(const Davidian::orbital::OrbitalElements& protoOrbit, const ::orbital::OrbitalElements& elements){
+  EXPECT_NEAR(protoOrbit.semimajor_axis(), elements.semiMajorAxis,
+              std::fabs(1e-6*protoOrbit.semimajor_axis()));
+
+  EXPECT_NEAR(protoOrbit.eccentricity(), elements.eccentricity,
+              std::fabs(1e-6*protoOrbit.eccentricity()));
+
+  EXPECT_NEAR(protoOrbit.inclination(), elements.inclination,
+              std::fabs(1e-6*protoOrbit.inclination()));
+
+  EXPECT_NEAR(protoOrbit.longitude_asc_node(), elements.longitudeOfAscendingNode,
+              std::fabs(1e-6*protoOrbit.longitude_asc_node()));
+
+  EXPECT_NEAR(protoOrbit.arg_periapsis(), elements.argumentOfPeriapsis,
+              std::fabs(1e-6*protoOrbit.arg_periapsis()));
+
+  EXPECT_NEAR(protoOrbit.mean_anomaly_0(), elements.meanAnomalyAtEpoch,
+              std::fabs(1e-6*protoOrbit.mean_anomaly_0()));
+}
+
+void testCelestialBody(const CelestialSystem& system, const System_proto& systemProto, const std::string& name){
+  SCOPED_TRACE("CB Test" + name);
+  ASSERT_NO_FATAL_FAILURE(testMainBody(system, systemProto, name));
+  const auto& proto = systemProto.body(indexOfBodyNamed(systemProto, name));
+  ASSERT_TRUE(proto.has_celestial_body());
+  const auto& protoData = proto.celestial_body();
+  const auto& protoOrbit = protoData.orbit();
+  auto* body = system.body(name);
+  const auto& elements = body->orbit()->orbitalElements();
+  EXPECT_NO_FATAL_FAILURE(testElements(protoOrbit, elements));
+}
+
+void testFreeBody(const CelestialSystem& system, const System_proto& systemProto, const std::string& name){
+  SCOPED_TRACE("FB Test" + name);
+  ASSERT_NO_FATAL_FAILURE(testMainBody(system, systemProto, name));
+  const auto& proto = systemProto.body(indexOfBodyNamed(systemProto, name));
+  ASSERT_TRUE(proto.has_free_body());
+  const auto& protoData = proto.free_body();
+  const auto& protoOrbit = protoData.orbit();
+  auto* body = system.body(name);
+  const auto& elements = body->orbit()->orbitalElements();
+  EXPECT_NO_FATAL_FAILURE(testElements(protoOrbit, elements));
+}
+
+TEST(CelestialSystemTest, complexTestSystem){
+  auto complexSystemProto = createComplicatedSystem();
+  CelestialSystem system{complexSystemProto};
+
+  EXPECT_TRUE(system.isValidSystem());
+
+  EXPECT_NO_FATAL_FAILURE(testMainBody(system, complexSystemProto, "Kerbol"));
+  EXPECT_NO_FATAL_FAILURE(testCelestialBody(system, complexSystemProto, "Kerbin"));
+  EXPECT_NO_FATAL_FAILURE(testCelestialBody(system, complexSystemProto, "Mun"));
+  EXPECT_NO_FATAL_FAILURE(testCelestialBody(system, complexSystemProto, "Minmus"));
+  EXPECT_NO_FATAL_FAILURE(testCelestialBody(system, complexSystemProto, "Duna"));
+  EXPECT_NO_FATAL_FAILURE(testCelestialBody(system, complexSystemProto, "Ike"));
+  EXPECT_NO_FATAL_FAILURE(testFreeBody(system, complexSystemProto, "Ship"));
 }
 
 } // anonymous namespace

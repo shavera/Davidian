@@ -38,6 +38,11 @@ Davidian::engine::System unitCircleSystem();
 /// @brief creates a system with no root body for testing error cases
 Davidian::engine::System createRootlessSystem();
 
+/// @brief create a system with a complicated structure and disordered bodies
+/// Creates Kerbol, Kerbin and moons, free ship in LKO, Duna/Ike, but orders them (used random order generator):
+/// Ship - Mun - Kerbin - Duna - Ike - Kerbol - Minmus
+Davidian::engine::System createComplicatedSystem();
+
 } // namespace engine
 
 #endif //DAVIDIAN_UNITTESTHELPERS_H
