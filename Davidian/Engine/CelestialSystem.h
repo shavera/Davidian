@@ -6,7 +6,7 @@
 #define DAVIDIAN_CELESTIALSYSTEM_H
 
 #include <memory>
-#include <vector>
+#include <unordered_map>
 
 namespace Davidian{
 namespace engine{
@@ -25,13 +25,24 @@ namespace engine {
 class CelestialSystem {
   using System_proto = Davidian::engine::System;
 public:
+  /**
+   * Construct CelestialSystem from System proto
+   *
+   * @warning Will require precisely one root body. With less than 1 root body, will generate none. With more than 1
+   * root body, behaviour may be undefined. Will try to construct based on the first root body found. But no validation
+   * is currently being performed on checking for multiple root bodies.
+   *
+   * @param systemProto Protobuf describing the system
+   */
   explicit CelestialSystem(const System_proto& systemProto);
   ~CelestialSystem();
+
+  bool isValidSystem() const;
 
   orbital::Body* body(const std::string& bodyName);
 
 private:
-  std::vector<std::unique_ptr<orbital::Body>> m_bodies;
+  std::unordered_map<std::string, std::unique_ptr<orbital::Body>> m_bodies;
 };
 
 } // namespace engine
