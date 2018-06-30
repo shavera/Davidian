@@ -23,7 +23,7 @@ public:
    * @param orbitalElements Description of (initial) orbit around (initial) parent body using orbital elements
    * @param parent Pointer to the (Celestial) body this body orbits.
    */
-  Body(double mass, const OrbitalElements& orbitalElements, CelestialBody* parent);
+  Body(double mass, const OrbitalElements& orbitalElements, const CelestialBody* parent);
   virtual ~Body();
 
   /// Using the more precise definition of GM_1 + GM_2, rather than just approximating it to be GM_1 (as appropriate)
@@ -41,7 +41,7 @@ public:
    * @param parent New parent body of this body
    * @param orbitalElements New orbit around parent body that this body occupies.
    */
-  void setParentAndOrbit(CelestialBody* parent, const OrbitalElements& orbitalElements);
+  void setParentAndOrbit(const CelestialBody* parent, const OrbitalElements& orbitalElements);
 
 protected:
   /**
@@ -54,7 +54,7 @@ protected:
 private:
   // allowing mass to be mutable if we wish to do more general cases like rockets that lose mass during burns.
   double m_mass;
-  CelestialBody* _parent;
+  const CelestialBody* _parent;
   std::unique_ptr<Orbit> m_orbit;
 
 };

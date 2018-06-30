@@ -24,7 +24,7 @@ public:
    */
   CelestialBody(double mass,
                 OrbitalElements elements,
-                CelestialBody* parent);
+                const CelestialBody* parent);
 
 };
 }

@@ -9,8 +9,8 @@ orbital::CelestialBody::CelestialBody(const double mass)
   : Body{mass}
 {}
 
-orbital::CelestialBody::CelestialBody(const double mass,
+orbital::CelestialBody::CelestialBody(double mass,
                                       OrbitalElements elements,
-                                      CelestialBody* parent)
+                                      const CelestialBody* parent)
   : Body{mass, elements, parent}
 {}

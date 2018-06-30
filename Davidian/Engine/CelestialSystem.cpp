@@ -2,10 +2,13 @@
 // Created by alexs on 6/24/18.
 //
 
+#include "CelestialSystem.h"
+
+#include "Body.h"
+#include "CelestialBody.h"
+
 #include <Orbital.pb.h>
 #include <Engine.pb.h>
-#include "CelestialSystem.h"
-#include "Body.h"
 
 using orbital::Body;
 using orbital::CelestialBody;
@@ -27,28 +30,75 @@ using System_proto = Davidian::engine::System;
   };
 }
 
-std::optional<int> indexOfRootBody(const System_proto& systemProto){
-  for(auto i=0; i < systemProto.body_size(); ++i){
-    if(systemProto.body(i).has_root_body()){return i;}
+
+struct CelestialSystemConstructionHelper{
+  CelestialSystemConstructionHelper(const System_proto& proto)
+  : systemProto{proto}{}
+
+  std::optional<int> indexOfRootBody(const System_proto& systemProto){
+    for(auto i=0; i < systemProto.body_size(); ++i){
+      if(systemProto.body(i).has_root_body()){return i;}
+    }
+    return std::optional<int>();
   }
-  return std::optional<int>();
-}
-//
-//std::unique_ptr<orbital::Body> makeBody(const Davidian::orbital::Body bodyProto){
-//  if()
-//}
+
+  std::optional<std::string> emplaceRootBody(){
+    auto index = indexOfRootBody(systemProto);
+    if(!index.has_value()){return {};}
+    const auto& proto = systemProto.body(index.value());
+    m_bodies.emplace(proto.name(), std::make_unique<CelestialBody>(proto.mass()));
+    return proto.name();
+  }
+
+  std::vector<int> childrenOfBody(const std::string& parentName) const {
+    std::vector<int> childIndices;
+    for(auto i = 0; i < systemProto.body_size(); ++i){
+      const auto& body = systemProto.body(i);
+      if((body.has_free_body() && body.free_body().parent_body_name() == parentName)
+          || (body.has_celestial_body() && body.celestial_body().parent_body_name() == parentName)){
+        childIndices.push_back(i);
+      }
+    }
+    return childIndices;
+  }
+
+  void constructCelestialBody(const Davidian::orbital::Body& body, const CelestialBody* parent){
+    const auto& orbit = body.celestial_body().orbit();
+    auto managedCelestialBody = std::make_unique<CelestialBody>(body.mass(), fromProto(orbit), parent);
+    auto* newCB = managedCelestialBody.get();
+    m_bodies.emplace(body.name(), std::move(managedCelestialBody));
+    auto grandchildIndices = childrenOfBody(body.name());
+    emplaceChildren(grandchildIndices, newCB);
+  }
+
+  void emplaceChildren(const std::vector<int> childIndices, const CelestialBody* parent){
+    for(int i : childIndices){
+      const auto& body = systemProto.body(i);
+      if(body.has_celestial_body()){
+        constructCelestialBody(body, parent);
+      } else if(body.has_free_body()){
+        const auto& orbit = body.free_body().orbit();
+        m_bodies.emplace(body.name(), std::make_unique<Body>(body.mass(), fromProto(orbit), parent));
+      }
+    }
+  }
+
+  const System_proto& systemProto;
+
+  std::unordered_map<std::string, std::unique_ptr<orbital::Body>> m_bodies;
+};
 
 } // anonymous namespace
 
 CelestialSystem::CelestialSystem(const System_proto& systemProto) {
-  auto rootIndex = indexOfRootBody(systemProto);
-  if(!rootIndex.has_value()){return;}
-
-//  const auto& rootBodyProto = systemProto.body(rootIndex.value());
-//  m_bodies.emplace(rootBodyProto.name(), std::make_unique<CelestialBody>(rootBodyProto.mass()));
-
-  for(const auto& body : systemProto.body()){
-
+  CelestialSystemConstructionHelper helper{systemProto};
+  auto rootName = helper.emplaceRootBody();
+  if(rootName.has_value()){
+    const std::unique_ptr<orbital::Body>& managedRoot = m_bodies.at(rootName.value());
+    const CelestialBody* rootBody = dynamic_cast<const CelestialBody*>(managedRoot.get());
+//    const CelestialBody* rootBody = dynamic_cast<const CelestialBody*>(helper.m_bodies.at(rootName.value()).get());
+    helper.emplaceChildren(helper.childrenOfBody(rootName.value()), rootBody);
+    std::swap(this->m_bodies, helper.m_bodies);
   }
 }
 

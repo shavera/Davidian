@@ -9,7 +9,7 @@
 
 namespace orbital{
 
-Body::Body(const double mass, const OrbitalElements& orbitalElements, CelestialBody* parent)
+Body::Body(double mass, const OrbitalElements& orbitalElements, const CelestialBody* parent)
   : m_mass{mass}
   , _parent{parent}
   , m_orbit{std::make_unique<Orbit>(orbitalElements, parent->mass(), m_mass)}
@@ -24,7 +24,7 @@ double Body::standardGravitationalParameter() const {
   return totalMass*orbital::G;
 }
 
-void Body::setParentAndOrbit(CelestialBody* parent, const OrbitalElements& orbitalElements) {
+void Body::setParentAndOrbit(const CelestialBody* parent, const OrbitalElements& orbitalElements) {
   _parent = parent;
   if(nullptr != _parent) {
     m_orbit = std::make_unique<Orbit>(orbitalElements, _parent->mass(), m_mass);

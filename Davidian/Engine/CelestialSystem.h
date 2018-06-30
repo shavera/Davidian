@@ -23,7 +23,6 @@ class Orbit;
 namespace engine {
 
 class CelestialSystem {
-  using System_proto = Davidian::engine::System;
 public:
   /**
    * Construct CelestialSystem from System proto
@@ -34,7 +33,7 @@ public:
    *
    * @param systemProto Protobuf describing the system
    */
-  explicit CelestialSystem(const System_proto& systemProto);
+  explicit CelestialSystem(const Davidian::engine::System& systemProto);
   ~CelestialSystem();
 
   bool isValidSystem() const;
