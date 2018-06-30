@@ -32,8 +32,9 @@ using System_proto = Davidian::engine::System;
 
 
 struct CelestialSystemConstructionHelper{
-  CelestialSystemConstructionHelper(const System_proto& proto)
-  : systemProto{proto}{}
+  CelestialSystemConstructionHelper(const System_proto& proto,
+                                    std::unordered_map<std::string, std::unique_ptr<orbital::Body>>& bodiesRef)
+  : systemProto{proto}, m_bodiesRef{bodiesRef}{}
 
   std::optional<int> indexOfRootBody(const System_proto& systemProto){
     for(auto i=0; i < systemProto.body_size(); ++i){
@@ -46,7 +47,7 @@ struct CelestialSystemConstructionHelper{
     auto index = indexOfRootBody(systemProto);
     if(!index.has_value()){return {};}
     const auto& proto = systemProto.body(index.value());
-    m_bodies.emplace(proto.name(), std::make_unique<CelestialBody>(proto.mass()));
+    m_bodiesRef.emplace(proto.name(), std::make_unique<CelestialBody>(proto.mass()));
     return proto.name();
   }
 
@@ -66,7 +67,7 @@ struct CelestialSystemConstructionHelper{
     const auto& orbit = body.celestial_body().orbit();
     auto managedCelestialBody = std::make_unique<CelestialBody>(body.mass(), fromProto(orbit), parent);
     auto* newCB = managedCelestialBody.get();
-    m_bodies.emplace(body.name(), std::move(managedCelestialBody));
+    m_bodiesRef.emplace(body.name(), std::move(managedCelestialBody));
     auto grandchildIndices = childrenOfBody(body.name());
     emplaceChildren(grandchildIndices, newCB);
   }
@@ -78,27 +79,25 @@ struct CelestialSystemConstructionHelper{
         constructCelestialBody(body, parent);
       } else if(body.has_free_body()){
         const auto& orbit = body.free_body().orbit();
-        m_bodies.emplace(body.name(), std::make_unique<Body>(body.mass(), fromProto(orbit), parent));
+        m_bodiesRef.emplace(body.name(), std::make_unique<Body>(body.mass(), fromProto(orbit), parent));
       }
     }
   }
 
   const System_proto& systemProto;
 
-  std::unordered_map<std::string, std::unique_ptr<orbital::Body>> m_bodies;
+  std::unordered_map<std::string, std::unique_ptr<orbital::Body>>& m_bodiesRef;
 };
 
 } // anonymous namespace
 
 CelestialSystem::CelestialSystem(const System_proto& systemProto) {
-  CelestialSystemConstructionHelper helper{systemProto};
+  CelestialSystemConstructionHelper helper{systemProto, m_bodies};
   auto rootName = helper.emplaceRootBody();
   if(rootName.has_value()){
     const std::unique_ptr<orbital::Body>& managedRoot = m_bodies.at(rootName.value());
-    const CelestialBody* rootBody = dynamic_cast<const CelestialBody*>(managedRoot.get());
-//    const CelestialBody* rootBody = dynamic_cast<const CelestialBody*>(helper.m_bodies.at(rootName.value()).get());
+    const auto* rootBody = dynamic_cast<const CelestialBody*>(managedRoot.get());
     helper.emplaceChildren(helper.childrenOfBody(rootName.value()), rootBody);
-    std::swap(this->m_bodies, helper.m_bodies);
   }
 }
 
