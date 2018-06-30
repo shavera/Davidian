@@ -117,11 +117,11 @@ TEST_F(OrbitalEngineTest, loadSystem){
 /// @test if loaded system has no root body, then the system is invalid
 TEST_F(OrbitalEngineTest, loadSystem_noRootBody){
   const std::string dummyFileName{"Dummy File Name"};
-  const auto system = createRootlessSystem();
+  const auto rootlessSystem = createRootlessSystem();
   std::string actualFileName;
   EXPECT_CALL(*mockFileManager, loadSystem(_))
       .WillOnce(DoAll(SaveArg<0>(&actualFileName),
-                      Return(kTestSystem)));
+                      Return(rootlessSystem)));
 
   orbitalEngine->loadSystem(dummyFileName);
 
@@ -139,9 +139,9 @@ TEST_F(OrbitalEngineTest, useSystem){
 
 /// @test if provided system has no root body, then system is invalid, don't bother constructing anything
 TEST_F(OrbitalEngineTest, useSystem_noRootBody){
-  const auto system = createRootlessSystem();
+  const auto rootlessSystem = createRootlessSystem();
 
-  orbitalEngine->useSystem(kTestSystem);
+  orbitalEngine->useSystem(rootlessSystem);
 
   EXPECT_FALSE(orbitalEngine->hasValidSystem());
   compareProtos(ProtoSystem{}, orbitalEngine->getCurrentSystem());
