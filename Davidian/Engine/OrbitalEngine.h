@@ -26,7 +26,7 @@ public:
 
   bool hasValidSystem() const override;
 
-  System_proto getCurrentSystem() override;
+  System_proto getCurrentSystem() const override;
 
   std::optional<OrbitState_proto> bodyStateAtTime(const std::string& bodyName, const double seconds) const override;
 

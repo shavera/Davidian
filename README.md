@@ -1,6 +1,8 @@
 # Davidian
 Calculator to analyze different orbits for slingshot behaviour
 
+Requires: CMake 3-ish, Protobuf 3-ish (targeting 3.6), gRPC 1 (targeting 1.13), c++17 standard
+
 In Kerbal Space Program, I'd like the information to execute slingshot maneuvers that will exit in or near desired orbits. As a start to that process, a program will need to be able to simulate a system of celestial bodies (fixed orbits with 'spheres of influence' patched conic gravitation) and the motion of one free body as it passes through the system. 
 
 Each data calculation run will consist of placing the free body at some position (Mean Anomaly) in its orbit for t=0, and giving it a delta-v 'kick' of varying strength and direction. The program will then follow the free body as it passes through its orbit and into the orbit of any other bodies to see what kind of final orbit the free body maintains.
