@@ -9,12 +9,12 @@ set(SOURCES
         OrbitalEngine
         OrbitalHistory
         OrbitState
-        RpcServer.cpp
+#        RpcServer.cpp
         )
 
 set(INTERFACES
         EngineInterface.h
-        RpcServer.h
+#        RpcServer.h
         )
 
 add_library(${PROJECT_NAME} ${SOURCES} ${INTERFACES})
