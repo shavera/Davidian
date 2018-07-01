@@ -10,6 +10,7 @@ include(CTest)
 add_subdirectory(3rd_party/eigen-3.3)
 
 find_package(Protobuf REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 
 if(BUILD_TESTING)
     add_subdirectory(3rd_party/googletest)
