@@ -45,7 +45,7 @@ void OrbitalEngine::loadSystem(const std::string& filename) {
   useSystem(m_fileManager->loadSystem(filename));
 }
 
-System_proto OrbitalEngine::getCurrentSystem() {
+System_proto OrbitalEngine::getCurrentSystem() const {
   return (nullptr == m_celestialSystem) ? System_proto{} : m_celestialSystem->constructCurrentSystem();
 }
 

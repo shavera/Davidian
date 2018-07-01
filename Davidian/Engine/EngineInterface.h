@@ -27,14 +27,14 @@ using OrbitState_proto = Davidian::engine::OrbitState;
 
 class EngineInterface{
 public:
-  virtual ~EngineInterface(){};
+  virtual ~EngineInterface() = default;
 
   virtual void loadSystem(const std::string& filename) = 0;
   virtual void useSystem(const System_proto& system) = 0;
 
   virtual bool hasValidSystem() const = 0;
 
-  virtual System_proto getCurrentSystem() = 0;
+  virtual System_proto getCurrentSystem() const = 0;
 
   /**
    * Without evolving the state (transfers, eg) get the state vector for a named body at a given time
@@ -43,7 +43,7 @@ public:
    * @return optional state vector. If the body exists and the system is valid, it will be valued with the state vector
    * of the body at the given time. Else, it will not be valued.
    */
-  virtual std::optional<OrbitState_proto> bodyStateAtTime(const std::string& bodyName, const double seconds) const = 0;
+  virtual std::optional<OrbitState_proto> bodyStateAtTime(const std::string& bodyName, double seconds) const = 0;
 };
 } // namespace engine
 
