@@ -26,6 +26,7 @@ endif ()
 add_subdirectory(Orbital)
 add_subdirectory(Engine)
 add_subdirectory(Proto)
+add_subdirectory(Server)
 
 set(SOURCE_FILES main.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
