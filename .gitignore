@@ -218,3 +218,5 @@ Davidian/cmake-build-debug/
 \.idea/*
 
 Astrolabe/\.idea/
+
+*.pyc
