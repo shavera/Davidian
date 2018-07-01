@@ -9,7 +9,7 @@
 
 namespace server{
 
-std::unique_ptr<RpcServer> createDefaultRpcServer(){
+std::unique_ptr<RpcServerInterface> createDefaultRpcServer(){
   return std::make_unique<RpcServer>(std::make_unique<engine::OrbitalEngine>());
 }
 
@@ -21,6 +21,8 @@ RpcServer::RpcServer(std::unique_ptr<::engine::EngineInterface>&& engine)
                                    ::Davidian::engine::LoadResponse* response) {
   return Service::LoadFile(context, request, response);
 }
+
+RpcServer::~RpcServer() = default;
 
 } // namespace engine
 #ifdef BUILD_TESTS
@@ -36,12 +38,12 @@ namespace {
 class MockEngine : public ::engine::EngineInterface{
 public:
   MOCK_METHOD1(loadSystem, void(const std::string&));
-  MOCK_METHOD1(useSystem, void(const System_proto&));
+  MOCK_METHOD1(useSystem, void(const ::engine::System_proto&));
 
   MOCK_CONST_METHOD0(hasValidSystem, bool());
 
-  MOCK_CONST_METHOD0(getCurrentSystem, System_proto());
-  MOCK_CONST_METHOD2(bodyStateAtTime, std::optional<OrbitState_proto>(const std::string&, double));
+  MOCK_CONST_METHOD0(getCurrentSystem, ::engine::System_proto());
+  MOCK_CONST_METHOD2(bodyStateAtTime, std::optional<::engine::OrbitState_proto>(const std::string&, double));
 };
 
 class RpcServerTest : public Test{

@@ -9,9 +9,9 @@
 
 namespace server{
 
-class RpcServer;
+class RpcServerInterface{};
 
-std::unique_ptr<RpcServer> createDefaultRpcServer();
+std::unique_ptr<RpcServerInterface> createDefaultRpcServer();
 
 } // namespace server
 

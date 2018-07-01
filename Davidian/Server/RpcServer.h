@@ -5,6 +5,8 @@
 #ifndef DAVIDIAN_RPCSERVER_H
 #define DAVIDIAN_RPCSERVER_H
 
+#include "RpcServerInterface.h"
+
 #include <Engine.grpc.pb.h>
 
 namespace engine{
@@ -13,9 +15,10 @@ class EngineInterface;
 
 namespace server {
 
-class RpcServer final : public Davidian::engine::Server::Service{
+class RpcServer final : public Davidian::engine::Server::Service, public RpcServerInterface{
 public:
   RpcServer(std::unique_ptr<engine::EngineInterface>&& engine);
+  virtual ~RpcServer();
 
   ::grpc::Status LoadFile(::grpc::ServerContext* context,
                           const ::Davidian::engine::LoadRequest* request,
