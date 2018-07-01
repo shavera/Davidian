@@ -17,7 +17,7 @@ public:
 
   ::grpc::Status LoadFile(::grpc::ServerContext* context,
                           const ::Davidian::engine::LoadRequest* request,
-                          ::Davidian::engine::LoadResponse* response);
+                          ::Davidian::engine::LoadResponse* response) override;
 
 private:
   std::unique_ptr<EngineInterface> m_engine;
