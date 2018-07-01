@@ -9,8 +9,12 @@ include(CTest)
 
 add_subdirectory(3rd_party/eigen-3.3)
 
+set(protobuf_MODULE_COMPATIBLE true)
 find_package(Protobuf REQUIRED)
+message(STATUS "Using protobuf ${Protobuf_VERSION}")
+
 find_package(gRPC CONFIG REQUIRED)
+message(STATUS "Using gRPC ${gRPC_VERSION}")
 
 if(BUILD_TESTING)
     add_subdirectory(3rd_party/googletest)
