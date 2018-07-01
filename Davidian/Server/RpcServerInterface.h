@@ -9,7 +9,10 @@
 
 namespace server{
 
-class RpcServerInterface{};
+class RpcServerInterface{
+public:
+  virtual void startServer(const std::string& serverAddress) = 0;
+};
 
 std::unique_ptr<RpcServerInterface> createDefaultRpcServer();
 
