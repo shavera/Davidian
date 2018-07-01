@@ -4,6 +4,10 @@ package Davidian.engine;
 
 import "Orbital.proto";
 
+service DavidianEngine{
+    rpc LoadFile(LoadRequest) returns (LoadResponse) {}
+}
+
 message System{
     repeated orbital.Body body = 1;
 }
@@ -11,4 +15,15 @@ message System{
 message OrbitState{
     double time = 1;
     orbital.StateVector state_vector = 2;
+}
+
+message LoadRequest{
+    string filename = 1;
+}
+
+message LoadResponse{
+    oneof response{
+        System system = 1;
+        string error = 2;
+    }
 }
