@@ -4,7 +4,7 @@ package Davidian.engine;
 
 import "Orbital.proto";
 
-service DavidianEngine{
+service Server {
     rpc LoadFile(LoadRequest) returns (LoadResponse) {}
 }
 

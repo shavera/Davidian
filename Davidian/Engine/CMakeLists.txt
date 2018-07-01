@@ -9,7 +9,7 @@ set(SOURCES
         OrbitalEngine
         OrbitalHistory
         OrbitState
-        )
+        RpcServer.cpp RpcServer.h)
 
 set(INTERFACES
         EngineInterface.h)
