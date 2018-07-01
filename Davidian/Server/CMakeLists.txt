@@ -7,7 +7,7 @@ set(SOURCES
         RpcServer
         )
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} RpcServerInterface.h)
 target_link_libraries(${PROJECT_NAME} engine davidian_rpc_server)
 
 if (BUILD_TESTING)

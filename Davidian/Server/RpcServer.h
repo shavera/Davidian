@@ -7,23 +7,25 @@
 
 #include <Engine.grpc.pb.h>
 
-namespace engine {
-
+namespace engine{
 class EngineInterface;
+}
+
+namespace server {
 
 class RpcServer final : public Davidian::engine::Server::Service{
 public:
-  RpcServer(std::unique_ptr<EngineInterface>&& engine);
+  RpcServer(std::unique_ptr<engine::EngineInterface>&& engine);
 
   ::grpc::Status LoadFile(::grpc::ServerContext* context,
                           const ::Davidian::engine::LoadRequest* request,
                           ::Davidian::engine::LoadResponse* response) override;
 
 private:
-  std::unique_ptr<EngineInterface> m_engine;
+  std::unique_ptr<engine::EngineInterface> m_engine;
 };
 
-} // namespace engine
+} // namespace server
 
 
 #endif //DAVIDIAN_RPCSERVER_H

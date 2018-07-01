@@ -3,11 +3,17 @@
 //
 
 #include "RpcServer.h"
+#include "RpcServerInterface.h"
+
 #include "OrbitalEngine.h"
 
-namespace engine{
+namespace server{
 
-RpcServer::RpcServer(std::unique_ptr<EngineInterface>&& engine)
+std::unique_ptr<RpcServer> createDefaultRpcServer(){
+  return std::make_unique<RpcServer>(std::make_unique<engine::OrbitalEngine>());
+}
+
+RpcServer::RpcServer(std::unique_ptr<::engine::EngineInterface>&& engine)
     : m_engine{std::move(engine)}
 {}
 
@@ -24,10 +30,10 @@ RpcServer::RpcServer(std::unique_ptr<EngineInterface>&& engine)
 
 using namespace ::testing;
 
-namespace engine {
+namespace server {
 namespace {
 
-class MockEngine : public EngineInterface{
+class MockEngine : public ::engine::EngineInterface{
 public:
   MOCK_METHOD1(loadSystem, void(const std::string&));
   MOCK_METHOD1(useSystem, void(const System_proto&));
@@ -55,6 +61,6 @@ TEST_F(RpcServerTest, Dummy){
 }
 
 } // anonymous namespace
-} // namespace engine
+} // namespace server
 
 #endif // BUILD_TESTS
