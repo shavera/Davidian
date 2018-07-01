@@ -58,10 +58,6 @@ bool OrbitalEngine::hasValidSystem() const {
   return (nullptr == m_celestialSystem) ? false : m_celestialSystem->isValidSystem();
 }
 
-System_proto OrbitalEngine::advanceSystemToTime(const double t) {
-  return engine::System_proto();
-}
-
 std::optional<OrbitState_proto> OrbitalEngine::bodyStateAtTime(const std::string& bodyName,
                                                                const double seconds) const {
   if(m_histories.empty() || 0 == m_histories.count(bodyName)){return {};}
@@ -171,18 +167,6 @@ TEST_F(OrbitalEngineTest, useSystem_noRootBody){
 
   EXPECT_FALSE(orbitalEngine->hasValidSystem());
   compareProtos(ProtoSystem{}, orbitalEngine->getCurrentSystem());
-}
-
-/// @test As of issue 4, we're not yet handling body transfers, should just be simple orbit.
-TEST_F(OrbitalEngineTest, advanceSystemToTime_simpleOrbit){
-  orbitalEngine->useSystem(unitCircleSystem());
-
-  orbitalEngine->advanceSystemToTime(2*M_PI/4);
-
-  auto expectedSystem = unitCircleSystem();
-  expectedSystem.mutable_body(1)->mutable_celestial_body()->mutable_orbit()->set_mean_anomaly_0(2*M_PI/4);
-
-  compareProtos(expectedSystem, orbitalEngine->getCurrentSystem());
 }
 
 TEST_F(OrbitalEngineTest, bodyStateAtTime){

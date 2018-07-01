@@ -37,14 +37,6 @@ public:
   virtual System_proto getCurrentSystem() = 0;
 
   /**
-   * Evolve the system forward t seconds, including any possible child transfers;
-   * New system will use this time as the new '0'/epoch for Mean Anomaly.
-   * @param t time in seconds to advance forward
-   * @return A system proto of the new system configuration
-   */
-  virtual System_proto advanceSystemToTime(const double t) = 0;
-
-  /**
    * Without evolving the state (transfers, eg) get the state vector for a named body at a given time
    * @param bodyName The name of the body
    * @param seconds time in seconds

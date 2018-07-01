@@ -28,8 +28,6 @@ public:
 
   System_proto getCurrentSystem() override;
 
-  System_proto advanceSystemToTime(double t) override;
-
   std::optional<OrbitState_proto> bodyStateAtTime(const std::string& bodyName, const double seconds) const override;
 
 protected:
