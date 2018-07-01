@@ -5,21 +5,19 @@
 #ifndef DAVIDIAN_CARTESIANVECTOR_H
 #define DAVIDIAN_CARTESIANVECTOR_H
 
-#include <memory>
+#include <Eigen/Dense>
 
 namespace orbital{
-
-namespace impl{
-class VectorImpl;
-}
 
 class SphericalVector;
 
 class CartesianVector {
+  friend CartesianVector operator*(const Eigen::Matrix3d& transform, const CartesianVector& vector);
 public:
   CartesianVector();
-  explicit CartesianVector(const double x, const double y, const double z);
+  CartesianVector(const double x, const double y, const double z);
   CartesianVector(const SphericalVector& otherVector);
+  virtual ~CartesianVector();
 
   double x() const;
   double y() const;
@@ -37,18 +35,38 @@ public:
   double separation(const CartesianVector& other) const;
 
   /// bounds checking member access by 0-based index (0->x, 1->y, 2->z)
-  double& at(const size_t index);
-  const double& c_at(const size_t index) const;
+  double& at(size_t index);
+  const double& c_at(size_t index) const;
 
   CartesianVector operator-() const;
   CartesianVector operator+(const CartesianVector& otherVector) const;
   CartesianVector operator-(const CartesianVector& otherVector) const;
+  CartesianVector operator*(const double& scale) const;
+  CartesianVector operator/(const double& scale) const;
   bool operator==(const CartesianVector& otherVector) const;
   bool operator!=(const CartesianVector& otherVector) const;
 
 private:
-  std::unique_ptr<impl::VectorImpl> m_impl;
+  Eigen::Vector3d m_vector;
 };
+
+CartesianVector operator*(const double& factor, const CartesianVector& vector);
+
+CartesianVector operator*(const Eigen::Matrix3d& transform, const CartesianVector& vector);
+
+/**
+ * @brief interpolate between two other vectors at two times for a third time in between them
+ * @param t0 (earlier) time at which v0 is calculated
+ * @param v0
+ * @param t1 (later) time at which v1 is calculated
+ * @param v1
+ * @param t time in between t1 and t0 to calculate an intermediate vector for
+ * @return Cartesian vector between the other two; if t is not between t1 and t0 then behaviour is undefined but likely
+ * to be reasonable (just applying the interpolation as an extrapolation). If t1 == t0, return zero vector
+ */
+CartesianVector interpolate(double t0, CartesianVector v0, double t1, CartesianVector v1, double t);
+
+::std::ostream& operator<<(::std::ostream& os, const CartesianVector& v);
 
 } // namespace orbital
 

@@ -5,13 +5,9 @@
 #ifndef DAVIDIAN_SPHERICALVECTOR_H
 #define DAVIDIAN_SPHERICALVECTOR_H
 
-#include <memory>
+#include <Eigen/Dense>//#include <Eigen/src/Core/Matrix.h>
 
 namespace orbital{
-
-namespace impl{
-class VectorImpl;
-}
 
 class CartesianVector;
 
@@ -39,7 +35,7 @@ public:
   const double& c_at(const size_t index) const;
 
 private:
-  std::unique_ptr<impl::VectorImpl> m_impl;
+  Eigen::Vector3d m_vector;
 };
 
 } // namespace orbital

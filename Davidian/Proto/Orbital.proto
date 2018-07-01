@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package Davidian.orbital;
+
+message OrbitalElements{
+    double semimajor_axis = 1;
+    double eccentricity = 2;
+    double longitude_asc_node = 3;
+    double inclination = 4;
+    double arg_periapsis = 5;
+    double mean_anomaly_0 = 6;
+}
+
+message CartesianVector{
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}
+
+message StateVector{
+    CartesianVector position = 1;
+    CartesianVector velocity = 2;
+}
+
+message BodyData{
+    string parent_body_name = 1;
+    OrbitalElements orbit = 2;
+}
+
+message RootBodyData{
+}
+
+message Body{
+    string name = 1;
+    double mass = 2;
+
+    oneof body_data{
+        RootBodyData root_body = 3;
+        BodyData celestial_body = 4;
+        BodyData free_body = 5;
+    };
+}
