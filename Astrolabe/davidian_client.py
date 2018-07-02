@@ -9,6 +9,6 @@ class DavidianClient:
         self.channel = grpc.insecure_channel(server_address)
         self.stub = Engine_pb2_grpc.ServerStub(self.channel)
 
-    def load_file(self, filename: str) -> object:
-        response = self.stub.LoadFile(filename)
+    def load_file(self, file: str) -> object:
+        response = self.stub.LoadFile(Engine_pb2.LoadRequest(filename=file))
         return response
