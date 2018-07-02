@@ -19,7 +19,7 @@ class ServiceImpl : public Davidian::engine::Server::Service{
 public:
   ServiceImpl(std::unique_ptr<engine::EngineInterface>&& engine);
 
-  ::grpc::Status LoadFile(::grpc::ServerContext* context,
+  ::grpc::Status LoadFile(::grpc::ServerContext*,
                           const ::Davidian::engine::LoadRequest* request,
                           ::Davidian::engine::LoadResponse* response) override;
 

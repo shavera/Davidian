@@ -3,7 +3,6 @@
 //
 
 #include "RpcServer.h"
-#include "RpcServerInterface.h"
 
 #include "OrbitalEngine.h"
 
@@ -19,9 +18,17 @@ ServiceImpl::ServiceImpl(std::unique_ptr<engine::EngineInterface>&& engine)
     : m_engine{std::move(engine)}
 {}
 
-::grpc::Status ServiceImpl::LoadFile(::grpc::ServerContext* context, const ::Davidian::engine::LoadRequest* request,
+::grpc::Status ServiceImpl::LoadFile(::grpc::ServerContext*,
+                                     const ::Davidian::engine::LoadRequest* request,
                                      ::Davidian::engine::LoadResponse* response) {
-  return Service::LoadFile(context, request, response);
+  m_engine->loadSystem(request->filename());
+  if(m_engine->hasValidSystem()){
+    response->mutable_system()->CopyFrom(m_engine->getCurrentSystem());
+    return ::grpc::Status::OK;
+  } else {
+    return ::grpc::Status{::grpc::NOT_FOUND, "Failed to load system, maybe file not found."};
+  }
+//  return Service::LoadFile(nullptr, request, response);
 }
 
 RpcServer::RpcServer(std::unique_ptr<::engine::EngineInterface>&& engine)
