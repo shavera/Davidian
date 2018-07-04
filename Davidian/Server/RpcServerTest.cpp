@@ -6,6 +6,7 @@
 
 #include "EngineInterface.h"
 
+#include <google/protobuf/util/message_differencer.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -30,15 +31,40 @@ public:
   void SetUp(){
     auto managedMockEngine = std::make_unique<MockEngine>();
     mockEngine = managedMockEngine.get();
-    server = std::make_unique<RpcServer>(std::move(managedMockEngine));
+    service = std::make_unique<ServiceImpl>(std::move(managedMockEngine));
+
+    protoDifferencer.ReportDifferencesToString(&differenceString);
   }
 
   MockEngine* mockEngine{nullptr};
-  std::unique_ptr<RpcServer> server;
+  std::unique_ptr<ServiceImpl> service;
+
+  google::protobuf::util::MessageDifferencer protoDifferencer;
+  std::string differenceString;
 };
 
-TEST_F(RpcServerTest, Dummy){
-  ASSERT_THAT(server, NotNull());
+TEST_F(RpcServerTest, LoadFile){
+  const std::string fileName{"RpcServerTest LoadFile filename"};
+  Davidian::engine::LoadRequest request;
+  request.set_filename(fileName);
+  Davidian::engine::LoadResponse response;
+
+  engine::System_proto systemProto;
+  systemProto.add_body()->set_name("TestBodyName");
+
+  std::string actualFileName;
+  EXPECT_CALL(*mockEngine, loadSystem(_))
+      .Times(1).WillOnce(SaveArg<0>(&actualFileName));
+  EXPECT_CALL(*mockEngine, hasValidSystem())
+      .Times(1).WillOnce(Return(true));
+  EXPECT_CALL(*mockEngine, getCurrentSystem())
+      .Times(1).WillOnce(Return(systemProto));
+
+  auto status = service->LoadFile(nullptr, &request, &response);
+
+  EXPECT_TRUE(status.ok());
+  EXPECT_EQ(fileName, actualFileName);
+  EXPECT_TRUE(protoDifferencer.Compare(systemProto, response.system())) << differenceString;
 }
 
 } // anonymous namespace
