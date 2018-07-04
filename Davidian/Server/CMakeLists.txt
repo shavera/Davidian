@@ -12,6 +12,6 @@ target_link_libraries(${PROJECT_NAME} engine davidian_rpc_server)
 
 if (BUILD_TESTING)
     target_include_directories(${PROJECT_NAME} PRIVATE ${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR})
-    add_executable(${PROJECT_NAME}_TEST ${SOURCES})
+    add_executable(${PROJECT_NAME}_TEST RpcServerTest)
     target_link_libraries(${PROJECT_NAME}_TEST gmock gmock_main gtest ${PROJECT_NAME})
 endif()
