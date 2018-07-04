@@ -23,6 +23,18 @@ public:
                           const ::Davidian::engine::LoadRequest* request,
                           ::Davidian::engine::System* response) override;
 
+  ::grpc::Status GetCurrentSystem(::grpc::ServerContext* context,
+                                  const ::Davidian::engine::GetCurrentSystemRequest* request,
+                                  ::Davidian::engine::System* response) override;
+
+  ::grpc::Status GetBodyStateAtTime(::grpc::ServerContext* context,
+                                     const ::Davidian::engine::BodyStateRequest* request,
+                                    ::Davidian::engine::OrbitState* response) override;
+
+  ::grpc::Status GetBodyStream(::grpc::ServerContext* context,
+                               const ::Davidian::engine::BodyStateStreamRequest* request,
+                               ::grpc::ServerWriter<::Davidian::engine::OrbitState>* writer) override;
+
 private:
   std::unique_ptr<engine::EngineInterface> m_engine;
 };

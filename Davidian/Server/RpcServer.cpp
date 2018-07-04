@@ -30,6 +30,24 @@ ServiceImpl::ServiceImpl(std::unique_ptr<engine::EngineInterface>&& engine)
   }
 }
 
+grpc::Status ServiceImpl::GetCurrentSystem(::grpc::ServerContext* context,
+                                           const ::Davidian::engine::GetCurrentSystemRequest* request,
+                                           ::Davidian::engine::System* response) {
+  return Service::GetCurrentSystem(context, request, response);
+}
+
+grpc::Status
+ServiceImpl::GetBodyStateAtTime(::grpc::ServerContext* context, const ::Davidian::engine::BodyStateRequest* request,
+                                ::Davidian::engine::OrbitState* response) {
+  return Service::GetBodyStateAtTime(context, request, response);
+}
+
+grpc::Status
+ServiceImpl::GetBodyStream(::grpc::ServerContext* context, const ::Davidian::engine::BodyStateStreamRequest* request,
+                           ::grpc::ServerWriter<::Davidian::engine::OrbitState>* writer) {
+  return Service::GetBodyStream(context, request, writer);
+}
+
 RpcServer::RpcServer(std::unique_ptr<::engine::EngineInterface>&& engine)
     : m_service{std::make_unique<ServiceImpl>(std::move(engine))}
 {}
