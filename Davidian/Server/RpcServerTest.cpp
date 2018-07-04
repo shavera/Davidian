@@ -43,13 +43,12 @@ public:
   std::string differenceString;
 };
 
-TEST_F(RpcServerTest, LoadFile){
+TEST_F(RpcServerTest, LoadSystem_file){
   const std::string fileName{"RpcServerTest LoadFile filename"};
   Davidian::engine::LoadRequest request;
   request.set_filename(fileName);
-  Davidian::engine::LoadResponse response;
 
-  engine::System_proto systemProto;
+  engine::System_proto systemProto, actualSystemProto;
   systemProto.add_body()->set_name("TestBodyName");
 
   std::string actualFileName;
@@ -60,11 +59,44 @@ TEST_F(RpcServerTest, LoadFile){
   EXPECT_CALL(*mockEngine, getCurrentSystem())
       .Times(1).WillOnce(Return(systemProto));
 
-  auto status = service->LoadFile(nullptr, &request, &response);
+  auto status = service->LoadSystem(nullptr, &request, &actualSystemProto);
 
   EXPECT_TRUE(status.ok());
   EXPECT_EQ(fileName, actualFileName);
-  EXPECT_TRUE(protoDifferencer.Compare(systemProto, response.system())) << differenceString;
+  EXPECT_TRUE(protoDifferencer.Compare(systemProto, actualSystemProto)) << differenceString;
+}
+
+TEST_F(RpcServerTest, LoadSystem_invalidSystem){
+  const std::string fileName{"RpcServerTest LoadFile filename"};
+  Davidian::engine::LoadRequest request;
+  request.set_filename(fileName);
+
+  engine::System_proto systemProto, actualSystemProto;
+  systemProto.add_body()->set_name("TestBodyName");
+
+  std::string actualFileName;
+  EXPECT_CALL(*mockEngine, loadSystem(_))
+      .Times(1).WillOnce(SaveArg<0>(&actualFileName));
+  EXPECT_CALL(*mockEngine, hasValidSystem())
+      .Times(1).WillOnce(Return(false));
+  EXPECT_CALL(*mockEngine, getCurrentSystem()).Times(0);
+
+  auto status = service->LoadSystem(nullptr, &request, &actualSystemProto);
+
+  EXPECT_EQ(::grpc::NOT_FOUND, status.error_code());
+  EXPECT_TRUE(protoDifferencer.Compare(Davidian::engine::System{}, actualSystemProto)) << differenceString;
+}
+
+TEST_F(RpcServerTest, UseSystem){
+
+}
+
+TEST_F(RpcServerTest, GetCurrentSystem){
+
+}
+
+TEST_F(RpcServerTest, BodyStateAtTime){
+
 }
 
 } // anonymous namespace
