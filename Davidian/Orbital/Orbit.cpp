@@ -17,17 +17,13 @@ double energy_f(const StateVector& stateVector, const double standardGravitation
   return stateVector.velocity.dot(stateVector.velocity)/2 - standardGravitationalParameter/stateVector.position.norm();
 }
 
-double energy_f(const double semiMajorAxis, const double standardGravitationalParamter){
-  return (semiMajorAxis == 0) ? 0 : -standardGravitationalParamter/(2*semiMajorAxis);
+double energy_f(const double semiMajorAxis, const double standardGravitationalParameter){
+  return (semiMajorAxis == 0) ? 0 : -standardGravitationalParameter/(2*semiMajorAxis);
 }
 
 CartesianVector specificAngularMomentum_f(const StateVector& stateVector){
   CartesianVector angularMomentum = stateVector.position.cross(stateVector.velocity);
   return angularMomentum;
-}
-
-double eccentricity_f(const double specificOrbitalEnergy, const double standardGravitationalParameter, const CartesianVector& specificAngularMomentum){
-  return sqrt(1 + (2*specificOrbitalEnergy*specificAngularMomentum.dot(specificAngularMomentum))/(std::pow(standardGravitationalParameter, 2)));
 }
 
 double semiMajorAxis_f(const double standardGravitationalParameter, const double specificOrbitalEnergy){
@@ -73,14 +69,6 @@ double meanAnomaly_f(double eccentricAnomaly, double eccentricity){
   return eccentricAnomaly - eccentricity * std::sin(eccentricAnomaly);
 }
 
-double angularMomentumMagnitudeSquared_f(double stdGravParam, double semiMajorAxis, double eccentricity){
-  return stdGravParam*semiMajorAxis*(1-(std::pow(eccentricity, 2)));
-}
-
-double radius_f(double semiMajorAxis, double eccentricity, double eccentricAnomaly){
-  return semiMajorAxis*(1-eccentricity*std::cos(eccentricAnomaly));
-}
-
 } // anonymous namespace
 
 Orbit::Orbit(const StateVector& stateVector, double barymass, double leptomass)
@@ -89,7 +77,6 @@ Orbit::Orbit(const StateVector& stateVector, double barymass, double leptomass)
   m_specificOrbitalEnergy = energy_f(stateVector, m_standardGravitationalParameter);
   m_specificAngularMomentum = specificAngularMomentum_f(stateVector);
   CartesianVector eccVector{eccentricityVector_f(stateVector, m_specificAngularMomentum, m_standardGravitationalParameter)};
-//  m_elements.eccentricity = eccentricity(m_specificOrbitalEnergy, stdGravParam, m_specificAngularMomentum);
   m_elements.eccentricity = eccVector.norm();
   m_elements.semiMajorAxis = semiMajorAxis_f(m_standardGravitationalParameter, m_specificOrbitalEnergy);
   m_period = period_f(m_elements.semiMajorAxis, m_standardGravitationalParameter);
