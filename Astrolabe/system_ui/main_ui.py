@@ -1,7 +1,11 @@
+from PySide2.QtUiTools import QUiLoader
+from PySide2.QtCore import QFile
 
-from PySide2.QtWidgets import QLabel
 
-class SystemEditor:
+class MainWindow():
     def __init__(self):
-        self.label = QLabel("Hello World!")
-        self.label.show()
+        file = QFile("./system_ui/main_window.ui")
+        file.open(QFile.ReadOnly)
+
+        loader = QUiLoader()
+        self.window = loader.load(file)
