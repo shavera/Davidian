@@ -14,7 +14,10 @@ set(SOURCES
 set(TEST_SOURCES
         CelestialSystemTest
         CSFileManagerTest
-        OrbitalEngineTest OrbitalHistoryTest.cpp OrbitStateTest.cpp)
+        OrbitalEngineTest
+        OrbitalHistoryTest
+        OrbitStateTest
+        )
 
 if(BUILD_TESTING)
     list(APPEND SOURCES UnitTestHelpers)

@@ -25,7 +25,7 @@ set(OUTPUT_FILES
 add_custom_command(
         OUTPUT ${OUTPUT_FILES}
         COMMAND ${_PROTOBUF_PROTOC}
-        ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
+        ARGS --grpc_out="${CMAKE_CURRENT_BINARY_DIR}"
         --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
         -I ${CMAKE_CURRENT_SOURCE_DIR}
         --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"

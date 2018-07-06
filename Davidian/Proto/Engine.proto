@@ -5,7 +5,10 @@ package Davidian.engine;
 import "Orbital.proto";
 
 service Server {
-    rpc LoadFile(LoadRequest) returns (LoadResponse) {}
+    rpc LoadSystem(LoadRequest) returns (System) {}
+    rpc GetCurrentSystem(GetCurrentSystemRequest) returns (System) {}
+    rpc GetBodyStateAtTime(BodyStateRequest) returns (OrbitState) {}
+    rpc GetBodyStream(BodyStateStreamRequest) returns (stream OrbitState) {}
 }
 
 message System{
@@ -17,13 +20,29 @@ message OrbitState{
     orbital.StateVector state_vector = 2;
 }
 
-message LoadRequest{
-    string filename = 1;
+message BodyStateRequest{
+    string bodyName = 1;
+    // time, in seconds, to calculate
+    double time = 2;
 }
 
-message LoadResponse{
-    oneof response{
-        System system = 1;
-        string error = 2;
+// Request a stream of Body State calculations at many different times
+message BodyStateStreamRequest{
+    string bodyName = 1;
+    // what time, in seconds, to start
+    double time_start = 2;
+    // what time, in seconds, to stop
+    double time_end = 3;
+    // how many seconds should separate the frames being calculated (if 0, will default to 1)
+    double seconds_per_frame = 4;
+}
+
+message GetCurrentSystemRequest{}
+
+message LoadRequest{
+    oneof request {
+        string filename = 1;
+        System system = 2;
     }
 }
+
