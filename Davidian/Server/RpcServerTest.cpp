@@ -3,7 +3,6 @@
 //
 
 #include "RpcServer.h"
-#include <Engine_mock.grpc.pb.h>
 
 #include "EngineInterface.h"
 
