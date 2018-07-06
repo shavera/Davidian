@@ -3,7 +3,7 @@ from PySide2.QtWidgets import QPushButton
 from PySide2.QtCore import QFile
 
 
-class MainWindow():
+class MainWindow:
     def __init__(self):
         file = QFile("./system_ui/main_window.ui")
         file.open(QFile.ReadOnly)
