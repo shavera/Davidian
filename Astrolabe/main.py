@@ -5,12 +5,12 @@ from PySide2.QtWidgets import QApplication
 
 from system_ui import main_ui
 
+
 def main():
     app = QApplication(sys.argv)
-    mainWindow = main_ui.MainWindow()
-    mainWindow.window.show()
+    main_window = main_ui.MainWindow()
+    main_window.show()
     app.exec_()
-
 
 
 if __name__ == "__main__":

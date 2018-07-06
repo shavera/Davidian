@@ -9,3 +9,6 @@ class MainWindow():
 
         loader = QUiLoader()
         self.window = loader.load(file)
+
+    def show(self):
+        self.window.show()
