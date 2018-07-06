@@ -1,7 +1,6 @@
 import grpc
 
-import Engine_pb2
-import Engine_pb2_grpc
+from client import Engine_pb2_grpc, Engine_pb2
 
 
 class DavidianClient:

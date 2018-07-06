@@ -1,4 +1,4 @@
-import davidian_client
+from client import davidian_client
 
 
 def main():
