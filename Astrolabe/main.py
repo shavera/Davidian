@@ -1,9 +1,8 @@
-from client import davidian_client
-
+# from client import davidian_client
+from system_ui import system_editor
 
 def main():
-    client = davidian_client.DavidianClient()
-    client.load_file("TestSystem")
+    editor = system_editor.SystemEditor()
 
 
 
