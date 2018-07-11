@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dialog</class>
- <widget class="QDialog" name="dialog">
+ <class>AddBodyDialog</class>
+ <widget class="QDialog" name="AddBodyDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>465</width>
-    <height>422</height>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -187,5 +187,38 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>AddBodyDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>408</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>264</x>
+     <y>434</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>AddBodyDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>415</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>112</x>
+     <y>433</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
