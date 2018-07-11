@@ -2,6 +2,8 @@ from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QPushButton
 from PySide2.QtCore import QFile
 
+from system_ui import add_body
+
 
 class MainWindow:
     def __init__(self):
@@ -18,7 +20,5 @@ class MainWindow:
         self.window.show()
 
     def display_add_body_dialog(self):
-        loader = QUiLoader()
-        file = QFile("./system_ui/add_body_dialog.ui")
-        dialog = loader.load(file, self.window)
-        dialog.show()
+        self._add_body_dialog = add_body.AddBodyDialog()
+        self._add_body_dialog.show()
