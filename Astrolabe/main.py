@@ -10,7 +10,8 @@ def main():
     app = QApplication(sys.argv)
     main_window = main_ui.MainWindow()
     main_window.show()
-    app.exec_()
+    exit_code: 	int = app.exec_()
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
