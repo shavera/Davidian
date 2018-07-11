@@ -21,4 +21,9 @@ class MainWindow:
 
     def display_add_body_dialog(self):
         self._add_body_dialog = add_body.AddBodyDialog()
+        self._add_body_dialog.add_root_body.connect(self.on_add_body)
         self._add_body_dialog.show()
+
+    def on_add_body(self, name: str, mass: float):
+        print(name)
+        print(mass)

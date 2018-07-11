@@ -1,7 +1,7 @@
 from PySide2 import QtCore
 from PySide2.QtCore import QFile, QObject
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QGroupBox, QComboBox
+from PySide2.QtWidgets import QComboBox, QGroupBox, QLineEdit
 
 
 class AddBodyDialog(QObject):
@@ -29,5 +29,7 @@ class AddBodyDialog(QObject):
         self.dialog.show()
 
     def on_accepted(self):
-        pass
+        name_edit = self.dialog.findChild(QLineEdit, "nameEdit")
+
+        self.add_root_body.emit(name_edit.text(), 123.54)
 
