@@ -17,13 +17,16 @@ class MainWindow:
         add_body_button.clicked.connect(self.display_add_body_dialog)
 
     def show(self):
+        """Display the main window"""
         self.window.show()
 
     def display_add_body_dialog(self):
-        self._add_body_dialog = add_body.AddBodyDialog()
-        self._add_body_dialog.add_root_body.connect(self.on_add_body)
-        self._add_body_dialog.show()
+        """Create and show a new Add Body dialog"""
+        add_body_dialog = add_body.AddBodyDialog()
+        add_body_dialog.add_root_body.connect(self.on_add_body)
+        add_body_dialog.show()
 
     def on_add_body(self, name: str, mass: float):
+        """When adding the dialog signals to add a body, gather the data and create a body"""
         print(name)
         print(mass)
