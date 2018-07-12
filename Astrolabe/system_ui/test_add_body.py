@@ -1,6 +1,6 @@
 import unittest
 
-from PySide2.QtWidgets import QApplication, QGroupBox
+from PySide2.QtWidgets import QApplication, QComboBox, QGroupBox
 
 from system_ui import add_body
 
@@ -25,15 +25,24 @@ class AddBodyDialogTest(UsesQApplication):
     def setUp(self):
         super(AddBodyDialogTest, self).setUp()
         self.add_body_dialog = add_body.AddBodyDialog()
+        self.orbit_group = self.add_body_dialog.dialog.findChild(QGroupBox, "orbitInfoBox")
+        self.parent_box = self.add_body_dialog.dialog.findChild(QComboBox, "parentBodySelectorBox")
 
     def test_initial_state(self):
-        orbit_group = self.add_body_dialog.dialog.findChild(QGroupBox, "orbitInfoBox")
-        self.assertIsNotNone(orbit_group)
-        self.assertFalse(orbit_group.isEnabled())
-        pass
+        self.assertIsNotNone(self.orbit_group)
+        self.assertFalse(self.orbit_group.isEnabled())
 
     def test_set_parent_list(self):
-        pass
+        with self.subTest("Empty List"):
+            self.add_body_dialog.set_parent_list([])
+            self.assertFalse(self.orbit_group.isEnabled())
+        with self.subTest("Non-Empty List"):
+            parent_list = ["Kerbol", "Kerbin", "Mun"]
+            self.add_body_dialog.set_parent_list(parent_list)
+            self.assertTrue(self.orbit_group.isEnabled())
+            self.assertEqual(len(parent_list), self.parent_box.count())
+            for parent in parent_list:
+                self.assertNotEqual(-1, self.parent_box.findText(parent))
 
 
 if __name__ == '__main__':

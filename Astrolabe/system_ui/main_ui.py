@@ -30,3 +30,4 @@ class MainWindow:
         """When adding the dialog signals to add a body, gather the data and create a body"""
         print(name)
         print(mass)
+

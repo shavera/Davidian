@@ -23,9 +23,9 @@ class AddBodyDialog(QObject):
     def set_parent_list(self, parent_list: list):
         """Set the parent selection combobox with a list of potential parent bodies. If this list is empty, then this \
         must be a root object"""
-        if 0 != parent_list.count:
-            orbit_group = self.dialog.findChild(QGroupBox, "orbitInfoBox")
-            orbit_group.setEnabled(True)
+        orbit_group = self.dialog.findChild(QGroupBox, "orbitInfoBox")
+        orbit_group.setEnabled(0 != len(parent_list))
+        if 0 != len(parent_list):
             parent_box = self.dialog.findChild(QComboBox, "parentBodySelectorBox")
             parent_box.addItems(parent_list)
 
