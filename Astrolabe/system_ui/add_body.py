@@ -1,10 +1,9 @@
 import os
-import unittest
 
 from PySide2 import QtCore
 from PySide2.QtCore import QFile, QObject
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication, QComboBox, QGroupBox, QLineEdit
+from PySide2.QtWidgets import QComboBox, QGroupBox, QLineEdit
 
 
 class AddBodyDialog(QObject):
@@ -39,38 +38,3 @@ class AddBodyDialog(QObject):
         name_edit = self.dialog.findChild(QLineEdit, "nameEdit")
 
         self.add_root_body.emit(name_edit.text(), 123.54)
-
-
-class UsesQApplication(unittest.TestCase):
-    """Helper class to provide QApplication instances"""
-
-    def setUp(self):
-        """Creates the QApplication instance"""
-
-        # Simple way of making instance a singleton
-        super(UsesQApplication, self).setUp()
-        self.app = QApplication.instance() or QApplication([])
-
-    def tearDown(self):
-        """Deletes the reference owned by self"""
-        del self.app
-        super(UsesQApplication, self).tearDown()
-
-
-class AddBodyDialogTest(UsesQApplication):
-    def setUp(self):
-        super(AddBodyDialogTest, self).setUp()
-        self.add_body_dialog = AddBodyDialog()
-
-    def test_initial_state(self):
-        orbit_group = self.add_body_dialog.dialog.findChild(QGroupBox, "orbitInfoBox")
-        self.assertIsNotNone(orbit_group)
-        self.assertFalse(orbit_group.isEnabled())
-        pass
-
-    def test_set_parent_list(self):
-        pass
-
-
-if __name__ == '__main__':
-    unittest.main()
