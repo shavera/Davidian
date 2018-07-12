@@ -1,6 +1,6 @@
 import unittest
 
-from PySide2.QtWidgets import QApplication, QComboBox, QGroupBox
+from PySide2.QtWidgets import QApplication, QCheckBox, QComboBox, QGroupBox
 
 from system_ui import add_body
 
@@ -25,12 +25,14 @@ class AddBodyDialogTest(UsesQApplication):
     def setUp(self):
         super(AddBodyDialogTest, self).setUp()
         self.add_body_dialog = add_body.AddBodyDialog()
-        self.orbit_group = self.add_body_dialog.dialog.findChild(QGroupBox, "orbitInfoBox")
-        self.parent_box = self.add_body_dialog.dialog.findChild(QComboBox, "parentBodySelectorBox")
+        self.dialog = self.add_body_dialog.dialog
+        self.orbit_group = self.dialog.findChild(QGroupBox, "orbitInfoBox")
+        self.parent_box = self.dialog.findChild(QComboBox, "parentBodySelectorBox")
+        self.celestial_body_box = self.dialog.findChild(QCheckBox, "celestialBodyBox")
 
     def test_initial_state(self):
-        self.assertIsNotNone(self.orbit_group)
         self.assertFalse(self.orbit_group.isEnabled())
+        self.assertTrue(self.celestial_body_box.isChecked())
 
     def test_set_parent_list(self):
         with self.subTest("Empty List"):
