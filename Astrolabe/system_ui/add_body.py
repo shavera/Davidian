@@ -2,6 +2,7 @@ import os
 
 from PySide2 import QtCore
 from PySide2.QtCore import QFile, QObject
+from PySide2.QtGui import QDoubleValidator
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QComboBox, QGroupBox, QLineEdit
 
@@ -17,6 +18,10 @@ class AddBodyDialog(QObject):
 
         loader = QUiLoader()
         self.dialog = loader.load(file)
+
+        self.mass_edit = self.dialog.findChild(QLineEdit, "massEdit")
+        mass_validator = QDoubleValidator(self.mass_edit)
+        self.mass_edit.setValidator(mass_validator)
 
         self.dialog.accepted.connect(self.on_accepted)
 
@@ -37,4 +42,4 @@ class AddBodyDialog(QObject):
         """Emit a signal containing the information in an accepted dialog"""
         name_edit = self.dialog.findChild(QLineEdit, "nameEdit")
 
-        self.add_root_body.emit(name_edit.text(), 123.54)
+        self.add_root_body.emit(name_edit.text(), float(self.mass_edit.text()))
