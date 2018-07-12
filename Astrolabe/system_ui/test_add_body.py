@@ -3,6 +3,8 @@ import unittest
 from PySide2.QtGui import QDoubleValidator
 from PySide2.QtWidgets import QApplication, QCheckBox, QComboBox, QGroupBox, QLineEdit
 
+from client import Orbital_pb2 as Davidian_orbital
+
 from system_ui import add_body
 
 
@@ -43,8 +45,6 @@ class AddBodyDialogTest(UsesQApplication):
         self.parent_box = self.dialog.findChild(QComboBox, "parentBodySelectorBox")
         self.celestial_body_box = self.dialog.findChild(QCheckBox, "celestialBodyBox")
 
-        self.add_body_dialog.add_root_body.connect(self._on_root_body_added)
-
     def test_initial_state(self):
         """Test that any specific details about initial conditions are met"""
         self.assertFalse(self.orbit_group.isEnabled())
@@ -68,12 +68,6 @@ class AddBodyDialogTest(UsesQApplication):
             for parent in parent_list:
                 self.assertNotEqual(-1, self.parent_box.findText(parent))
 
-    def _on_root_body_added(self, name: str, mass: float):
-        """Helper signal spy for root_body_added signal"""
-        self.root_body_added = True
-        self.last_emitted_name = name
-        self.last_emitted_mass = mass
-
     def test_root_body_data_accepted(self):
         """Test that when a root body's data is entered, the add_body signal is emitted with the appropriate data"""
         name = "Kerbol"
@@ -81,11 +75,51 @@ class AddBodyDialogTest(UsesQApplication):
         mass = "1.7565459e28"
         self.massEdit.setText(mass)
 
+        add_root_body_called = False
+
+        def _on_add_root_body(actual_name, actual_mass):
+            nonlocal add_root_body_called
+            add_root_body_called = True
+            self.assertEqual(name, actual_name)
+            self.assertLess(relative_error(1.7565459e28, actual_mass), 1e-6)
+
+        self.add_body_dialog.add_root_body.connect(_on_add_root_body)
+
         self.dialog.accept()
 
-        self.assertTrue(self.root_body_added)
-        self.assertEqual(name, self.last_emitted_name)
-        self.assertLess(relative_error(1.7565459e28, self.last_emitted_mass), 1e-6)
+        self.assertTrue(add_root_body_called)
+
+
+class AddBodyDialogAcceptedTest(AddBodyDialogTest):
+    add_body_emitted = False
+    signalled_body = Davidian_orbital.Body()
+
+    def setUp(self):
+        super(AddBodyDialogAcceptedTest, self).setUp()
+        self.add_body_dialog.add_body.connect(self._on_add_body)
+
+    def _on_add_body(self, body):
+        self.add_body_emitted = True
+        self.signalled_body = body
+
+    def test_root_body(self):
+        name = "Kerbol"
+        self.nameEdit.setText(name)
+        mass = "1.7565459e28"
+        self.massEdit.setText(mass)
+
+        self.dialog.accept()
+
+        self.assertTrue(self.add_body_emitted)
+        self.assertEqual(name, self.signalled_body.name)
+        self.assertEqual(float(mass), self.signalled_body.mass)
+        self.assertTrue(self.signalled_body.HasField('root_body'))
+
+    def test_free_body(self):
+        pass
+
+    def test_celestial_body(self):
+        pass
 
 
 if __name__ == '__main__':

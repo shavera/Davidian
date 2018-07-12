@@ -6,9 +6,12 @@ from PySide2.QtGui import QDoubleValidator
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QComboBox, QGroupBox, QLineEdit
 
+from client import Orbital_pb2 as Davidian_orbital
+
 
 class AddBodyDialog(QObject):
     add_root_body = QtCore.Signal(str, float)
+    add_body = QtCore.Signal(Davidian_orbital.Body)
 
     def __init__(self):
         super(AddBodyDialog, self).__init__()
@@ -41,5 +44,10 @@ class AddBodyDialog(QObject):
     def on_accepted(self):
         """Emit a signal containing the information in an accepted dialog"""
         name_edit = self.dialog.findChild(QLineEdit, "nameEdit")
+        body = Davidian_orbital.Body()
+        body.name = name_edit.text()
+        body.mass = float(self.mass_edit.text())
+        body.root_body.SetInParent()
 
         self.add_root_body.emit(name_edit.text(), float(self.mass_edit.text()))
+        self.add_body.emit(body)
