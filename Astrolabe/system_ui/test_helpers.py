@@ -2,6 +2,7 @@ import unittest
 
 from PySide2.QtWidgets import QApplication
 
+
 class UsesQApplication(unittest.TestCase):
     """Helper class to provide QApplication instances"""
 
@@ -16,11 +17,3 @@ class UsesQApplication(unittest.TestCase):
         """Deletes the reference owned by self"""
         del self.app
         super(UsesQApplication, self).tearDown()
-
-
-def relative_error(expected, actual) -> float:
-    diff = abs(expected - actual)
-    if 0 != expected:
-        return diff/expected
-    else:
-        return diff
