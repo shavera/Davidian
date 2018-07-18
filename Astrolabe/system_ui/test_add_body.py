@@ -1,4 +1,3 @@
-import math
 import unittest
 
 from PySide2.QtGui import QDoubleValidator
@@ -6,34 +5,10 @@ from PySide2.QtWidgets import QApplication, QCheckBox, QComboBox, QDoubleSpinBox
 
 from client import Orbital_pb2 as Davidian_orbital
 
-from system_ui import add_body
+from system_ui import add_body, test_helpers
 
 
-class UsesQApplication(unittest.TestCase):
-    """Helper class to provide QApplication instances"""
-
-    def setUp(self):
-        """Creates the QApplication instance"""
-
-        # Simple way of making instance a singleton
-        super(UsesQApplication, self).setUp()
-        self.app = QApplication.instance() or QApplication([])
-
-    def tearDown(self):
-        """Deletes the reference owned by self"""
-        del self.app
-        super(UsesQApplication, self).tearDown()
-
-
-def relative_error(expected, actual) -> float:
-    diff = abs(expected - actual)
-    if 0 != expected:
-        return diff/expected
-    else:
-        return diff
-
-
-class AddBodyDialogTest(UsesQApplication):
+class AddBodyDialogTest(test_helpers.UsesQApplication):
     def setUp(self):
         super(AddBodyDialogTest, self).setUp()
         self.add_body_dialog = add_body.AddBodyDialog()
