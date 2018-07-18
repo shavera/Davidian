@@ -46,7 +46,7 @@ class AddBodyDialog(QObject):
 
     def show(self):
         """Display the dialog"""
-        self.dialog.show()
+        self.dialog.exec_()
 
     def on_accepted(self):
         """Emit a signal containing the information in an accepted dialog"""
