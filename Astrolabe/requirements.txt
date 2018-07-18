@@ -2,5 +2,5 @@ googleapis-common-protos==1.6.0b3
 grpcio==1.13.0
 grpcio-tools==1.13.0
 protobuf==3.6.0
-PySide2==5.11.1a1.dev1530708810518
+PySide2==5.11
 six==1.11.0
