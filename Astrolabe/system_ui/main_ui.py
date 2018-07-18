@@ -2,6 +2,7 @@ from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QPushButton
 from PySide2.QtCore import QFile
 
+from client import Orbital_pb2 as Davidian_orbital
 from system_ui import add_body
 
 
@@ -23,11 +24,10 @@ class MainWindow:
     def display_add_body_dialog(self):
         """Create and show a new Add Body dialog"""
         add_body_dialog = add_body.AddBodyDialog()
-        add_body_dialog.add_root_body.connect(self.on_add_body)
+        add_body_dialog.add_body.connect(self._on_add_body)
         add_body_dialog.show()
 
-    def on_add_body(self, name: str, mass: float):
+    def _on_add_body(self, body: Davidian_orbital.Body):
         """When adding the dialog signals to add a body, gather the data and create a body"""
-        print(name)
-        print(mass)
+        print(body.name)
 
