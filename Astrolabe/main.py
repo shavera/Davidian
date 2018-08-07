@@ -8,7 +8,7 @@ from system_ui import main_ui
 
 def main():
     app = QApplication(sys.argv)
-    main_window = main_ui.MainWindow()
+    main_window = main_ui.MainWindow(None)
     main_window.show()
     exit_code: 	int = app.exec_()
     sys.exit(exit_code)
