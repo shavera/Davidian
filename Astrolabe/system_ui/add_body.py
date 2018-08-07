@@ -36,7 +36,7 @@ class AddBodyDialog(QDialog):
         body.name = self.ui.nameEdit.text()
         body.mass = float(self.ui.massEdit.text())
 
-        if self.orbit_group.isEnabled():
+        if self.ui.orbitInfoBox.isEnabled():
             is_celestial = self.ui.celestialBodyBox.isChecked()
             body_data = body.celestial_body if is_celestial else body.free_body
             body_data.parent_body_name = self.parent_box.currentText()
@@ -51,4 +51,4 @@ class AddBodyDialog(QDialog):
             body.root_body.SetInParent()
 
         self.add_body.emit(body)
-        super(AddBodyDialog, self).accept(args, kwargs)
+        super(AddBodyDialog, self).accept()
