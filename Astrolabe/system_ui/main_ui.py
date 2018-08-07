@@ -10,21 +10,20 @@ class MainWindow(QMainWindow):
     _bodies = []
 
     def __init__(self, parent):
-        QMainWindow.__init__(self, parent)
+        super(MainWindow, self).__init__(parent)
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
         self.ui.addBodyButton.clicked.connect(self.display_add_body_dialog)
 
-        self.add_body_dialog = AddBodyDialog()
+        self.add_body_dialog = AddBodyDialog(self)
         self.add_body_dialog.add_body.connect(self._on_add_body)
 
     @Slot()
     def display_add_body_dialog(self):
         """Create and show a new Add Body dialog"""
-        # self.add_body_dialog.show()
-        pass
+        self.add_body_dialog.show()
 
     @Slot(Davidian_orbital.Body)
     def _on_add_body(self, body: Davidian_orbital.Body):
