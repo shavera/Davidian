@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QMainWindow
-from PySide2.QtCore import Slot
+from PySide2.QtCore import Qt, Slot
 
 from client import Orbital_pb2 as Davidian_orbital
 from system_ui.ui_main_window import Ui_MainWindow
@@ -30,8 +30,14 @@ class MainWindow(QMainWindow):
     @Slot()
     def display_add_body_dialog(self):
         """Create and show a new Add Body dialog"""
-        self.add_body_dialog.set_parent_list(self._get_body_names())
-        self.add_body_dialog.show()
+        dialog = AddBodyDialog(self)
+        dialog.setAttribute(Qt.WA_DeleteOnClose)
+        dialog.setModal(True)
+        dialog.set_parent_list(self._get_body_names())
+
+        dialog.add_body.connect(self._on_add_body)
+
+        dialog.show()
 
     @Slot(Davidian_orbital.Body)
     def _on_add_body(self, body: Davidian_orbital.Body):
