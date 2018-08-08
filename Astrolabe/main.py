@@ -1,10 +1,17 @@
-import davidian_client
+# from client import davidian_client
+import sys
+
+from PySide2.QtWidgets import QApplication
+
+from system_ui import main_ui
 
 
 def main():
-    client = davidian_client.DavidianClient()
-    client.load_file("TestSystem")
-
+    app = QApplication(sys.argv)
+    main_window = main_ui.MainWindow(None)
+    main_window.show()
+    exit_code: 	int = app.exec_()
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
