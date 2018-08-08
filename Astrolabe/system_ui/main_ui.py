@@ -20,9 +20,17 @@ class MainWindow(QMainWindow):
         self.add_body_dialog = AddBodyDialog(self)
         self.add_body_dialog.add_body.connect(self._on_add_body)
 
+    def _get_body_names(self):
+        """Get a list of the current body names"""
+        _body_names = []
+        for body in self._bodies:
+            _body_names.append(body.name)
+        return _body_names
+
     @Slot()
     def display_add_body_dialog(self):
         """Create and show a new Add Body dialog"""
+        self.add_body_dialog.set_parent_list(self._get_body_names())
         self.add_body_dialog.show()
 
     @Slot(Davidian_orbital.Body)

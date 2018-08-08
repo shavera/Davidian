@@ -1,7 +1,10 @@
-from PySide2.QtCore import QTimer
-from PySide2.QtWidgets import QListWidget, QLineEdit, QPushButton
+from unittest.mock import patch
 
+from PySide2.QtWidgets import QWidget
+
+from client import Orbital_pb2 as Davidian_orbital
 from system_ui import main_ui, test_helpers
+from system_ui.add_body import AddBodyDialog
 
 
 class MainWindowTest(test_helpers.UsesQApplication):
@@ -10,28 +13,34 @@ class MainWindowTest(test_helpers.UsesQApplication):
 
     def setUp(self):
         super(MainWindowTest, self).setUp()
-        self.main_window = main_ui.MainWindow()
-        self.window = self.main_window.window
 
-        self.list_widget = self.window.findChild(QListWidget, "bodyList")
+        self.show_patcher = patch.object(QWidget, 'show')
+        self.mock_show = self.show_patcher.start()
+        self.addCleanup(self.show_patcher.stop)
 
-        self.add_body_button = self.window.findChild(QPushButton, "addBodyButton")
-        self.assertIsNotNone(self.add_body_button)
+        self.set_parent_list_patcher = patch.object(AddBodyDialog, 'set_parent_list')
+        self.mock_set_parent_list = self.set_parent_list_patcher.start()
+        self.addCleanup(self.set_parent_list_patcher.stop)
 
-    def _fill_and_accept_modal_dialog(self):
-        dialog = self.app.activeModalWidget()
-        self.assertIsNotNone(dialog)
-        dialog.findChild(QLineEdit, "nameEdit").setText(self.body_added_name)
-        dialog.findChild(QLineEdit, "massEdit").setText(str(self.body_added_mass))
-        dialog.accept()
+        self.window = main_ui.MainWindow(None)
 
-    def test_add_body_button(self):
-        """Test that when add body button is clicked, a dialog will appear that can be filled in with data"""
-        # since dialog is modal, connect a singleshot timer to a function that will fill in the dialog and accept it
-        QTimer.singleShot(0, self._fill_and_accept_modal_dialog)
-        self.add_body_button.click()
+    def _button_click_test(self, body_names):
+        self.window.ui.addBodyButton.click()
 
-        self.assertEqual(1, len(self.main_window._bodies))
+        self.mock_set_parent_list.assert_called_once_with(body_names)
+        self.mock_show.assert_called_once()
 
-        self.assertEqual(1, self.list_widget.count())
-        self.assertEqual(self.body_added_name, self.list_widget.item(0).text())
+    def test_add_body_button_clicked_empty_list(self):
+        """Test what happens when the add body button is clicked with no bodies"""
+        _expected_body_names = []
+        self._button_click_test(_expected_body_names)
+
+    def test_add_body_button_clicked_existing_bodies(self):
+        """Test what happens when the add body button is clicked with some bodies already added"""
+        _expected_body_names = ["Kerbol", "Kerbin", "Mun"]
+        for name in _expected_body_names:
+            body = Davidian_orbital.Body()
+            body.name = name
+            self.window._bodies.append(body)
+            self.window.ui.bodyList.addItem(name)
+        self._button_click_test(_expected_body_names)
