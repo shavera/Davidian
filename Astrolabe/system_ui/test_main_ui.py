@@ -8,9 +8,6 @@ from system_ui.add_body import AddBodyDialog
 
 
 class MainWindowTest(test_helpers.UsesQApplication):
-    body_added_name = "Kerbol"
-    body_added_mass = 1.7565459e28
-
     def setUp(self):
         super(MainWindowTest, self).setUp()
 
@@ -24,11 +21,16 @@ class MainWindowTest(test_helpers.UsesQApplication):
 
         self.window = main_ui.MainWindow(None)
 
+    def _get_dialog(self):
+        return self.window.findChild(AddBodyDialog)
+
     def _button_click_test(self, body_names):
         self.window.ui.addBodyButton.click()
 
         self.mock_set_parent_list.assert_called_once_with(body_names)
         self.mock_show.assert_called_once()
+
+        self._get_dialog().reject()
 
     def test_add_body_button_clicked_empty_list(self):
         """Test what happens when the add body button is clicked with no bodies"""
@@ -44,3 +46,18 @@ class MainWindowTest(test_helpers.UsesQApplication):
             self.window._bodies.append(body)
             self.window.ui.bodyList.addItem(name)
         self._button_click_test(_expected_body_names)
+
+    def test_add_body_signal(self):
+        self.window.ui.addBodyButton.click()
+        dialog = self._get_dialog()
+
+        body = Davidian_orbital.Body()
+        body.name = "Kerbol"
+        body.mass = 1.7565459e28
+        body.root_body.SetInParent()
+
+        dialog.add_body.emit(body)
+
+        self.assertEqual([body], self.window._bodies)
+        self.assertEqual(1, self.window.ui.bodyList.count())
+        self.assertEqual(body.name, self.window.ui.bodyList.item(0).text())

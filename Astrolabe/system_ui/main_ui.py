@@ -7,10 +7,9 @@ from system_ui.add_body import AddBodyDialog
 
 
 class MainWindow(QMainWindow):
-    _bodies = []
-
     def __init__(self, parent):
         super(MainWindow, self).__init__(parent)
+        self._bodies = []
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
