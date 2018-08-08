@@ -1,6 +1,7 @@
 from PySide2.QtWidgets import QMainWindow
 from PySide2.QtCore import Qt, Slot
 
+from client.davidian_client import DavidianClient
 from client import Orbital_pb2 as Davidian_orbital
 from system_ui.ui_main_window import Ui_MainWindow
 from system_ui.add_body import AddBodyDialog
@@ -18,6 +19,8 @@ class MainWindow(QMainWindow):
 
         self.add_body_dialog = AddBodyDialog(self)
         self.add_body_dialog.add_body.connect(self._on_add_body)
+
+        self.client = DavidianClient()
 
     def _get_body_names(self):
         """Get a list of the current body names"""

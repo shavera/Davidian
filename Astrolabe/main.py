@@ -1,4 +1,3 @@
-# from client import davidian_client
 import sys
 
 from PySide2.QtWidgets import QApplication
