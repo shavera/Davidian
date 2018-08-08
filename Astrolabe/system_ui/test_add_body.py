@@ -1,7 +1,6 @@
 import unittest
 
 from PySide2.QtGui import QDoubleValidator
-from PySide2.QtWidgets import QApplication, QCheckBox, QComboBox, QDoubleSpinBox, QGroupBox, QLineEdit
 
 from client import Orbital_pb2 as Davidian_orbital
 
@@ -11,40 +10,23 @@ from system_ui import add_body, test_helpers
 class AddBodyDialogTest(test_helpers.UsesQApplication):
     def setUp(self):
         super(AddBodyDialogTest, self).setUp()
-        self.add_body_dialog = add_body.AddBodyDialog()
-        self.dialog = self.add_body_dialog.dialog
-
-        self.nameEdit = self.dialog.findChild(QLineEdit, "nameEdit")
-        self.assertIsNotNone(self.nameEdit)
-
-        self.massEdit = self.dialog.findChild(QLineEdit, "massEdit")
-        self.assertIsNotNone(self.massEdit)
-
-        self.orbit_group = self.dialog.findChild(QGroupBox, "orbitInfoBox")
-        self.assertIsNotNone(self.orbit_group)
-
-        self.parent_box = self.dialog.findChild(QComboBox, "parentBodySelectorBox")
-        self.assertIsNotNone(self.parent_box)
-
-        self.celestial_body_box = self.dialog.findChild(QCheckBox, "celestialBodyBox")
-        self.assertIsNotNone(self.celestial_body_box)
+        self.dialog = add_body.AddBodyDialog(None)
 
     def test_initial_state(self):
         """Test that any specific details about initial conditions are met"""
         with self.subTest("Orbit edit is disabled by default"):
-            self.assertFalse(self.orbit_group.isEnabled())
+            self.assertFalse(self.dialog.ui.orbitInfoBox.isEnabled())
 
         with self.subTest("Celestial Body is default body"):
-            self.assertTrue(self.celestial_body_box.isChecked())
+            self.assertTrue(self.dialog.ui.celestialBodyBox.isChecked())
 
         with self.subTest("Mass edit has double validator with 0 as bottom limit"):
-            _mass_validator = self.massEdit.validator()
+            _mass_validator = self.dialog.ui.massEdit.validator()
             self.assertIsInstance(_mass_validator, QDoubleValidator)
             self.assertEqual(0, _mass_validator.bottom())
 
         with self.subTest("SemiMajor Axis edit has double validator with 0 as bottom limit"):
-            _semimajor_axis_edit = self.dialog.findChild(QLineEdit, "semiMajorAxisEdit")
-            _semimajor_axis_validator = _semimajor_axis_edit.validator()
+            _semimajor_axis_validator = self.dialog.ui.semiMajorAxisEdit.validator()
             self.assertIsInstance(_semimajor_axis_validator, QDoubleValidator)
             self.assertEqual(0, _semimajor_axis_validator.bottom())
 
@@ -53,17 +35,19 @@ class AddBodyDialogTest(test_helpers.UsesQApplication):
         * Empty lists should not enable orbit group
         * Non-empty lists should enable orbit group and populate the combobox"""
         with self.subTest("Empty List"):
-            self.add_body_dialog.set_parent_list([])
-            self.assertFalse(self.orbit_group.isEnabled())
-            self.assertEqual(0, self.parent_box.count())
+            self.dialog.set_parent_list([])
+            self.assertFalse(self.dialog.ui.orbitInfoBox.isEnabled())
+            self.assertEqual(0, self.dialog.ui.parentBodySelectorBox.count())
+
         with self.subTest("Non-Empty List"):
             parent_list = ["Kerbol", "Kerbin", "Mun"]
-            self.add_body_dialog.set_parent_list(parent_list)
-            self.assertTrue(self.orbit_group.isEnabled())
-            self.assertEqual(len(parent_list), self.parent_box.count())
+            self.dialog.set_parent_list(parent_list)
+            self.assertTrue(self.dialog.ui.orbitInfoBox.isEnabled())
+            _parent_box = self.dialog.ui.parentBodySelectorBox
+            self.assertEqual(len(parent_list), _parent_box.count())
             for parent in parent_list:
-                self.assertNotEqual(-1, self.parent_box.findText(parent))
-            self.assertEqual(parent_list[0], self.parent_box.currentText())
+                self.assertNotEqual(-1,_parent_box.findText(parent))
+            self.assertEqual(parent_list[0], _parent_box.currentText())
 
 
 class AddBodyDialogAcceptedTest(AddBodyDialogTest):
@@ -73,25 +57,7 @@ class AddBodyDialogAcceptedTest(AddBodyDialogTest):
 
     def setUp(self):
         super(AddBodyDialogAcceptedTest, self).setUp()
-        self.add_body_dialog.add_body.connect(self._on_add_body)
-
-        self.semimajor_axis_edit = self.dialog.findChild(QLineEdit, "semiMajorAxisEdit")
-        self.assertIsNotNone(self.semimajor_axis_edit)
-
-        self.eccentricity_spin_box = self.dialog.findChild(QDoubleSpinBox, "eccentricitySpinBox")
-        self.assertIsNotNone(self.eccentricity_spin_box)
-
-        self.inclination_spin_box = self.dialog.findChild(QDoubleSpinBox, "inclinationSpinBox")
-        self.assertIsNotNone(self.inclination_spin_box)
-
-        self.longitude_asc_node_spin_box = self.dialog.findChild(QDoubleSpinBox, "longitudeAscNodeSpinBox")
-        self.assertIsNotNone(self.longitude_asc_node_spin_box)
-
-        self.arg_periapsis_spin_box = self.dialog.findChild(QDoubleSpinBox, "argOfPeriapsisSpinBox")
-        self.assertIsNotNone(self.arg_periapsis_spin_box)
-
-        self.mean_anomaly_spin_box = self.dialog.findChild(QDoubleSpinBox, "meanAnomalySpinBox")
-        self.assertIsNotNone(self.mean_anomaly_spin_box)
+        self.dialog.add_body.connect(self._on_add_body)
 
     def _on_add_body(self, body):
         self.add_body_emitted = True
@@ -103,8 +69,8 @@ class AddBodyDialogAcceptedTest(AddBodyDialogTest):
         expected_body.name = "Kerbol"
         expected_body.mass = 1.7565459e28
         expected_body.root_body.SetInParent()
-        self.nameEdit.setText(expected_body.name)
-        self.massEdit.setText(str(expected_body.mass))
+        self.dialog.ui.nameEdit.setText(expected_body.name)
+        self.dialog.ui.massEdit.setText(str(expected_body.mass))
 
         self.dialog.accept()
 
@@ -113,7 +79,6 @@ class AddBodyDialogAcceptedTest(AddBodyDialogTest):
 
     def test_celestial_body(self):
         """Test that when parents are present can enter data for a child celestial body"""
-        self.add_body_dialog.set_parent_list(self.parent_list)
         parent_index = 1
         expected_body = Davidian_orbital.Body()
         expected_body.name = "Minmus"
@@ -129,16 +94,17 @@ class AddBodyDialogAcceptedTest(AddBodyDialogTest):
         # 0.9 radians, rounded to 2 decimals, is 51.57
         orbit.mean_anomaly_0 = 51.57
 
-        self.add_body_dialog.set_parent_list(self.parent_list)
-        self.nameEdit.setText(expected_body.name)
-        self.massEdit.setText(str(expected_body.mass))
-        self.parent_box.setCurrentIndex(self.parent_box.findText(body_data.parent_body_name))
-        self.semimajor_axis_edit.setText(str(orbit.semimajor_axis))
-        self.eccentricity_spin_box.setValue(orbit.eccentricity)
-        self.inclination_spin_box.setValue(orbit.inclination)
-        self.longitude_asc_node_spin_box.setValue(orbit.longitude_asc_node)
-        self.arg_periapsis_spin_box.setValue(orbit.arg_periapsis)
-        self.mean_anomaly_spin_box.setValue(orbit.mean_anomaly_0)
+        _parent_box = self.dialog.ui.parentBodySelectorBox
+        self.dialog.set_parent_list(self.parent_list)
+        self.dialog.ui.nameEdit.setText(expected_body.name)
+        self.dialog.ui.massEdit.setText(str(expected_body.mass))
+        _parent_box.setCurrentIndex(_parent_box.findText(body_data.parent_body_name))
+        self.dialog.ui.semiMajorAxisEdit.setText(str(orbit.semimajor_axis))
+        self.dialog.ui.eccentricitySpinBox.setValue(orbit.eccentricity)
+        self.dialog.ui.inclinationSpinBox.setValue(orbit.inclination)
+        self.dialog.ui.longitudeAscNodeSpinBox.setValue(orbit.longitude_asc_node)
+        self.dialog.ui.argOfPeriapsisSpinBox.setValue(orbit.arg_periapsis)
+        self.dialog.ui.meanAnomalySpinBox.setValue(orbit.mean_anomaly_0)
 
         self.dialog.accept()
 
@@ -161,18 +127,19 @@ class AddBodyDialogAcceptedTest(AddBodyDialogTest):
         orbit.arg_periapsis = 103.24
         orbit.mean_anomaly_0 = 36.6
 
-        self.add_body_dialog.set_parent_list(self.parent_list)
-        self.nameEdit.setText(expected_body.name)
-        self.massEdit.setText(str(expected_body.mass))
-        self.parent_box.setCurrentIndex(self.parent_box.findText(body_data.parent_body_name))
+        _parent_box = self.dialog.ui.parentBodySelectorBox
+        self.dialog.set_parent_list(self.parent_list)
+        self.dialog.ui.nameEdit.setText(expected_body.name)
+        self.dialog.ui.massEdit.setText(str(expected_body.mass))
+        _parent_box.setCurrentIndex(_parent_box.findText(body_data.parent_body_name))
         # remember to remove celestial body check here
-        self.celestial_body_box.setChecked(False)
-        self.semimajor_axis_edit.setText(str(orbit.semimajor_axis))
-        self.eccentricity_spin_box.setValue(orbit.eccentricity)
-        self.inclination_spin_box.setValue(orbit.inclination)
-        self.longitude_asc_node_spin_box.setValue(orbit.longitude_asc_node)
-        self.arg_periapsis_spin_box.setValue(orbit.arg_periapsis)
-        self.mean_anomaly_spin_box.setValue(orbit.mean_anomaly_0)
+        self.dialog.ui.celestialBodyBox.setChecked(False)
+        self.dialog.ui.semiMajorAxisEdit.setText(str(orbit.semimajor_axis))
+        self.dialog.ui.eccentricitySpinBox.setValue(orbit.eccentricity)
+        self.dialog.ui.inclinationSpinBox.setValue(orbit.inclination)
+        self.dialog.ui.longitudeAscNodeSpinBox.setValue(orbit.longitude_asc_node)
+        self.dialog.ui.argOfPeriapsisSpinBox.setValue(orbit.arg_periapsis)
+        self.dialog.ui.meanAnomalySpinBox.setValue(orbit.mean_anomaly_0)
 
         self.dialog.accept()
 

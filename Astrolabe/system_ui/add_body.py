@@ -39,7 +39,7 @@ class AddBodyDialog(QDialog):
         if self.ui.orbitInfoBox.isEnabled():
             is_celestial = self.ui.celestialBodyBox.isChecked()
             body_data = body.celestial_body if is_celestial else body.free_body
-            body_data.parent_body_name = self.parent_box.currentText()
+            body_data.parent_body_name = self.ui.parentBodySelectorBox.currentText()
             orbit = body_data.orbit
             orbit.semimajor_axis = float(self.ui.semiMajorAxisEdit.text())
             orbit.eccentricity = self.ui.eccentricitySpinBox.value()
