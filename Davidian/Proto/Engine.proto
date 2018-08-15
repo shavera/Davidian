@@ -4,22 +4,34 @@ package Davidian.engine;
 
 import "Orbital.proto";
 
+// Service that saves/loads/imports Celestial Systems, and performs calculations for those bodies
 service Server {
+    // Save whatever system the service current holds to a named file
+    rpc SaveCurrentSystemToFile(string) returns (Empty) {}
+
+    // Import a system from either a direct import, or a named file
     rpc LoadSystem(LoadRequest) returns (System) {}
+    // Retrieve the system currently loaded into the service for the client
     rpc GetCurrentSystem(GetCurrentSystemRequest) returns (System) {}
+
+    // Calculate the state for a specific body at a specific point in time
     rpc GetBodyStateAtTime(BodyStateRequest) returns (OrbitState) {}
+    // Generate a stream of data for a specific body's state over a length of time
     rpc GetBodyStream(BodyStateStreamRequest) returns (stream OrbitState) {}
 }
 
+// A system is many bodies together
 message System{
     repeated orbital.Body body = 1;
 }
 
+// The 1+3+3 vector description of a body (ie, time + cartesian position, velocity vectors)
 message OrbitState{
     double time = 1;
     orbital.StateVector state_vector = 2;
 }
 
+// A request to calculate a state for a named body for a specific point in time
 message BodyStateRequest{
     string bodyName = 1;
     // time, in seconds, to calculate
@@ -37,8 +49,10 @@ message BodyStateStreamRequest{
     double seconds_per_frame = 4;
 }
 
+// A request for the service to inform the client of what celestial system it's currently using
 message GetCurrentSystemRequest{}
 
+// A request for the service to import a system either as a direct import, or from a named file.
 message LoadRequest{
     oneof request {
         string filename = 1;
