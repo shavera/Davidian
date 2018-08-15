@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='Engine.proto',
   package='Davidian.engine',
   syntax='proto3',
-  serialized_pb=_b('\n\x0c\x45ngine.proto\x12\x0f\x44\x61vidian.engine\x1a\rOrbital.proto\".\n\x06System\x12$\n\x04\x62ody\x18\x01 \x03(\x0b\x32\x16.Davidian.orbital.Body\"O\n\nOrbitState\x12\x0c\n\x04time\x18\x01 \x01(\x01\x12\x33\n\x0cstate_vector\x18\x02 \x01(\x0b\x32\x1d.Davidian.orbital.StateVector\"2\n\x10\x42odyStateRequest\x12\x10\n\x08\x62odyName\x18\x01 \x01(\t\x12\x0c\n\x04time\x18\x02 \x01(\x01\"k\n\x16\x42odyStateStreamRequest\x12\x10\n\x08\x62odyName\x18\x01 \x01(\t\x12\x12\n\ntime_start\x18\x02 \x01(\x01\x12\x10\n\x08time_end\x18\x03 \x01(\x01\x12\x19\n\x11seconds_per_frame\x18\x04 \x01(\x01\"\x19\n\x17GetCurrentSystemRequest\"W\n\x0bLoadRequest\x12\x12\n\x08\x66ilename\x18\x01 \x01(\tH\x00\x12)\n\x06system\x18\x02 \x01(\x0b\x32\x17.Davidian.engine.SystemH\x00\x42\t\n\x07request2\xdb\x02\n\x06Server\x12\x45\n\nLoadSystem\x12\x1c.Davidian.engine.LoadRequest\x1a\x17.Davidian.engine.System\"\x00\x12W\n\x10GetCurrentSystem\x12(.Davidian.engine.GetCurrentSystemRequest\x1a\x17.Davidian.engine.System\"\x00\x12V\n\x12GetBodyStateAtTime\x12!.Davidian.engine.BodyStateRequest\x1a\x1b.Davidian.engine.OrbitState\"\x00\x12Y\n\rGetBodyStream\x12\'.Davidian.engine.BodyStateStreamRequest\x1a\x1b.Davidian.engine.OrbitState\"\x00\x30\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0c\x45ngine.proto\x12\x0f\x44\x61vidian.engine\x1a\rOrbital.proto\".\n\x06System\x12$\n\x04\x62ody\x18\x01 \x03(\x0b\x32\x16.Davidian.orbital.Body\"O\n\nOrbitState\x12\x0c\n\x04time\x18\x01 \x01(\x01\x12\x33\n\x0cstate_vector\x18\x02 \x01(\x0b\x32\x1d.Davidian.orbital.StateVector\"2\n\x10\x42odyStateRequest\x12\x10\n\x08\x62odyName\x18\x01 \x01(\t\x12\x0c\n\x04time\x18\x02 \x01(\x01\"k\n\x16\x42odyStateStreamRequest\x12\x10\n\x08\x62odyName\x18\x01 \x01(\t\x12\x12\n\ntime_start\x18\x02 \x01(\x01\x12\x10\n\x08time_end\x18\x03 \x01(\x01\x12\x19\n\x11seconds_per_frame\x18\x04 \x01(\x01\",\n\x18SaveCurrentSystemRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"\x1b\n\x19SaveCurrentSystemResponse\"\x19\n\x17GetCurrentSystemRequest\"W\n\x0bLoadRequest\x12\x12\n\x08\x66ilename\x18\x01 \x01(\tH\x00\x12)\n\x06system\x18\x02 \x01(\x0b\x32\x17.Davidian.engine.SystemH\x00\x42\t\n\x07request2\xcf\x03\n\x06Server\x12r\n\x17SaveCurrentSystemToFile\x12).Davidian.engine.SaveCurrentSystemRequest\x1a*.Davidian.engine.SaveCurrentSystemResponse\"\x00\x12\x45\n\nLoadSystem\x12\x1c.Davidian.engine.LoadRequest\x1a\x17.Davidian.engine.System\"\x00\x12W\n\x10GetCurrentSystem\x12(.Davidian.engine.GetCurrentSystemRequest\x1a\x17.Davidian.engine.System\"\x00\x12V\n\x12GetBodyStateAtTime\x12!.Davidian.engine.BodyStateRequest\x1a\x1b.Davidian.engine.OrbitState\"\x00\x12Y\n\rGetBodyStream\x12\'.Davidian.engine.BodyStateStreamRequest\x1a\x1b.Davidian.engine.OrbitState\"\x00\x30\x01\x62\x06proto3')
   ,
   dependencies=[Orbital__pb2.DESCRIPTOR,])
 
@@ -186,6 +186,61 @@ _BODYSTATESTREAMREQUEST = _descriptor.Descriptor(
 )
 
 
+_SAVECURRENTSYSTEMREQUEST = _descriptor.Descriptor(
+  name='SaveCurrentSystemRequest',
+  full_name='Davidian.engine.SaveCurrentSystemRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='filename', full_name='Davidian.engine.SaveCurrentSystemRequest.filename', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=338,
+  serialized_end=382,
+)
+
+
+_SAVECURRENTSYSTEMRESPONSE = _descriptor.Descriptor(
+  name='SaveCurrentSystemResponse',
+  full_name='Davidian.engine.SaveCurrentSystemResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=384,
+  serialized_end=411,
+)
+
+
 _GETCURRENTSYSTEMREQUEST = _descriptor.Descriptor(
   name='GetCurrentSystemRequest',
   full_name='Davidian.engine.GetCurrentSystemRequest',
@@ -205,8 +260,8 @@ _GETCURRENTSYSTEMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=338,
-  serialized_end=363,
+  serialized_start=413,
+  serialized_end=438,
 )
 
 
@@ -246,8 +301,8 @@ _LOADREQUEST = _descriptor.Descriptor(
       name='request', full_name='Davidian.engine.LoadRequest.request',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=365,
-  serialized_end=452,
+  serialized_start=440,
+  serialized_end=527,
 )
 
 _SYSTEM.fields_by_name['body'].message_type = Orbital__pb2._BODY
@@ -263,6 +318,8 @@ DESCRIPTOR.message_types_by_name['System'] = _SYSTEM
 DESCRIPTOR.message_types_by_name['OrbitState'] = _ORBITSTATE
 DESCRIPTOR.message_types_by_name['BodyStateRequest'] = _BODYSTATEREQUEST
 DESCRIPTOR.message_types_by_name['BodyStateStreamRequest'] = _BODYSTATESTREAMREQUEST
+DESCRIPTOR.message_types_by_name['SaveCurrentSystemRequest'] = _SAVECURRENTSYSTEMREQUEST
+DESCRIPTOR.message_types_by_name['SaveCurrentSystemResponse'] = _SAVECURRENTSYSTEMRESPONSE
 DESCRIPTOR.message_types_by_name['GetCurrentSystemRequest'] = _GETCURRENTSYSTEMREQUEST
 DESCRIPTOR.message_types_by_name['LoadRequest'] = _LOADREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -295,6 +352,20 @@ BodyStateStreamRequest = _reflection.GeneratedProtocolMessageType('BodyStateStre
   ))
 _sym_db.RegisterMessage(BodyStateStreamRequest)
 
+SaveCurrentSystemRequest = _reflection.GeneratedProtocolMessageType('SaveCurrentSystemRequest', (_message.Message,), dict(
+  DESCRIPTOR = _SAVECURRENTSYSTEMREQUEST,
+  __module__ = 'Engine_pb2'
+  # @@protoc_insertion_point(class_scope:Davidian.engine.SaveCurrentSystemRequest)
+  ))
+_sym_db.RegisterMessage(SaveCurrentSystemRequest)
+
+SaveCurrentSystemResponse = _reflection.GeneratedProtocolMessageType('SaveCurrentSystemResponse', (_message.Message,), dict(
+  DESCRIPTOR = _SAVECURRENTSYSTEMRESPONSE,
+  __module__ = 'Engine_pb2'
+  # @@protoc_insertion_point(class_scope:Davidian.engine.SaveCurrentSystemResponse)
+  ))
+_sym_db.RegisterMessage(SaveCurrentSystemResponse)
+
 GetCurrentSystemRequest = _reflection.GeneratedProtocolMessageType('GetCurrentSystemRequest', (_message.Message,), dict(
   DESCRIPTOR = _GETCURRENTSYSTEMREQUEST,
   __module__ = 'Engine_pb2'
@@ -317,13 +388,22 @@ _SERVER = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=455,
-  serialized_end=802,
+  serialized_start=530,
+  serialized_end=993,
   methods=[
+  _descriptor.MethodDescriptor(
+    name='SaveCurrentSystemToFile',
+    full_name='Davidian.engine.Server.SaveCurrentSystemToFile',
+    index=0,
+    containing_service=None,
+    input_type=_SAVECURRENTSYSTEMREQUEST,
+    output_type=_SAVECURRENTSYSTEMRESPONSE,
+    options=None,
+  ),
   _descriptor.MethodDescriptor(
     name='LoadSystem',
     full_name='Davidian.engine.Server.LoadSystem',
-    index=0,
+    index=1,
     containing_service=None,
     input_type=_LOADREQUEST,
     output_type=_SYSTEM,
@@ -332,7 +412,7 @@ _SERVER = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetCurrentSystem',
     full_name='Davidian.engine.Server.GetCurrentSystem',
-    index=1,
+    index=2,
     containing_service=None,
     input_type=_GETCURRENTSYSTEMREQUEST,
     output_type=_SYSTEM,
@@ -341,7 +421,7 @@ _SERVER = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetBodyStateAtTime',
     full_name='Davidian.engine.Server.GetBodyStateAtTime',
-    index=2,
+    index=3,
     containing_service=None,
     input_type=_BODYSTATEREQUEST,
     output_type=_ORBITSTATE,
@@ -350,7 +430,7 @@ _SERVER = _descriptor.ServiceDescriptor(
   _descriptor.MethodDescriptor(
     name='GetBodyStream',
     full_name='Davidian.engine.Server.GetBodyStream',
-    index=3,
+    index=4,
     containing_service=None,
     input_type=_BODYSTATESTREAMREQUEST,
     output_type=_ORBITSTATE,

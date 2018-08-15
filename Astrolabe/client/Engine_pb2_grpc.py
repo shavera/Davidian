@@ -5,8 +5,8 @@ from . import Engine_pb2 as Engine__pb2
 
 
 class ServerStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """Service that saves/loads/imports Celestial Systems, and performs calculations for those bodies
+  """
 
   def __init__(self, channel):
     """Constructor.
@@ -14,6 +14,11 @@ class ServerStub(object):
     Args:
       channel: A grpc.Channel.
     """
+    self.SaveCurrentSystemToFile = channel.unary_unary(
+        '/Davidian.engine.Server/SaveCurrentSystemToFile',
+        request_serializer=Engine__pb2.SaveCurrentSystemRequest.SerializeToString,
+        response_deserializer=Engine__pb2.SaveCurrentSystemResponse.FromString,
+        )
     self.LoadSystem = channel.unary_unary(
         '/Davidian.engine.Server/LoadSystem',
         request_serializer=Engine__pb2.LoadRequest.SerializeToString,
@@ -37,33 +42,40 @@ class ServerStub(object):
 
 
 class ServerServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """Service that saves/loads/imports Celestial Systems, and performs calculations for those bodies
+  """
+
+  def SaveCurrentSystemToFile(self, request, context):
+    """Save whatever system the service current holds to a named file
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
 
   def LoadSystem(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Import a system from either a direct import, or a named file
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetCurrentSystem(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Retrieve the system currently loaded into the service for the client
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetBodyStateAtTime(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Calculate the state for a specific body at a specific point in time
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetBodyStream(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Generate a stream of data for a specific body's state over a length of time
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
@@ -71,6 +83,11 @@ class ServerServicer(object):
 
 def add_ServerServicer_to_server(servicer, server):
   rpc_method_handlers = {
+      'SaveCurrentSystemToFile': grpc.unary_unary_rpc_method_handler(
+          servicer.SaveCurrentSystemToFile,
+          request_deserializer=Engine__pb2.SaveCurrentSystemRequest.FromString,
+          response_serializer=Engine__pb2.SaveCurrentSystemResponse.SerializeToString,
+      ),
       'LoadSystem': grpc.unary_unary_rpc_method_handler(
           servicer.LoadSystem,
           request_deserializer=Engine__pb2.LoadRequest.FromString,
