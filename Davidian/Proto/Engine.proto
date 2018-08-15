@@ -7,7 +7,7 @@ import "Orbital.proto";
 // Service that saves/loads/imports Celestial Systems, and performs calculations for those bodies
 service Server {
     // Save whatever system the service current holds to a named file
-    rpc SaveCurrentSystemToFile(string) returns (Empty) {}
+    rpc SaveCurrentSystemToFile(SaveCurrentSystemRequest) returns (SaveCurrentSystemResponse) {}
 
     // Import a system from either a direct import, or a named file
     rpc LoadSystem(LoadRequest) returns (System) {}
@@ -48,6 +48,14 @@ message BodyStateStreamRequest{
     // how many seconds should separate the frames being calculated (if 0, will default to 1)
     double seconds_per_frame = 4;
 }
+
+// Request current system be saved to a specific file
+message SaveCurrentSystemRequest{
+    string filename = 1;
+}
+
+// A(n unused) response from the save system request
+message SaveCurrentSystemResponse{}
 
 // A request for the service to inform the client of what celestial system it's currently using
 message GetCurrentSystemRequest{}
