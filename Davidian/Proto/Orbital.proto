@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package Davidian.orbital;
 
+// All angles are degrees, semimajor_axis is meters (using mks system throughout)
 message OrbitalElements{
     double semimajor_axis = 1;
     double eccentricity = 2;
@@ -32,6 +33,7 @@ message RootBodyData{
 
 message Body{
     string name = 1;
+    // In kg
     double mass = 2;
 
     oneof body_data{
