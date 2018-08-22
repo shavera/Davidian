@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from client.davidian_client import DavidianClient
 from client import Engine_pb2 as Davidian_Engine, Orbital_pb2 as Davidian_Orbital
+from client import Engine_pb2_grpc
 
 test_system = Davidian_Engine.System()
 kerbol = test_system.body.add(name="Kerbol", mass=1.7565459e28)
@@ -31,21 +32,19 @@ ship_body_data.orbit.CopyFrom(ship_orbit)
 ship.free_body.CopyFrom(ship_body_data)
 
 
+@patch('client.Engine_pb2_grpc.ServerStub')
 class DavidianClientTest(unittest.TestCase):
     def setUp(self):
-
-        self.stub_patcher = patch.object(DavidianClient, 'stub')
-        self.mock_stub = self.stub_patcher.start()
-        self.addCleanup(self.stub_patcher.stop)
-
         self.client = DavidianClient()
 
-    def test_load_system(self):
-        self.mock_stub.LoadFile.return_value = test_system
+    def test_load_system(self, MockStub):
+        self.client.stub = MockStub
+        self.assertIs(self.client.stub, MockStub)
+        MockStub.LoadSystem.return_value = test_system
         _filename = "TestFile"
         actual_system = self.client.load_file(_filename)
 
         expected_request = Davidian_Engine.LoadRequest(filename=_filename)
 
-        self.mock_stub.LoadFile.assert_called_once_with(expected_request)
+        MockStub.LoadSystem.assert_called_once_with(expected_request)
         self.assertEqual(test_system, actual_system)

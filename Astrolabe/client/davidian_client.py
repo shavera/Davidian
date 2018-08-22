@@ -9,5 +9,5 @@ class DavidianClient:
         self.stub = Engine_pb2_grpc.ServerStub(self.channel)
 
     def load_file(self, file: str) -> Engine_pb2.System:
-        response = self.stub.LoadFile(Engine_pb2.LoadRequest(filename=file))
+        response = self.stub.LoadSystem(Engine_pb2.LoadRequest(filename=file))
         return response
