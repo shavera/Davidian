@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, sentinel
 
 from client.davidian_client import DavidianClient
 from client import Engine_pb2 as Davidian_Engine, Orbital_pb2 as Davidian_Orbital
@@ -30,6 +30,23 @@ ship_orbit = Davidian_Orbital.OrbitalElements(semimajor_axis=750000,
                                               mean_anomaly_0=40)
 ship_body_data.orbit.CopyFrom(ship_orbit)
 ship.free_body.CopyFrom(ship_body_data)
+
+
+@patch('client.Engine_pb2_grpc.ServerStub')
+@patch('grpc.insecure_channel')
+class DavidianClientConstructorTest(unittest.TestCase):
+    def test_client_constructor(self, MockChannel, MockStub):
+        channel_sentinel = sentinel.some_object
+        MockChannel.return_value = channel_sentinel
+        stub_sentinel = sentinel.some_object
+        MockStub.return_value = stub_sentinel
+
+        client = DavidianClient()
+
+        MockChannel.assert_called_once_with('localhost:12345')
+        self.assertIs(client.channel, channel_sentinel)
+        MockStub.assert_called_once_with(channel_sentinel)
+        self.assertIs(client.stub, stub_sentinel)
 
 
 @patch('client.Engine_pb2_grpc.ServerStub')
