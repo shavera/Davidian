@@ -56,12 +56,21 @@ class DavidianClientTest(unittest.TestCase):
 
     def test_load_system(self, MockStub):
         self.client.stub = MockStub
-        self.assertIs(self.client.stub, MockStub)
         MockStub.LoadSystem.return_value = test_system
         _filename = "TestFile"
-        actual_system = self.client.load_file(_filename)
-
         expected_request = Davidian_Engine.LoadRequest(filename=_filename)
 
+        actual_system = self.client.load_system(_filename)
+
         MockStub.LoadSystem.assert_called_once_with(expected_request)
+        self.assertEqual(test_system, actual_system)
+
+    def test_get_current_system(self, MockStub):
+        self.client.stub = MockStub
+        MockStub.GetCurrentSystem.return_value = test_system
+        expected_request = Davidian_Engine.GetCurrentSystemRequest()
+
+        actual_system = self.client.get_current_system()
+
+        MockStub.GetCurrentSystem.assert_called_once_with(expected_request)
         self.assertEqual(test_system, actual_system)
