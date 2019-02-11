@@ -54,6 +54,18 @@ class DavidianClientTest(unittest.TestCase):
     def setUp(self):
         self.client = DavidianClient()
 
+    def test_save_current_system(self, MockStub):
+        self.client.stub = MockStub
+        return_setinel = sentinel.some_object
+        _filename = "SaveFileName"
+        MockStub.SaveCurrentSystemToFile.return_value = return_setinel
+        expected_request = Davidian_Engine.SaveCurrentSystemRequest(filename=_filename)
+
+        actual_response = self.client.save_current_system(_filename)
+
+        MockStub.SaveCurrentSystemToFile.assert_called_once_with(expected_request)
+        self.assertEqual(return_setinel, actual_response)
+
     def test_load_system(self, MockStub):
         self.client.stub = MockStub
         MockStub.LoadSystem.return_value = test_system
@@ -74,3 +86,4 @@ class DavidianClientTest(unittest.TestCase):
 
         MockStub.GetCurrentSystem.assert_called_once_with(expected_request)
         self.assertEqual(test_system, actual_system)
+
