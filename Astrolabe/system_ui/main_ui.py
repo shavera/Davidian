@@ -1,8 +1,8 @@
-from PySide2.QtWidgets import QMainWindow
+from PySide2.QtWidgets import QMainWindow, QFileDialog
 from PySide2.QtCore import Qt, Slot
 
 from client.davidian_client import DavidianClient
-from client import Orbital_pb2 as Davidian_orbital
+from client import Engine_pb2 as Davidian_Engine, Orbital_pb2 as Davidian_Orbital
 from system_ui.ui_main_window import Ui_MainWindow
 from system_ui.add_body import AddBodyDialog
 
@@ -42,7 +42,18 @@ class MainWindow(QMainWindow):
         dialog.show()
 
     @Slot(Davidian_orbital.Body)
-    def _on_add_body(self, body: Davidian_orbital.Body):
+    def _on_add_body(self, body: Davidian_Orbital.Body):
         """When adding the dialog signals to add a body, gather the data and create a body"""
         self._bodies.append(body)
         self.ui.bodyList.addItem(body.name)
+
+    @Slot()
+    def save_bodies(self):
+        system = Davidian_Engine.System
+        for body in self._bodies:
+            system.body.add().CopyFrom(body)
+
+        filename = QFileDialog.getSaveFileName(self)
+
+        load_request = Davidian_Engine.LoadRequest(system=system)
+        self.client.load_system()

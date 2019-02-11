@@ -3,7 +3,6 @@ from unittest.mock import patch, sentinel
 
 from client.davidian_client import DavidianClient
 from client import Engine_pb2 as Davidian_Engine, Orbital_pb2 as Davidian_Orbital
-from client import Engine_pb2_grpc
 
 test_system = Davidian_Engine.System()
 kerbol = test_system.body.add(name="Kerbol", mass=1.7565459e28)
