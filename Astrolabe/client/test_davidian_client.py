@@ -31,6 +31,11 @@ ship_orbit = Davidian_Orbital.OrbitalElements(semimajor_axis=750000,
 ship_body_data.orbit.CopyFrom(ship_orbit)
 ship.free_body.CopyFrom(ship_body_data)
 
+test_state_time = 123.45678
+test_orbit_state = Davidian_Engine.OrbitState(time=test_state_time,
+                                              state_vector=Davidian_Orbital.StateVector(
+                                                  position=Davidian_Orbital.CartesianVector(x=123, y=-456, z=789),
+                                                  velocity=Davidian_Orbital.CartesianVector(x=-111, y=222)))
 
 @patch('client.Engine_pb2_grpc.ServerStub')
 @patch('grpc.insecure_channel')
@@ -87,3 +92,12 @@ class DavidianClientTest(unittest.TestCase):
         MockStub.GetCurrentSystem.assert_called_once_with(expected_request)
         self.assertEqual(test_system, actual_system)
 
+    def test_get_body_state_at_time(self, MockStub):
+        self.client.stub = MockStub
+        MockStub.GetBodyStateAtTime.return_value = test_orbit_state
+        expected_request = Davidian_Engine.BodyStateRequest(bodyName=ship.name, time=test_state_time)
+
+        actual_state = self.client.get_body_state_at_time(ship.name, test_state_time)
+
+        MockStub.GetBodyStateAtTime.assert_called_once_with(expected_request)
+        self.assertEqual(test_orbit_state, actual_state)

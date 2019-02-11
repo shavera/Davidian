@@ -19,7 +19,8 @@ class DavidianClient:
         return self.stub.GetCurrentSystem(Engine_pb2.GetCurrentSystemRequest())
 
     def get_body_state_at_time(self, body_name: str, time: float) -> Engine_pb2.OrbitState:
-        return Engine_pb2.OrbitState
+        request = Engine_pb2.BodyStateRequest(bodyName=body_name, time=time)
+        return self.stub.GetBodyStateAtTime(request)
 
     def get_body_stream(self, body_name: str, time_start: float, time_end: float, seconds_per_frame: float):
         return None
